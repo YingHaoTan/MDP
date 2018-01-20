@@ -1,2 +1,2 @@
-# MDP
-MDP Group 6 module source code repository
+# Android
+MDP Group 6 android source code repository
