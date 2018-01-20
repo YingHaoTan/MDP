@@ -1,2 +1,2 @@
-# MDP
-MDP Group 6 module source code repository
+# Algorithm
+MDP Group 6 algorithm source code repository
