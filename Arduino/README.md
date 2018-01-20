@@ -1,2 +1,2 @@
-# MDP
-MDP Group 6 module source code repository
+# Arduino
+MDP Group 6 arduino source code repository
