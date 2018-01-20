@@ -1,2 +1,2 @@
-# MDP
-MDP Group 6 module source code repository
+# Rasberry Pi
+MDP Group 6 rasberry pi source code repository
