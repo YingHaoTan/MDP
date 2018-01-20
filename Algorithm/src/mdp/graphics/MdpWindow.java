@@ -1,10 +1,11 @@
 package mdp.graphics;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import mdp.graphics.input.MainInputPane;
 import mdp.graphics.map.MdpMap;
-import mdp.graphics.map.MdpMap.CellState;
 
 /**
  * MdpWindow class encapsulates the main graphics user interface and application wide context
@@ -14,6 +15,7 @@ import mdp.graphics.map.MdpMap.CellState;
 public class MdpWindow {
 	private JFrame frame;
 	private JPanel maincontent;
+	private MainInputPane inputpane;
 	private MdpMap map;
 	
 	/**
@@ -27,9 +29,11 @@ public class MdpWindow {
 		frame = new JFrame();
 		maincontent = new JPanel();
 		map = new MdpMap(noOfRows, noOfColumns);
-		map.setCellState(new java.awt.Point(5, 5), CellState.WAYPOINT);
+		inputpane = new MainInputPane(map);
 		
+		maincontent.setLayout(new BoxLayout(maincontent, BoxLayout.X_AXIS));
 		maincontent.add(map);
+		maincontent.add(inputpane);
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(windowTitle);
@@ -47,6 +51,14 @@ public class MdpWindow {
 	 */
 	public MdpMap getMap() {
 		return this.map;
+	}
+	
+	/**
+	 * Gets the input user interface
+	 * @return
+	 */
+	public MainInputPane getMainInputPane() {
+		return this.inputpane;
 	}
 
 }
