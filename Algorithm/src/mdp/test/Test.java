@@ -3,6 +3,7 @@ package mdp.test;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import mdp.controllers.MdpWindowController;
 import mdp.graphics.MdpWindow;
 
 public class Test {
@@ -20,6 +21,7 @@ public class Test {
 		}
 		
 		MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", 20, 15);
+		MdpWindowController controller = new MdpWindowController(window);
 	}
 
 }

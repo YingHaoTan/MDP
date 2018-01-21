@@ -270,6 +270,16 @@ public class MdpMap extends JPanel {
 	public Dimension getMinimumSize() {
 		return this.getSize();
 	}
+	
+	@Override
+	public BaselineResizeBehavior getBaselineResizeBehavior() {
+		return BaselineResizeBehavior.CONSTANT_ASCENT;
+	}
+
+	@Override
+	public int getBaseline(int width, int height) {
+		return 0;
+	}
 
 	@Override
 	protected void paintComponent(Graphics g) {

@@ -1,5 +1,6 @@
 package mdp.graphics.input;
 
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
@@ -55,6 +56,9 @@ public class CoordinateInputPane extends JPanel {
 		ycombobox.setSelectedIndex(initial.y);
 		xcombobox.addItemListener((ItemEvent ae) -> notifyCoordinateInput());
 		ycombobox.addItemListener((ItemEvent ae) -> notifyCoordinateInput());
+		
+		FlowLayout layout = new FlowLayout(FlowLayout.LEADING);
+		this.setLayout(layout);
 		
 		this.add(new JLabel(label));
 		this.add(xcombobox);

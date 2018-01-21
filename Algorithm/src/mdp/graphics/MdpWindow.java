@@ -1,6 +1,7 @@
 package mdp.graphics;
 
-import javax.swing.BoxLayout;
+import java.awt.FlowLayout;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -31,7 +32,10 @@ public class MdpWindow {
 		map = new MdpMap(noOfRows, noOfColumns);
 		inputpane = new MainInputPane(map);
 		
-		maincontent.setLayout(new BoxLayout(maincontent, BoxLayout.X_AXIS));
+		FlowLayout layout = new FlowLayout(FlowLayout.LEADING);
+		layout.setAlignOnBaseline(true);
+		
+		maincontent.setLayout(layout);
 		maincontent.add(map);
 		maincontent.add(inputpane);
 		
