@@ -10,9 +10,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -271,8 +271,8 @@ public class MdpMap extends JPanel {
 	 * @param p
 	 * @return
 	 */
-	public List<Point> convertRobotPointToMapPoints(Point p) {
-		List<Point> points = new ArrayList<>();
+	public Set<Point> convertRobotPointToMapPoints(Point p) {
+		Set<Point> points = new HashSet<>();
 		
 		for(int x = 0; x < robotdim.width; x++)
 			for(int y = 0; y < robotdim.height; y++)

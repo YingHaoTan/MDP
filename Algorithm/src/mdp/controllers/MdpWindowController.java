@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -121,14 +121,15 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Point p = map.convertScreenPointToMapPoint(e.getPoint());
-		List<Point> rpoints = map.convertRobotPointToMapPoints(map.getRobotLocation());
-		List<Point> epoints = map.convertRobotPointToMapPoints(map.getEndLocation());
 		MapInteractionMode mode = inputpane.getMapInteractionModeInput().getSelectedValue();
+		
+		Set<Point> rpoints = map.convertRobotPointToMapPoints(map.getRobotLocation());
+		rpoints.addAll(map.convertRobotPointToMapPoints(map.getEndLocation()));
 		
 		CellState pstate = map.getCellState(p);
 		// Only add obstacle/set waypoint when CellState is normal and
 		// is not intersecting current robot or endpoint
-		if(pstate == CellState.NORMAL && !rpoints.contains(p) && !epoints.contains(p)) {
+		if(pstate == CellState.NORMAL && !rpoints.contains(p)) {
 			if(mode == MapInteractionMode.ADD_OBSTACLE)
 				map.setCellState(p, CellState.OBSTACLE);
 			else if(mode == MapInteractionMode.SET_WAYPOINT)
@@ -181,7 +182,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		if(explore) {
 			this.map.setCellState(CellState.UNEXPLORED);
 			
-			List<Point> exploredpoints = this.map.convertRobotPointToMapPoints(map.getRobotLocation());
+			Set<Point> exploredpoints = this.map.convertRobotPointToMapPoints(map.getRobotLocation());
 			exploredpoints.addAll(this.map.convertRobotPointToMapPoints(map.getEndLocation()));
 			
 			for(Point p: exploredpoints)
