@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -14,7 +15,6 @@ import mdp.graphics.MdpWindow;
 import mdp.graphics.input.CoordinateInputPane;
 import mdp.graphics.input.CoordinateInputPane.CoordinateInputListener;
 import mdp.graphics.input.MainInputPane;
-import mdp.graphics.input.MainInputPane.ExecutionMode;
 import mdp.graphics.input.MainInputPane.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
 import mdp.graphics.map.MdpMap.CellState;
@@ -53,32 +53,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	}
 	
 	/**
-	 * ExecutionController provides contract method needed for MdpWindowController to delegate
-	 * exploration and fastest path task
-	 * 
-	 * @author Ying Hao
-	 */
-	public interface ExecutionController extends MapBaseInterface {
-		/**
-		 * Explores the map
-		 * @param map
-		 * @param mode
-		 */
-		public void explore(ExecutionMode mode);
-		
-		/**
-		 * Perform a fastest path route planning from the start point to the end point
-		 */
-		public void fastestpath();
-		
-		/**
-		 * Cancels the previously executed action
-		 * @param map
-		 */
-		public void cancel();
-	}
-	
-	/**
 	 * ExecutionState contains the enumeration of all possible mutually exclusive execution states
 	 * @author Ying Hao
 	 */
@@ -98,7 +72,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private MdpMap map;
 	private MainInputPane inputpane;
 	private MapLoader maploader;
-	private ExecutionController executor;
 	
 	public MdpWindowController(MdpWindow window) {
 		this.frame = window.getFrame();
@@ -134,26 +107,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		this.maploader = loader;
 		this.maploader.setMap(map);
 	}
-	
-	/**
-	 * Gets the execution controller
-	 * @return
-	 */
-	public ExecutionController getExecutionController() {
-		return this.executor;
-	}
-	
-	/**
-	 * Sets the execution controller
-	 * @param controller
-	 */
-	public void setExecutionController(ExecutionController controller) {
-		if(this.executor != null)
-			this.executor.setMap(null);
-		
-		this.executor = controller;
-		this.executor.setMap(map);
-	}
 
 	@Override
 	public void onCoordinateInput(CoordinateInputPane source, Point point) {
@@ -168,12 +121,19 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Point p = map.convertScreenPointToMapPoint(e.getPoint());
+		List<Point> rpoints = map.convertRobotPointToMapPoints(map.getRobotLocation());
+		List<Point> epoints = map.convertRobotPointToMapPoints(map.getEndLocation());
 		MapInteractionMode mode = inputpane.getMapInteractionModeInput().getSelectedValue();
 		
-		if(mode == MapInteractionMode.ADD_OBSTACLE)
-			map.setCellState(p, CellState.OBSTACLE);
-		else if(mode == MapInteractionMode.SET_WAYPOINT)
-			map.setCellState(p, CellState.WAYPOINT);
+		CellState pstate = map.getCellState(p);
+		// Only add obstacle/set waypoint when CellState is normal and
+		// is not intersecting current robot or endpoint
+		if(pstate == CellState.NORMAL && !rpoints.contains(p) && !epoints.contains(p)) {
+			if(mode == MapInteractionMode.ADD_OBSTACLE)
+				map.setCellState(p, CellState.OBSTACLE);
+			else if(mode == MapInteractionMode.SET_WAYPOINT)
+				map.setCellState(p, CellState.WAYPOINT);
+		}
 		
 		map.repaint();
 	}
@@ -203,20 +163,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private void loadmap() {
 		JFileChooser chooser = new JFileChooser();
 		
-		// Stops execution
-		if(this.executor != null)
-			this.executor.cancel();
-		
 		if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION && this.maploader != null)
 			this.maploader.load(chooser.getSelectedFile());
 	}
 	
 	private void savemap() {
 		JFileChooser chooser = new JFileChooser();
-		
-		// Stops execution
-		if(this.executor != null)
-			this.executor.cancel();
 		
 		if(chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION && this.maploader != null)
 			this.maploader.load(chooser.getSelectedFile());
@@ -226,23 +178,24 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		JButton executionbtn = inputpane.getExecutionButton();
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
-		if(this.executor != null) {
-			if(explore) {
-				this.map.setCellState(CellState.UNEXPLORED);
-				this.executor.explore(inputpane.getExecutionModeInput().getSelectedValue());
-			}
-			else {
-				this.executor.fastestpath();
-			}
+		if(explore) {
+			this.map.setCellState(CellState.UNEXPLORED);
+			
+			List<Point> exploredpoints = this.map.convertRobotPointToMapPoints(map.getRobotLocation());
+			exploredpoints.addAll(this.map.convertRobotPointToMapPoints(map.getEndLocation()));
+			
+			for(Point p: exploredpoints)
+				this.map.setCellState(p, CellState.NORMAL);
+			
+			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
 		}
-		
-		executionbtn.setText(explore? ExecutionState.FASTEST_PATH.toString(): ExecutionState.EXPLORE.toString());
+		else {
+			executionbtn.setText(ExecutionState.EXPLORE.toString());
+		}
 	}
 	
 	private void cancel() {
-		if(this.executor != null)
-			this.executor.cancel();
-		
+		this.map.setCellState(CellState.NORMAL);
 		inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
 	}
 

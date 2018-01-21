@@ -10,7 +10,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -143,10 +145,10 @@ public class MdpMap extends JPanel {
 	 */
 	public void setEndLocation(Point location) {
 		if(this.endlocation != null)
-			setCellLabel(convertRobotPointToMapPoint(this.endlocation), null);
+			setCellLabel(getEndMapPoint(), null);
 		
 		this.endlocation = location;
-		setCellLabel(convertRobotPointToMapPoint(location), "Endpoint");
+		setCellLabel(getEndMapPoint(), "Endpoint");
 	}
 	
 	/**
@@ -163,10 +165,10 @@ public class MdpMap extends JPanel {
 	 */
 	public void setRobotLocation(Point location) {
 		if(this.robotlocation != null)
-			setCellLabel(convertRobotPointToMapPoint(this.robotlocation), null);
+			setCellLabel(getRobotMapPoint(), null);
 		
 		this.robotlocation = location;
-		setCellLabel(convertRobotPointToMapPoint(this.robotlocation), "Robot");
+		setCellLabel(getRobotMapPoint(), "Robot");
 	}
 	
 	/**
@@ -202,20 +204,32 @@ public class MdpMap extends JPanel {
 	 * @param value
 	 */
 	public void setCellState(Point location, CellState state) {
-		// Only set cell state when specified state is normal or the 
-		// cell state at the specified location is in normal
-		if(state == CellState.NORMAL || this.cellstates[location.x][location.y] == CellState.NORMAL) {
-			this.cellstates[location.x][location.y] = state;
+		this.cellstates[location.x][location.y] = state;
+		
+		if(state == CellState.WAYPOINT) {
+			// Clears previous waypoint
+			if(this.waypoint != null && this.waypoint != location)
+				this.setCellState(waypoint, CellState.NORMAL);
 			
-			if(state == CellState.WAYPOINT) {
-				// Clears previous waypoint
-				if(this.waypoint != null && this.waypoint != location)
-					this.setCellState(waypoint, CellState.NORMAL);
-				
-				// Set waypoint value
-				this.waypoint = location;
-			}
+			// Set waypoint value
+			this.waypoint = location;
 		}
+	}
+	
+	/**
+	 * Gets the robot center location in map coordinate
+	 * @return
+	 */
+	public Point getRobotMapPoint() {
+		return new Point(robotlocation.x + (robotdim.width / 2), robotlocation.y + (robotdim.height / 2));
+	}
+	
+	/**
+	 * Gets the end center location in map coordinate
+	 * @return
+	 */
+	public Point getEndMapPoint() {
+		return new Point(endlocation.x + (robotdim.width / 2), endlocation.y + (robotdim.height / 2));
 	}
 	
 	/**
@@ -225,24 +239,11 @@ public class MdpMap extends JPanel {
 	public void setCellState(CellState state) {
 		for(int x = 0; x < this.cellstates.length; x++) {
 			for(int y = 0; y < this.cellstates[x].length; y++) {
-				Point point = new Point(x, y);
-				
-				// Clear cell state to normal first
-				this.setCellState(point, CellState.NORMAL);
-				this.setCellState(point, state);
+				this.setCellState(new Point(x, y), state);
 			}
 		}
 		
 		this.repaint();
-	}
-	
-	/**
-	 * Converts a robot coordinate to map coordinate
-	 * @param p
-	 * @return
-	 */
-	public Point convertRobotPointToMapPoint(Point p) {
-		return new Point(p.x + (robotdim.width / 2), p.y + (robotdim.height / 2));
 	}
 	
 	/**
@@ -263,6 +264,21 @@ public class MdpMap extends JPanel {
 	public Point convertScreenPointToMapPoint(Point p) {
 		return new Point((p.x - 1) / (1 + this.cellsize.width), 
 				this.row - (this.cellsize.height + p.y) / (1 + this.cellsize.height));
+	}
+	
+	/**
+	 * Converts a robot point in robot coordinate to a list of matching map point in map coordinate
+	 * @param p
+	 * @return
+	 */
+	public List<Point> convertRobotPointToMapPoints(Point p) {
+		List<Point> points = new ArrayList<>();
+		
+		for(int x = 0; x < robotdim.width; x++)
+			for(int y = 0; y < robotdim.height; y++)
+				points.add(new Point(p.x + x, p.y + y));
+	
+		return points;
 	}
 	
 	/**
@@ -376,7 +392,7 @@ public class MdpMap extends JPanel {
 	}
 	
 	private void paintRobot(Graphics g) {
-		Point robotMapPoint = convertRobotPointToMapPoint(this.getRobotLocation());
+		Point robotMapPoint = getRobotMapPoint();
 		Point robotScreenPoint = convertMapPointToScreenPoint(new Point(robotMapPoint.x - (robotdim.width / 2), robotMapPoint.y + (robotdim.height / 2)));
 		int robotWidth = robotdim.width * (this.cellsize.width + 1) - 2;
 		int robotHeight = robotdim.height * (this.cellsize.height + 1) - 2;
@@ -386,7 +402,7 @@ public class MdpMap extends JPanel {
 	}
 	
 	private void paintEndLocation(Graphics g) {
-		Point endMapPoint = convertRobotPointToMapPoint(this.getEndLocation());
+		Point endMapPoint = getEndMapPoint();
 		Point endScreenPoint = convertMapPointToScreenPoint(new Point(endMapPoint.x - (robotdim.width / 2), endMapPoint.y + (robotdim.height / 2)));
 		int robotWidth = robotdim.width * (this.cellsize.width + 1) - 1;
 		int robotHeight = robotdim.height * (this.cellsize.height + 1) - 1;
