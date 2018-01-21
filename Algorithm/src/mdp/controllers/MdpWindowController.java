@@ -110,12 +110,23 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 	@Override
 	public void onCoordinateInput(CoordinateInputPane source, Point point) {
-		if(source == inputpane.getStartCoordinateInput())
-			map.setRobotLocation(point);
-		else
-			map.setEndLocation(point);
+		CoordinateInputPane sinput = inputpane.getStartCoordinateInput();
+		CoordinateInputPane einput = inputpane.getEndCoordinateInput();
 		
-		map.repaint();
+		if(map.getCellState(point, false) == CellState.NORMAL) {
+			if(source == sinput)
+				map.setRobotLocation(point);
+			else
+				map.setEndLocation(point);
+			
+			map.repaint();
+		}
+		else {
+			if(source == sinput)
+				sinput.setCoordinate(map.getRobotLocation());
+			else
+				einput.setCoordinate(map.getEndLocation());
+		}
 	}
 
 	@Override
@@ -134,6 +145,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 				map.setCellState(p, CellState.OBSTACLE);
 			else if(mode == MapInteractionMode.SET_WAYPOINT)
 				map.setCellState(p, CellState.WAYPOINT);
+		}
+		else if(mode == MapInteractionMode.ADD_OBSTACLE && pstate == CellState.OBSTACLE) {
+			map.setCellState(p, CellState.NORMAL);
 		}
 		
 		map.repaint();

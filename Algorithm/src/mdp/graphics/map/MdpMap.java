@@ -192,6 +192,33 @@ public class MdpMap extends JPanel {
 	/**
 	 * Gets the cell state at the specified location
 	 * @param location
+	 * @param mapcoordinates - Indicates to use map coordinates or robot coordinates
+	 * @return
+	 */
+	public CellState getCellState(Point location, boolean mapcoordinates) {
+		CellState state = CellState.NORMAL;
+		
+		if(mapcoordinates) {
+			state = getCellState(location);
+		}
+		else {
+			Set<Point> points = this.convertRobotPointToMapPoints(location);
+			for(Point p: points) {
+				CellState pstate = getCellState(p);
+				
+				if(pstate == CellState.UNEXPLORED || 
+						(pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED) ||
+						(pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE))
+					state = pstate;
+			}
+		}
+		
+		return state;
+	}
+	
+	/**
+	 * Gets the cell state at the specified location using map coordinates
+	 * @param location
 	 * @return
 	 */
 	public CellState getCellState(Point location) {
@@ -199,7 +226,7 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Sets the cell state at the specified location
+	 * Sets the cell state at the specified location using map coordinates
 	 * @param location
 	 * @param value
 	 */
