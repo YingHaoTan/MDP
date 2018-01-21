@@ -67,7 +67,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		public void explore(ExecutionMode mode);
 		
 		/**
-		 * Perform a fastest path route planning to from the start point to the end point
+		 * Perform a fastest path route planning from the start point to the end point
 		 */
 		public void fastestpath();
 		
@@ -193,6 +193,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 			cancel();
 		}
 		else if(e.getSource() == inputpane.getResetButton()) {
+			cancel();
 			map.reset();
 			inputpane.getStartCoordinateInput().setCoordinate(map.getRobotLocation());
 			inputpane.getEndCoordinateInput().setCoordinate(map.getEndLocation());
@@ -226,18 +227,23 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
 		if(this.executor != null) {
-			if(explore)
+			if(explore) {
+				this.map.setCellState(CellState.UNEXPLORED);
 				this.executor.explore(inputpane.getExecutionModeInput().getSelectedValue());
-			else
+			}
+			else {
 				this.executor.fastestpath();
+			}
 		}
 		
 		executionbtn.setText(explore? ExecutionState.FASTEST_PATH.toString(): ExecutionState.EXPLORE.toString());
 	}
 	
-	public void cancel() {
+	private void cancel() {
 		if(this.executor != null)
 			this.executor.cancel();
+		
+		inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
 	}
 
 }

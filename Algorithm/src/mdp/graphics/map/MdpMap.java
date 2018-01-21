@@ -219,6 +219,24 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
+	 * Sets the cell state for all cells
+	 * @param state
+	 */
+	public void setCellState(CellState state) {
+		for(int x = 0; x < this.cellstates.length; x++) {
+			for(int y = 0; y < this.cellstates[x].length; y++) {
+				Point point = new Point(x, y);
+				
+				// Clear cell state to normal first
+				this.setCellState(point, CellState.NORMAL);
+				this.setCellState(point, state);
+			}
+		}
+		
+		this.repaint();
+	}
+	
+	/**
 	 * Converts a robot coordinate to map coordinate
 	 * @param p
 	 * @return
@@ -256,7 +274,8 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Resets this map by removing all cell labels, obstacles, way points, end point, unexplored states
+	 * Resets this map by removing all cell labels, obstacles, way points, unexplored states
+	 * @param Indicates if start point and end points must be reset
 	 */
 	public void reset() {
 		Rectangle rbound = this.getRobotCoordinateBounds();
