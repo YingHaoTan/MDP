@@ -67,6 +67,23 @@ public class CoordinateInputPane extends JPanel {
 	}
 	
 	/**
+	 * Gets the coordinate
+	 * @return
+	 */
+	public Point getCoordinate() {
+		return new Point((Integer) xcombobox.getSelectedItem(), (Integer) ycombobox.getSelectedItem());
+	}
+	
+	/**
+	 * Sets the coordinate
+	 * @param p
+	 */
+	public void setCoordinate(Point p) {
+		this.xcombobox.setSelectedItem(p.x);
+		this.ycombobox.setSelectedIndex(p.y);
+	}
+	
+	/**
 	 * Adds a CoordinateInputListener
 	 * @param listener
 	 */

@@ -50,6 +50,14 @@ public class MdpWindow {
 	}
 	
 	/**
+	 * Gets the main application window frame
+	 * @return
+	 */
+	public JFrame getFrame() {
+		return this.frame;
+	}
+	
+	/**
 	 * Gets the map user interface
 	 * @return
 	 */

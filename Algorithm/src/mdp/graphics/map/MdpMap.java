@@ -77,6 +77,7 @@ public class MdpMap extends JPanel {
 	private Point endlocation;
 	private String[][] celllabels;
 	private CellState[][] cellstates;
+	private Point waypoint;
 	
 	/**
 	 * Creates an instance of MdpMap with the specified map size in rows and columns
@@ -93,7 +94,7 @@ public class MdpMap extends JPanel {
 		
 		this.setBackground(Color.WHITE);
 		this.setRobotDimension(DEFAULT_ROBOT_DIMENSION);
-		clear();
+		reset();
 	}
 
 	/**
@@ -201,7 +202,20 @@ public class MdpMap extends JPanel {
 	 * @param value
 	 */
 	public void setCellState(Point location, CellState state) {
-		this.cellstates[location.x][location.y] = state;
+		// Only set cell state when specified state is normal or the 
+		// cell state at the specified location is in normal
+		if(state == CellState.NORMAL || this.cellstates[location.x][location.y] == CellState.NORMAL) {
+			this.cellstates[location.x][location.y] = state;
+			
+			if(state == CellState.WAYPOINT) {
+				// Clears previous waypoint
+				if(this.waypoint != null && this.waypoint != location)
+					this.setCellState(waypoint, CellState.NORMAL);
+				
+				// Set waypoint value
+				this.waypoint = location;
+			}
+		}
 	}
 	
 	/**
@@ -242,9 +256,9 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Clears this map by removing all cell labels, obstacles, way points, end point, unexplored states
+	 * Resets this map by removing all cell labels, obstacles, way points, end point, unexplored states
 	 */
-	public void clear() {
+	public void reset() {
 		Rectangle rbound = this.getRobotCoordinateBounds();
 		
 		for(String[] rowlabels: this.celllabels)
@@ -254,6 +268,7 @@ public class MdpMap extends JPanel {
 		
 		this.setRobotLocation(new Point(0, 0));
 		this.setEndLocation(new Point(rbound.width - 1, rbound.height - 1));
+		this.repaint();
 	}
 
 	@Override

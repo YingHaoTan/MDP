@@ -25,7 +25,7 @@ public class MainInputPane extends JPanel {
 	 * 
 	 * @author Ying Hao
 	 */
-	private enum MapInteractionMode {
+	public enum MapInteractionMode {
 		NONE, ADD_OBSTACLE, SET_WAYPOINT
 	}
 	
@@ -34,7 +34,7 @@ public class MainInputPane extends JPanel {
 	 * 
 	 * @author Ying Hao
 	 */
-	private enum ExecutionMode {
+	public enum ExecutionMode {
 		SIMULATION, PHYSICAL
 	}
 	
@@ -115,11 +115,43 @@ public class MainInputPane extends JPanel {
 	}
 	
 	/**
+	 * Gets the load map button
+	 * @return
+	 */
+	public JButton getLoadMapButton() {
+		return this.loadmapbtn;
+	}
+	
+	/**
+	 * Gets the save map button
+	 * @return
+	 */
+	public JButton getSaveMapButton() {
+		return this.savemapbtn;
+	}
+	
+	/**
 	 * Gets the execution button
 	 * @return
 	 */
 	public JButton getExecutionButton() {
 		return this.executionbtn;
+	}
+	
+	/**
+	 * Gets the cancel button
+	 * @return
+	 */
+	public JButton getCancelButton() {
+		return this.cancelbtn;
+	}
+	
+	/**
+	 * Gets the reset button
+	 * @return
+	 */
+	public JButton getResetButton() {
+		return this.resetbtn;
 	}
 
 	@Override
