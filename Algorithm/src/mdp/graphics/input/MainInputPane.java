@@ -1,13 +1,17 @@
 package mdp.graphics.input;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import mdp.graphics.map.MdpMap;
+import mdp.graphics.map.MdpMap.MapDescriptorFormat;
 
 /**
  * CoordinateInputPane encapsulates input controls necessary for all user inputs
@@ -42,6 +46,8 @@ public class MainInputPane extends JPanel {
 	private CoordinateInputPane endinput;
 	private ComboBoxInputPane<MapInteractionMode> minteractionmode;
 	private ComboBoxInputPane<ExecutionMode> executionmode;
+	private JTextArea mdf1;
+	private JTextArea mdf2;
 	private JButton loadmapbtn;
 	private JButton savemapbtn;
 	private JButton executionbtn;
@@ -57,6 +63,24 @@ public class MainInputPane extends JPanel {
 		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateBounds(), map.getEndLocation());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
+		
+		JPanel mdf1panel = new JPanel();
+		mdf1panel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		this.mdf1 = new JTextArea(map.toString(MapDescriptorFormat.MDF1));
+		this.mdf1.setPreferredSize(new Dimension(300, 50));
+		this.mdf1.setLineWrap(true);
+		this.mdf1.setEditable(false);
+		mdf1panel.add(new JLabel("MDF 1:"));
+		mdf1panel.add(mdf1);
+		
+		JPanel mdf2panel = new JPanel();
+		mdf2panel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		this.mdf2 = new JTextArea(map.toString(MapDescriptorFormat.MDF2));
+		this.mdf2.setPreferredSize(new Dimension(300, 50));
+		this.mdf2.setLineWrap(true);
+		this.mdf2.setEditable(false);
+		mdf2panel.add(new JLabel("MDF 2:"));
+		mdf2panel.add(mdf2);
 		
 		JPanel loadsavepane = new JPanel();
 		loadsavepane.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -79,6 +103,8 @@ public class MainInputPane extends JPanel {
 		this.add(endinput);
 		this.add(minteractionmode);
 		this.add(executionmode);
+		this.add(mdf1panel);
+		this.add(mdf2panel);
 		this.add(executionpane);
 	}
 	
@@ -112,6 +138,22 @@ public class MainInputPane extends JPanel {
 	 */
 	public ComboBoxInputPane<ExecutionMode> getExecutionModeInput() {
 		return this.executionmode;
+	}
+	
+	/**
+	 * Gets the MDF 1 label
+	 * @return
+	 */
+	public JTextArea getMDF1Label() {
+		return this.mdf1;
+	}
+	
+	/**
+	 * Gets the MDF 2 label
+	 * @return
+	 */
+	public JTextArea getMDF2Label() {
+		return this.mdf2;
 	}
 	
 	/**

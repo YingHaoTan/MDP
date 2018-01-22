@@ -18,6 +18,7 @@ import mdp.graphics.input.MainInputPane;
 import mdp.graphics.input.MainInputPane.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
 import mdp.graphics.map.MdpMap.CellState;
+import mdp.graphics.map.MdpMap.MapDescriptorFormat;
 
 /**
  * MdpWindowController encapsulates logic required for handling user inputs from MainInputPane
@@ -47,9 +48,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		public void load(File file);
 		
 		/**
-		 * Perform saving of map to the specified file
+		 * Perform saving of map to the specified file using the specified mdf1 and mdf2 values
 		 */
-		public void save(File file);
+		public void save(File file, String mdf1, String mdf2);
 	}
 	
 	/**
@@ -150,6 +151,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 			map.setCellState(p, CellState.NORMAL);
 		}
 		
+		// Updates MDF 2 label
+		if(mode == MapInteractionMode.ADD_OBSTACLE)
+			inputpane.getMDF2Label().setText(map.toString(MapDescriptorFormat.MDF2));
+		
 		map.repaint();
 	}
 
@@ -161,17 +166,22 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		else if(e.getSource() == inputpane.getSaveMapButton()) {
 			savemap();
 		}
-		else if(e.getSource() == inputpane.getExecutionButton()) {
-			execute();
-		}
-		else if(e.getSource() == inputpane.getCancelButton()) {
-			cancel();
-		}
-		else if(e.getSource() == inputpane.getResetButton()) {
-			cancel();
-			map.reset();
-			inputpane.getStartCoordinateInput().setCoordinate(map.getRobotLocation());
-			inputpane.getEndCoordinateInput().setCoordinate(map.getEndLocation());
+		else {
+			if(e.getSource() == inputpane.getExecutionButton()) {
+				execute();
+			}
+			else if(e.getSource() == inputpane.getCancelButton()) {
+				cancel();
+			}
+			else if(e.getSource() == inputpane.getResetButton()) {
+				cancel();
+				map.reset();
+				inputpane.getStartCoordinateInput().setCoordinate(map.getRobotLocation());
+				inputpane.getEndCoordinateInput().setCoordinate(map.getEndLocation());
+			}
+			
+			inputpane.getMDF1Label().setText(map.toString(MapDescriptorFormat.MDF1));
+			inputpane.getMDF2Label().setText(map.toString(MapDescriptorFormat.MDF2));
 		}
 	}
 	
@@ -186,7 +196,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		JFileChooser chooser = new JFileChooser();
 		
 		if(chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION && this.maploader != null)
-			this.maploader.load(chooser.getSelectedFile());
+			this.maploader.save(chooser.getSelectedFile(), null, null);
 	}
 	
 	private void execute() {

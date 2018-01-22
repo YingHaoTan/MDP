@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -69,6 +70,15 @@ public class MdpMap extends JPanel {
 	 */
 	public enum CellState {
 		UNEXPLORED, OBSTACLE, NORMAL, WAYPOINT
+	}
+	
+	/**
+	 * MapDescriptorFormat contains the enumeration of all possible mutually exclusive map descriptor formats
+	 * 
+	 * @author Ying Hao
+	 */
+	public enum MapDescriptorFormat {
+		MDF1, MDF2
 	}
 	
 	private int row;
@@ -331,6 +341,31 @@ public class MdpMap extends JPanel {
 		this.setRobotLocation(new Point(0, 0));
 		this.setEndLocation(new Point(rbound.width - 1, rbound.height - 1));
 		this.repaint();
+	}
+	
+	/**
+	 * Returns a string representation of this map based on the MapDescriptorFormat specified in hexadecimal
+	 * @param format
+	 * @return
+	 */
+	public String toString(MapDescriptorFormat format) {
+		String descriptor = new String();
+		
+		for(int x = 0; x < this.column; x++) {
+			for(int y = 0; y < this.row; y++) {
+				boolean explored = this.cellstates[x][y] != CellState.UNEXPLORED;
+				
+				if(format == MapDescriptorFormat.MDF1)
+					descriptor += explored? "1": "0";
+				else if(explored)
+					descriptor += this.cellstates[x][y] == CellState.OBSTACLE? "1": "0";
+			}
+		}
+		
+		if(format == MapDescriptorFormat.MDF1)
+			descriptor = "11" + descriptor + "11";
+		
+		return new BigInteger(descriptor, 2).toString(16).toUpperCase();
 	}
 
 	@Override
