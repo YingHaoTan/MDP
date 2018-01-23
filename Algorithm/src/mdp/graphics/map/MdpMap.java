@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -338,21 +339,23 @@ public class MdpMap extends JPanel {
 		String mdf1bin = new BigInteger(mdf1, 16).toString(2);
 		String mdf2bin = new BigInteger(mdf2, 16).toString(2);
 		
-		int mdf2counter = mdf2bin.length() - 1;
+		mdf2bin = String.join("", Collections.nCopies(mdf2.length() * 4 - mdf2bin.length(), "0")) + mdf2bin;
+		
+		int mdf1counter = 0;
+		int mdf2counter = 0;
 		mdf1bin = mdf1bin.substring(2, mdf1bin.length() - 2);
-		for(int mdf1counter = mdf1bin.length() - 1; mdf1counter >= 0; mdf1counter--) {
-			int x = mdf1counter % this.column;
-			int y = mdf1counter / this.column;
-			
-			if(mdf1bin.substring(mdf1counter, mdf1counter + 1).equals("0"))
-				this.cellstates[x][y] = CellState.UNEXPLORED;
-			else {
-				if(mdf2counter >= 0 && mdf2bin.substring(mdf2counter, mdf2counter + 1).equals("1"))
-					this.cellstates[x][y] = CellState.OBSTACLE;
-				else
-					this.cellstates[x][y] = CellState.NORMAL;
+		for(int y = 0; y < this.row; y++) {
+			for(int x = 0; x < this.column; x++) {
+				if(mdf1bin.substring(mdf1counter, mdf1counter + 1).equals("0"))
+					this.cellstates[x][y] = CellState.UNEXPLORED;
+				else {
+					if(mdf2bin.substring(mdf2counter, mdf2counter + 1).equals("1"))
+						this.cellstates[x][y] = CellState.OBSTACLE;
+					
+					mdf2counter++;
+				}
 				
-				mdf2counter--;
+				mdf1counter++;
 			}
 		}
 		
@@ -386,12 +389,16 @@ public class MdpMap extends JPanel {
 		else {
 			bitcount = bitcount % 8;
 			if(bitcount > 0) {
-				for(int pad = bitcount; pad < 8; pad++)
-					descriptor += "0";
+				descriptor += String.join("", Collections.nCopies(8 - bitcount, "0"));
 			}
 		}
 		
-		return new BigInteger(descriptor, 2).toString(16).toUpperCase();
+		int expectedlength = descriptor.length() / 4;
+		String hexstring = new BigInteger(descriptor, 2).toString(16).toUpperCase();
+		if(expectedlength > hexstring.length())
+			hexstring = String.join("", Collections.nCopies(expectedlength - hexstring.length(), "0")) + hexstring;
+		
+		return hexstring;
 	}
 
 	@Override

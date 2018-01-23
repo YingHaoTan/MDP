@@ -116,7 +116,7 @@ public abstract class RobotBase {
 		actionsequence.add(RobotAction.FORWARD);
 		
 		// Performs the actual moving of the robot
-		move(actionsequence.toArray(new RobotAction[0]));
+		move(mapdirection, actionsequence.toArray(new RobotAction[0]));
 	}
 	
 	/**
@@ -138,8 +138,9 @@ public abstract class RobotBase {
 	
 	/**
 	 * Moves the robot by performing the actions in order
+	 * @mapdirection
 	 * @param actions
 	 */
-	protected abstract void move(RobotAction... actions); 
+	protected abstract void move(Direction mapdirection, RobotAction... actions); 
 
 }
