@@ -344,6 +344,37 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
+	 * Parses the mdf1 and mdf2 representation and loads the map with the descriptors
+	 * @param mdf1
+	 * @param mdf2
+	 * @return
+	 */
+	public void parseString(String mdf1, String mdf2) {
+		String mdf1bin = new BigInteger(mdf1, 16).toString(2);
+		String mdf2bin = new BigInteger(mdf2, 16).toString(2);
+		
+		int mdf2counter = mdf2bin.length() - 1;
+		mdf1bin = mdf1bin.substring(2, mdf1bin.length() - 2);
+		for(int mdf1counter = mdf1bin.length() - 1; mdf1counter >= 0; mdf1counter--) {
+			int x = mdf1counter % this.column;
+			int y = mdf1counter / this.column;
+			
+			if(mdf1bin.substring(mdf1counter, mdf1counter + 1).equals("0"))
+				this.cellstates[x][y] = CellState.UNEXPLORED;
+			else {
+				if(mdf2counter >= 0 && mdf2bin.substring(mdf2counter, mdf2counter + 1).equals("1"))
+					this.cellstates[x][y] = CellState.OBSTACLE;
+				else
+					this.cellstates[x][y] = CellState.NORMAL;
+				
+				mdf2counter--;
+			}
+		}
+		
+		this.repaint();
+	}
+	
+	/**
 	 * Returns a string representation of this map based on the MapDescriptorFormat specified in hexadecimal
 	 * @param format
 	 * @return
@@ -351,19 +382,29 @@ public class MdpMap extends JPanel {
 	public String toString(MapDescriptorFormat format) {
 		String descriptor = new String();
 		
-		for(int x = 0; x < this.column; x++) {
-			for(int y = 0; y < this.row; y++) {
+		int bitcount = 0;
+		for(int y = 0; y < this.row; y++) {
+			for(int x = 0; x < this.column; x++) {
 				boolean explored = this.cellstates[x][y] != CellState.UNEXPLORED;
 				
 				if(format == MapDescriptorFormat.MDF1)
 					descriptor += explored? "1": "0";
-				else if(explored)
+				else if(explored) {
 					descriptor += this.cellstates[x][y] == CellState.OBSTACLE? "1": "0";
+					bitcount++;
+				}
 			}
 		}
 		
 		if(format == MapDescriptorFormat.MDF1)
 			descriptor = "11" + descriptor + "11";
+		else {
+			bitcount = bitcount % 8;
+			if(bitcount > 0) {
+				for(int pad = bitcount; pad < 8; pad++)
+					descriptor += "0";
+			}
+		}
 		
 		return new BigInteger(descriptor, 2).toString(16).toUpperCase();
 	}
