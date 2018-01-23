@@ -4,12 +4,9 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 import mdp.graphics.MdpWindow;
 import mdp.graphics.input.CoordinateInputPane;
@@ -18,7 +15,6 @@ import mdp.graphics.input.MainInputPane;
 import mdp.graphics.input.MainInputPane.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
 import mdp.graphics.map.MdpMap.CellState;
-import mdp.graphics.map.MdpMap.MapDescriptorFormat;
 
 /**
  * MdpWindowController encapsulates logic required for handling user inputs from MainInputPane
@@ -27,31 +23,6 @@ import mdp.graphics.map.MdpMap.MapDescriptorFormat;
  * @author Ying Hao
  */
 public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener {
-	private interface MapBaseInterface {
-		/**
-		 * Sets the map
-		 * @param map
-		 */
-		public void setMap(MdpMap map);
-	}
-	
-	/**
-	 * MapLoader provides contract method needed for MdpWindowController to delegate
-	 * map loading and saving task
-	 * 
-	 * @author Ying Hao
-	 */
-	public interface MapLoader extends MapBaseInterface {
-		/**
-		 * Perform loading of map from the specified file
-		 */
-		public void load(File file);
-		
-		/**
-		 * Perform saving of map to the specified file using the specified mdf1 and mdf2 values
-		 */
-		public void save(File file, String mdf1, String mdf2);
-	}
 	
 	/**
 	 * ExecutionState contains the enumeration of all possible mutually exclusive execution states
@@ -69,13 +40,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		}
 	}
 	
-	private JFrame frame;
 	private MdpMap map;
 	private MainInputPane inputpane;
 	private MapLoader maploader;
+	private MapSaver mapsaver;
 	
 	public MdpWindowController(MdpWindow window) {
-		this.frame = window.getFrame();
 		this.map = window.getMap();
 		this.inputpane = window.getMainInputPane();
 		
@@ -102,11 +72,23 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 * @param loader
 	 */
 	public void setMapLoader(MapLoader loader) {
-		if(this.maploader != null)
-			this.maploader.setMap(null);
-		
 		this.maploader = loader;
-		this.maploader.setMap(map);
+	}
+	
+	/**
+	 * Gets the map saver
+	 * @return
+	 */
+	public MapSaver getMapSaver() {
+		return this.mapsaver;
+	}
+	
+	/**
+	 * Sets the map saver
+	 * @param saver
+	 */
+	public void setMapSaver(MapSaver saver) {
+		this.mapsaver = saver;
 	}
 
 	@Override
@@ -153,7 +135,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		
 		// Updates MDF 2 label
 		if(mode == MapInteractionMode.ADD_OBSTACLE)
-			inputpane.getMDF2Label().setText(map.toString(MapDescriptorFormat.MDF2));
+			inputpane.sync(map);
 		
 		map.repaint();
 	}
@@ -166,37 +148,28 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		else if(e.getSource() == inputpane.getSaveMapButton()) {
 			savemap();
 		}
-		else {
-			if(e.getSource() == inputpane.getExecutionButton()) {
-				execute();
-			}
-			else if(e.getSource() == inputpane.getCancelButton()) {
-				cancel();
-			}
-			else if(e.getSource() == inputpane.getResetButton()) {
-				cancel();
-				map.reset();
-				inputpane.getStartCoordinateInput().setCoordinate(map.getRobotLocation());
-				inputpane.getEndCoordinateInput().setCoordinate(map.getEndLocation());
-			}
-			
-			inputpane.getMDF1Label().setText(map.toString(MapDescriptorFormat.MDF1));
-			inputpane.getMDF2Label().setText(map.toString(MapDescriptorFormat.MDF2));
+		else if(e.getSource() == inputpane.getExecutionButton()) {
+			execute();
 		}
+		else if(e.getSource() == inputpane.getCancelButton()) {
+			cancel();
+		}
+		else if(e.getSource() == inputpane.getResetButton()) {
+			cancel();
+			map.reset();
+		}
+		
+		inputpane.sync(map);
 	}
 	
 	private void loadmap() {
-		JFileChooser chooser = new JFileChooser();
-		
-		if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION && this.maploader != null)
-			this.maploader.load(chooser.getSelectedFile());
+		if(this.maploader != null)
+			this.maploader.load(map);
 	}
 	
 	private void savemap() {
-		JFileChooser chooser = new JFileChooser();
-		
-		if(chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION && this.maploader != null)
-			this.maploader.save(chooser.getSelectedFile(), null, null);
+		if(this.mapsaver != null)
+			this.mapsaver.save(map);
 	}
 	
 	private void execute() {

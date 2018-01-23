@@ -59,14 +59,14 @@ public class MainInputPane extends JPanel {
 		this.setLayout(layout);
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
-		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateBounds(), map.getRobotLocation());
-		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateBounds(), map.getEndLocation());
+		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateBounds());
+		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateBounds());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
 		
 		JPanel mdf1panel = new JPanel();
 		mdf1panel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		this.mdf1 = new JTextArea(map.toString(MapDescriptorFormat.MDF1));
+		this.mdf1 = new JTextArea();
 		this.mdf1.setPreferredSize(new Dimension(300, 50));
 		this.mdf1.setLineWrap(true);
 		this.mdf1.setEditable(false);
@@ -75,7 +75,7 @@ public class MainInputPane extends JPanel {
 		
 		JPanel mdf2panel = new JPanel();
 		mdf2panel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		this.mdf2 = new JTextArea(map.toString(MapDescriptorFormat.MDF2));
+		this.mdf2 = new JTextArea();
 		this.mdf2.setPreferredSize(new Dimension(300, 50));
 		this.mdf2.setLineWrap(true);
 		this.mdf2.setEditable(false);
@@ -106,6 +106,8 @@ public class MainInputPane extends JPanel {
 		this.add(mdf1panel);
 		this.add(mdf2panel);
 		this.add(executionpane);
+		
+		this.sync(map);
 	}
 	
 	/**
@@ -194,6 +196,17 @@ public class MainInputPane extends JPanel {
 	 */
 	public JButton getResetButton() {
 		return this.resetbtn;
+	}
+	
+	/**
+	 * Syncrhonizes the current MainInputPane displays with the provided map instance
+	 * @param map
+	 */
+	public void sync(MdpMap map) {
+		this.startinput.setCoordinate(map.getRobotLocation());
+		this.endinput.setCoordinate(map.getEndLocation());
+		this.mdf1.setText(map.toString(MapDescriptorFormat.MDF1));
+		this.mdf2.setText(map.toString(MapDescriptorFormat.MDF2));
 	}
 
 	@Override

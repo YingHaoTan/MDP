@@ -38,10 +38,6 @@ public class CoordinateInputPane extends JPanel {
 	private List<CoordinateInputListener> listeners;
 	
 	public CoordinateInputPane(String label, Rectangle bounds) {
-		this(label, bounds, new Point(0, 0));
-	}
-	
-	public CoordinateInputPane(String label, Rectangle bounds, Point initial) {
 		listeners = new ArrayList<CoordinateInputListener>();
 		
 		xcombobox = new JComboBox<Integer>();
@@ -52,8 +48,6 @@ public class CoordinateInputPane extends JPanel {
 		for(int y = bounds.y; y < bounds.y + bounds.height; y++)
 			ycombobox.addItem(y);
 		
-		xcombobox.setSelectedItem(initial.x);
-		ycombobox.setSelectedIndex(initial.y);
 		xcombobox.addItemListener((ItemEvent ae) -> notifyCoordinateInput());
 		ycombobox.addItemListener((ItemEvent ae) -> notifyCoordinateInput());
 		
