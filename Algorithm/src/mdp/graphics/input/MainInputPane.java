@@ -10,8 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import mdp.graphics.ExecutionMode;
+import mdp.graphics.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
-import mdp.graphics.map.MdpMap.MapDescriptorFormat;
+import mdp.models.MapDescriptorFormat;
 
 /**
  * CoordinateInputPane encapsulates input controls necessary for all user inputs
@@ -23,24 +25,6 @@ public class MainInputPane extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -4895645877543278267L;
-	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive map interaction modes
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum MapInteractionMode {
-		NONE, ADD_OBSTACLE, SET_WAYPOINT
-	}
-	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive execution modes
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum ExecutionMode {
-		SIMULATION, PHYSICAL
-	}
 	
 	private CoordinateInputPane startinput;
 	private CoordinateInputPane endinput;

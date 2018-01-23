@@ -18,6 +18,9 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import mdp.models.CellState;
+import mdp.models.MapDescriptorFormat;
+
 /**
  * MdpMap class encapsulates the map graphics user interface<br />
  * MdpMap operates in 2 coordinate systems, map coordinate system and robot coordinate system<br /><br />
@@ -62,24 +65,6 @@ public class MdpMap extends JPanel {
 	private static final long serialVersionUID = -5182200928126366649L;
 	private static final Dimension DEFAULT_CELL_SIZE = new Dimension(40, 40);
 	private static final Dimension DEFAULT_ROBOT_DIMENSION = new Dimension(3, 3);
-	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive cell states
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum CellState {
-		UNEXPLORED, OBSTACLE, NORMAL, WAYPOINT
-	}
-	
-	/**
-	 * MapDescriptorFormat contains the enumeration of all possible mutually exclusive map descriptor formats
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum MapDescriptorFormat {
-		MDF1, MDF2
-	}
 	
 	private int row;
 	private int column;

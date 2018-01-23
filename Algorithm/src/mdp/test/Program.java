@@ -8,7 +8,7 @@ import mdp.controllers.MdpWindowController;
 import mdp.files.MapFileHandler;
 import mdp.graphics.MdpWindow;
 
-public class Test {
+public class Program {
 	
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 	    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {

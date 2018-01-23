@@ -8,13 +8,13 @@ import java.util.Set;
 
 import javax.swing.JButton;
 
+import mdp.graphics.MapInteractionMode;
 import mdp.graphics.MdpWindow;
 import mdp.graphics.input.CoordinateInputPane;
 import mdp.graphics.input.CoordinateInputPane.CoordinateInputListener;
 import mdp.graphics.input.MainInputPane;
-import mdp.graphics.input.MainInputPane.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
-import mdp.graphics.map.MdpMap.CellState;
+import mdp.models.CellState;
 
 /**
  * MdpWindowController encapsulates logic required for handling user inputs from MainInputPane

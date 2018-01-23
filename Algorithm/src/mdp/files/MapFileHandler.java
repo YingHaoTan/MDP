@@ -12,7 +12,7 @@ import javax.swing.JFileChooser;
 import mdp.controllers.MapLoader;
 import mdp.controllers.MapSaver;
 import mdp.graphics.map.MdpMap;
-import mdp.graphics.map.MdpMap.MapDescriptorFormat;
+import mdp.models.MapDescriptorFormat;
 
 /**
  * MapFileHandler implements MapSaver and MapLoader to save and load from the file system
