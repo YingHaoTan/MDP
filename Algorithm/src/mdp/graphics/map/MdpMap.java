@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -305,11 +304,19 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Gets the bounding rectangle of the robot coordinates
+	 * Gets the dimension of the robot coordinates
 	 * @return
 	 */
-	public Rectangle getRobotCoordinateBounds() {
-		return new Rectangle(0, 0, this.column - this.robotdim.width + 1, this.row - this.robotdim.height + 1);
+	public Dimension getRobotCoordinateDimension() {
+		return new Dimension(this.column - this.robotdim.width + 1, this.row - this.robotdim.height + 1);
+	}
+	
+	/**
+	 * Gets the dimension of the map coordinates
+	 * @return
+	 */
+	public Dimension getMapCoordinateDimension() {
+		return new Dimension(this.column, this.row);
 	}
 	
 	/**
@@ -317,7 +324,7 @@ public class MdpMap extends JPanel {
 	 * @param Indicates if start point and end points must be reset
 	 */
 	public void reset() {
-		Rectangle rbound = this.getRobotCoordinateBounds();
+		Dimension dim = this.getRobotCoordinateDimension();
 		
 		for(String[] rowlabels: this.celllabels)
 			Arrays.fill(rowlabels, null);
@@ -325,7 +332,7 @@ public class MdpMap extends JPanel {
 			Arrays.fill(rowStates, CellState.NORMAL);
 		
 		this.setRobotLocation(new Point(0, 0));
-		this.setEndLocation(new Point(rbound.width - 1, rbound.height - 1));
+		this.setEndLocation(new Point(dim.width - 1, dim.height - 1));
 		this.repaint();
 	}
 	

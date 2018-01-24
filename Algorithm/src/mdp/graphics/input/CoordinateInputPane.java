@@ -1,8 +1,8 @@
 package mdp.graphics.input;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +37,15 @@ public class CoordinateInputPane extends JPanel {
 	private JComboBox<Integer> ycombobox;
 	private List<CoordinateInputListener> listeners;
 	
-	public CoordinateInputPane(String label, Rectangle bounds) {
+	public CoordinateInputPane(String label, Dimension dimension) {
 		listeners = new ArrayList<CoordinateInputListener>();
 		
 		xcombobox = new JComboBox<Integer>();
 		ycombobox = new JComboBox<Integer>();
 		
-		for(int x = bounds.x; x < bounds.x + bounds.width; x++)
+		for(int x = 0; x <  dimension.width; x++)
 			xcombobox.addItem(x);
-		for(int y = bounds.y; y < bounds.y + bounds.height; y++)
+		for(int y = 0; y < dimension.height; y++)
 			ycombobox.addItem(y);
 		
 		xcombobox.addItemListener((ItemEvent ae) -> notifyCoordinateInput());

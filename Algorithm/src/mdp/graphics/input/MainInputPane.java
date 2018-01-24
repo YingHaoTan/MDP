@@ -43,8 +43,8 @@ public class MainInputPane extends JPanel {
 		this.setLayout(layout);
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
-		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateBounds());
-		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateBounds());
+		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateDimension());
+		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateDimension());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
 		

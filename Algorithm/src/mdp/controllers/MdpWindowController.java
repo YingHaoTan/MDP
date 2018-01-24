@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.swing.JButton;
 
+import mdp.graphics.ExecutionMode;
 import mdp.graphics.MapInteractionMode;
 import mdp.graphics.MdpWindow;
 import mdp.graphics.input.CoordinateInputPane;
@@ -15,6 +16,11 @@ import mdp.graphics.input.CoordinateInputPane.CoordinateInputListener;
 import mdp.graphics.input.MainInputPane;
 import mdp.graphics.map.MdpMap;
 import mdp.models.CellState;
+import mdp.models.Direction;
+import mdp.models.RobotAction;
+import mdp.robots.RobotActionListener;
+import mdp.robots.RobotBase;
+import mdp.robots.SimulatorRobot;
 
 /**
  * MdpWindowController encapsulates logic required for handling user inputs from MainInputPane
@@ -22,7 +28,7 @@ import mdp.models.CellState;
  * 
  * @author Ying Hao
  */
-public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener {
+public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener {
 	
 	/**
 	 * ExecutionState contains the enumeration of all possible mutually exclusive execution states
@@ -44,6 +50,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private MainInputPane inputpane;
 	private MapLoader maploader;
 	private MapSaver mapsaver;
+	private SimulatorRobot srobot;
+	private RobotBase probot;
+	private ExplorationBase explorer;
 	
 	public MdpWindowController(MdpWindow window) {
 		this.map = window.getMap();
@@ -89,6 +98,66 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 */
 	public void setMapSaver(MapSaver saver) {
 		this.mapsaver = saver;
+	}
+	
+	/**
+	 * Gets the simulator robot
+	 * @return
+	 */
+	public SimulatorRobot getSimulatorRobot() {
+		return srobot;
+	}
+
+	/**
+	 * Sets the simulator robot
+	 * @param srobot
+	 */
+	public void setSimulatorRobot(SimulatorRobot srobot) {
+		if(this.srobot != null)
+			this.srobot.removeRobotActionListener(this);
+		
+		this.srobot = srobot;
+		this.srobot.addRobotActionListener(this);
+	}
+
+	/**
+	 * Gets the physical robot
+	 * @return
+	 */
+	public RobotBase getPhysicalRobot() {
+		return probot;
+	}
+
+	/**
+	 * Sets the physical robot
+	 * @param probot
+	 */
+	public void setPhysicalRobot(RobotBase probot) {
+		if(this.probot != null)
+			this.probot.removeRobotActionListener(this);
+		
+		this.probot = probot;
+		this.probot.addRobotActionListener(this);
+	}
+	
+	/**
+	 * Sets the explorer
+	 * @return
+	 */
+	public ExplorationBase getExplorer() {
+		return explorer;
+	}
+
+	/**
+	 * Gets the explorer
+	 * @param explorer
+	 */
+	public void setExplorer(ExplorationBase explorer) {
+		if(this.explorer != null)
+			this.explorer.removeCellStateUpdateListener(this);
+		
+		this.explorer = explorer;
+		this.explorer.addCellStateUpdateListener(this);
 	}
 
 	@Override
@@ -162,6 +231,36 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		inputpane.sync(map);
 	}
 	
+	@Override
+	public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+		Point rlocation = map.getRobotLocation();
+		
+		switch(mapdirection) {
+		case UP:
+			map.setRobotLocation(new Point(rlocation.x, rlocation.y + 1));
+			break;
+		case DOWN:
+			map.setRobotLocation(new Point(rlocation.x, rlocation.y - 1));
+			break;
+		case LEFT:
+			map.setRobotLocation(new Point(rlocation.x - 1, rlocation.y));
+			break;
+		default:
+			map.setRobotLocation(new Point(rlocation.x + 1, rlocation.y));
+			break;
+		}
+		
+		map.repaint();
+	}
+	
+	@Override
+	public void onCellStateUpdate(Point location, CellState state, String label) {
+		map.setCellState(location, state);
+		map.setCellLabel(location, label);
+		
+		map.repaint();
+	}
+	
 	private void loadmap() {
 		if(this.maploader != null)
 			this.maploader.load(map);
@@ -174,6 +273,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	
 	private void execute() {
 		JButton executionbtn = inputpane.getExecutionButton();
+		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
 		if(explore) {
@@ -185,6 +285,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 			for(Point p: exploredpoints)
 				this.map.setCellState(p, CellState.NORMAL);
 			
+			explorer.explore(mode == ExecutionMode.PHYSICAL? probot: srobot);
 			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
 		}
 		else {
