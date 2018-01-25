@@ -52,7 +52,7 @@ public abstract class RobotBase {
          * Sets the current orientation of this robot instance
          * 
          */
-        public void setCurrentOrientation(Direction direction){
+        private void setCurrentOrientation(Direction direction){
             this.orientation = direction;
         }
 	
@@ -123,6 +123,7 @@ public abstract class RobotBase {
 		
 		actionsequence.add(RobotAction.FORWARD);
 		
+                setCurrentOrientation(mapdirection);
 		// Performs the actual moving of the robot
 		move(mapdirection, actionsequence.toArray(new RobotAction[0]));
 	}
