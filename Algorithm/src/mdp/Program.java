@@ -3,6 +3,8 @@ package mdp;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+import mdp.controllers.ExplorationBase;
+import mdp.controllers.ExplorationController;
 
 import mdp.controllers.MdpWindowController;
 import mdp.files.MapFileHandler;
@@ -25,6 +27,7 @@ public class Program {
 		MdpWindowController controller = new MdpWindowController(window);
 		MapFileHandler filehandler = new MapFileHandler();
 		SimulatorRobot srobot = new SimulatorRobot(Direction.UP);
+                ExplorationBase explorer = new ExplorationController();
 		srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
 		srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
 		srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
@@ -36,6 +39,7 @@ public class Program {
 		controller.setMapLoader(filehandler);
 		controller.setMapSaver(filehandler);
 		controller.setSimulatorRobot(srobot);
+                controller.setExplorer(explorer);
 	}
 
 }

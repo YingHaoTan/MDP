@@ -277,6 +277,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
 		if(explore) {
+                        // Must call init() before reseting cell states to UNEXPLORED
+                        if(mode == ExecutionMode.SIMULATION)
+                            srobot.init(this.map);
+                    
 			this.map.setCellState(CellState.UNEXPLORED);
 			
 			Set<Point> exploredpoints = this.map.convertRobotPointToMapPoints(map.getRobotLocation());
