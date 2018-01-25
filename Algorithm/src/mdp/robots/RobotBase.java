@@ -47,6 +47,14 @@ public abstract class RobotBase {
 	public Direction getCurrentOrientation() {
 		return this.orientation;
 	}
+        
+        /**
+         * Sets the current orientation of this robot instance
+         * 
+         */
+        public void setCurrentOrientation(Direction direction){
+            this.orientation = direction;
+        }
 	
 	/**
 	 * Adds a RobotActionListener
@@ -135,6 +143,15 @@ public abstract class RobotBase {
 	 * @return
 	 */
 	public abstract Map<SensorConfiguration, Integer> getSensorReading();
+        
+        
+        /**
+	 * Gets the direction of sensor with reference to the grid, 
+         * e.g. the sensor facing left when the robot is facing right becomes the sensor facing upwards
+         * @param sensor
+	 * @returns relative direction
+	 */
+	public abstract Direction getSensorDirection(SensorConfiguration sensor);
 	
 	/**
 	 * Moves the robot by performing the actions in order

@@ -84,6 +84,7 @@ public class SimulatorRobot extends RobotBase {
 
 	@Override
 	protected void move(Direction mapdirection, RobotAction... actions) {
+                setCurrentOrientation(mapdirection);
 		if(mapdirection == Direction.UP)
 			this.location = new Point(location.x, location.y + 1);
 		else if(mapdirection == Direction.DOWN)
@@ -101,7 +102,7 @@ public class SimulatorRobot extends RobotBase {
 	 * @param sensor
 	 * @return
 	 */
-	private Direction getSensorDirection(SensorConfiguration sensor) {
+	public Direction getSensorDirection(SensorConfiguration sensor) {
 		Direction orientation = this.getCurrentOrientation();
 		Direction sdirection = sensor.getDirection();
 		
