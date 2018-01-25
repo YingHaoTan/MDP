@@ -20,7 +20,5 @@ public class ExplorationController extends ExplorationBase{
         robot.move(Direction.RIGHT);
         System.out.println(robot.getCurrentOrientation());
         //Map<SensorConfiguration, Integer> readings = robot.getSensorReading();
-        //robot.getSensors();
     }
-
 }
