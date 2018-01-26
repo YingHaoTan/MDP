@@ -42,7 +42,7 @@ public class Program {
 		controller.setMapLoader(filehandler);
 		controller.setMapSaver(filehandler);
 		controller.setSimulatorRobot(srobot);
-                controller.setExplorer(explorer);
+        controller.setExplorer(explorer);
 	}
 
 }

@@ -59,13 +59,13 @@ public abstract class RobotBase {
 		return this.orientation;
 	}
         
-        /**
-         * Sets the current orientation of this robot instance
-         * 
-         */
-        private void setCurrentOrientation(Direction direction){
-            this.orientation = direction;
-        }
+    /**
+     * Sets the current orientation of this robot instance
+     * 
+     */
+    private void setCurrentOrientation(Direction direction){
+        this.orientation = direction;
+    }
 	
 	/**
 	 * Adds a RobotActionListener

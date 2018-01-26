@@ -1,6 +1,8 @@
 package mdp.controllers;
 
+import java.awt.Dimension;
 import java.awt.Point;
+
 import mdp.models.Direction;
 import mdp.robots.RobotBase;
 
@@ -13,7 +15,9 @@ import mdp.robots.RobotBase;
 public class ExplorationController extends ExplorationBase {
 
 	@Override
-	public void explore(RobotBase robot, Point rcoordinate) {
+	public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
+		super.explore(mapdim, robot, rcoordinate, ecoordinate);
+		
 		System.out.println("Code goes here");
         System.out.println(robot.getCurrentOrientation());
         robot.move(Direction.RIGHT);

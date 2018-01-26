@@ -277,9 +277,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
 		if(explore) {
-                        // Must call init() before reseting cell states to UNEXPLORED
-                        if(mode == ExecutionMode.SIMULATION)
-                            srobot.init(this.map);
+            // Must call init() before reseting cell states to UNEXPLORED
+            if(mode == ExecutionMode.SIMULATION)
+                srobot.init(this.map);
                     
 			this.map.setCellState(CellState.UNEXPLORED);
 			
@@ -290,7 +290,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 				this.map.setCellState(p, CellState.NORMAL);
 			
 			if(explorer != null)
-				explorer.explore(mode == ExecutionMode.PHYSICAL? probot: srobot, map.getRobotLocation());
+				explorer.explore(map.getMapCoordinateDimension(), mode == ExecutionMode.PHYSICAL? probot: srobot, map.getRobotLocation(), map.getEndLocation());
 			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
 		}
 		else {

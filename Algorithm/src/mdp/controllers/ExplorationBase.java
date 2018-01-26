@@ -1,9 +1,12 @@
 package mdp.controllers;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import mdp.models.CellState;
 import mdp.robots.RobotBase;
 
 /**
@@ -12,6 +15,7 @@ import mdp.robots.RobotBase;
  * @author Ying Hao
  */
 public abstract class ExplorationBase {
+	private CellState[][] cellstates;
 	private List<CellStateUpdateListener> listeners;
 	
 	public ExplorationBase() {
@@ -23,7 +27,18 @@ public abstract class ExplorationBase {
 	 * @param robot
 	 * @param start
 	 */
-	public abstract void explore(RobotBase robot, Point rcoordinate);
+	public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
+		Dimension robotdim = robot.getDimension();
+		
+		this.cellstates = new CellState[mapdim.width][mapdim.height];
+		
+		for(CellState[] states: this.cellstates)
+			Arrays.fill(states, CellState.UNEXPLORED);
+		
+		for(int x = 0; x < robotdim.width; x++)
+			for(int y = 0; y < robotdim.height; y++)
+				this.cellstates[rcoordinate.x + x][rcoordinate.y + y] = CellState.NORMAL;
+	}
 	
 	/**
 	 * Adds CellStateUpdateListener
@@ -39,6 +54,28 @@ public abstract class ExplorationBase {
 	 */
 	public void removeCellStateUpdateListener(CellStateUpdateListener listener) {
 		this.listeners.remove(listener);
+	}
+	
+	/**
+	 * Sets the CellState at a particular coordinate
+	 * @param coordinate
+	 * @param state
+	 * @param label
+	 */
+	protected void setCellState(Point coordinate, CellState state, String label) {
+		this.cellstates[coordinate.x][coordinate.y] = state;
+		
+		for(CellStateUpdateListener listener: listeners)
+			listener.onCellStateUpdate(coordinate, state, label);
+	}
+	
+	/**
+	 * Gets the CellState at a particular coordinate
+	 * @param coordinate
+	 * @return
+	 */
+	protected CellState getCellState(Point coordinate) {
+		return this.cellstates[coordinate.x][coordinate.y];
 	}
 
 }
