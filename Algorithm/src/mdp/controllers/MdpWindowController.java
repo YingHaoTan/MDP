@@ -290,7 +290,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 				this.map.setCellState(p, CellState.NORMAL);
 			
 			if(explorer != null)
-				explorer.explore(mode == ExecutionMode.PHYSICAL? probot: srobot);
+				explorer.explore(mode == ExecutionMode.PHYSICAL? probot: srobot, map.getRobotLocation());
 			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
 		}
 		else {

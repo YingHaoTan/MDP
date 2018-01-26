@@ -32,8 +32,8 @@ public class SimulatorRobot extends RobotBase {
 	 * @param map
 	 * @param orientation
 	 */
-	public SimulatorRobot(Direction orientation) {
-		super(orientation);
+	public SimulatorRobot(Dimension dimension, Direction orientation) {
+		super(dimension, orientation);
 	}
 	
 	/**

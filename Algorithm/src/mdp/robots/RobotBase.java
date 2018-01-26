@@ -1,5 +1,6 @@
 package mdp.robots;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import mdp.models.SensorConfiguration;
  * @author Ying Hao
  */
 public abstract class RobotBase {
+	private Dimension dimension;
 	private Direction orientation;
 	private List<SensorConfiguration> sensors;
 	private List<RobotActionListener> listeners;
 	
-	public RobotBase(Direction orientation) {
+	public RobotBase(Dimension dimension, Direction orientation) {
+		this.dimension = dimension;
 		this.orientation = orientation;
 		this.sensors = new ArrayList<>();
 		this.listeners = new ArrayList<>();
@@ -38,6 +41,14 @@ public abstract class RobotBase {
 	 */
 	public List<SensorConfiguration> getSensors() {
 		return new ArrayList<>(this.sensors);
+	}
+	
+	/**
+	 * Gets the robot dimension
+	 * @return
+	 */
+	public Dimension getDimension() {
+		return this.dimension;
 	}
 	
 	/**

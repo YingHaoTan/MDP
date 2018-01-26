@@ -1,8 +1,7 @@
 package mdp.controllers;
 
-import java.util.Map;
+import java.awt.Point;
 import mdp.models.Direction;
-import mdp.models.SensorConfiguration;
 import mdp.robots.RobotBase;
 
 /**
@@ -11,14 +10,14 @@ import mdp.robots.RobotBase;
  * 
  * @author Ying Hao
  */
-public class ExplorationController extends ExplorationBase{
+public class ExplorationController extends ExplorationBase {
 
-    @Override
-    public void explore(RobotBase robot) {
-        System.out.println("Code goes here");
+	@Override
+	public void explore(RobotBase robot, Point rcoordinate) {
+		System.out.println("Code goes here");
         System.out.println(robot.getCurrentOrientation());
         robot.move(Direction.RIGHT);
         System.out.println(robot.getCurrentOrientation());
         //Map<SensorConfiguration, Integer> readings = robot.getSensorReading();
-    }
+	}
 }

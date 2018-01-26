@@ -1,5 +1,6 @@
 package mdp.controllers;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +19,11 @@ public abstract class ExplorationBase {
 	}
 	
 	/**
-	 * Performs exploration with the provided robot
+	 * Performs exploration with the provided robot and current coordinate of the robot in robot coordinate system
 	 * @param robot
+	 * @param start
 	 */
-	public abstract void explore(RobotBase robot);
+	public abstract void explore(RobotBase robot, Point rcoordinate);
 	
 	/**
 	 * Adds CellStateUpdateListener
