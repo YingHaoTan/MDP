@@ -296,6 +296,8 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 			for(Point p: exploredpoints)
 				mstate.setMapCellState(p, CellState.NORMAL);
 			
+			map.repaint();
+			
 			if(explorer != null)
 				explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL? probot: srobot, mstate.getRobotPoint(), mstate.getEndPoint());
 			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());

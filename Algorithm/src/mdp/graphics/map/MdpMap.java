@@ -240,8 +240,8 @@ public class MdpMap extends JPanel {
 		
 		Point labelScreenPoint = convertMapPointToScreenPoint(endMapPoint);
 		g.drawString(label, 
-				(int)((this.cellsize.width - metrics.stringWidth(label)) / 2) + labelScreenPoint.x, 
-				this.cellsize.height / 2 + labelScreenPoint.y);
+			(int)((this.cellsize.width - metrics.stringWidth(label)) / 2) + labelScreenPoint.x, 
+			this.cellsize.height / 2 + labelScreenPoint.y);
 	}
 	
 	private void paintLabel(Graphics g) {
