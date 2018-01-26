@@ -74,7 +74,7 @@ public class CoordinateInputPane extends JPanel {
 	 */
 	public void setCoordinate(Point p) {
 		this.xcombobox.setSelectedItem(p.x);
-		this.ycombobox.setSelectedIndex(p.y);
+		this.ycombobox.setSelectedItem(p.y);
 	}
 	
 	/**

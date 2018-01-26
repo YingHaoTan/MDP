@@ -26,11 +26,12 @@ public class Program {
 	    }
 		
 	    Dimension rdim = new Dimension(3, 3);
-		MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", 20, 15);
+		MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", new Dimension(15, 20), new Dimension(3, 3));
 		MdpWindowController controller = new MdpWindowController(window);
 		MapFileHandler filehandler = new MapFileHandler();
 		SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
-                ExplorationBase explorer = new ExplorationController();
+        ExplorationBase explorer = new ExplorationController();
+        
 		srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
 		srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
 		srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));

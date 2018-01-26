@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -17,6 +18,7 @@ import mdp.graphics.input.MainInputPane;
 import mdp.graphics.map.MdpMap;
 import mdp.models.CellState;
 import mdp.models.Direction;
+import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
@@ -164,20 +166,21 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	public void onCoordinateInput(CoordinateInputPane source, Point point) {
 		CoordinateInputPane sinput = inputpane.getStartCoordinateInput();
 		CoordinateInputPane einput = inputpane.getEndCoordinateInput();
+		MapState mstate = map.getMapState();
 		
-		if(map.getCellState(point, false) == CellState.NORMAL) {
+		if(mstate.getRobotCellState(point) == CellState.NORMAL) {
 			if(source == sinput)
-				map.setRobotLocation(point);
+				mstate.setRobotPoint(point);
 			else
-				map.setEndLocation(point);
+				mstate.setEndPoint(point);
 			
 			map.repaint();
 		}
 		else {
 			if(source == sinput)
-				sinput.setCoordinate(map.getRobotLocation());
+				sinput.setCoordinate(mstate.getRobotPoint());
 			else
-				einput.setCoordinate(map.getEndLocation());
+				einput.setCoordinate(mstate.getEndPoint());
 		}
 	}
 
@@ -185,26 +188,27 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	public void mouseClicked(MouseEvent e) {
 		Point p = map.convertScreenPointToMapPoint(e.getPoint());
 		MapInteractionMode mode = inputpane.getMapInteractionModeInput().getSelectedValue();
+		MapState mstate = map.getMapState();
 		
-		Set<Point> rpoints = map.convertRobotPointToMapPoints(map.getRobotLocation());
-		rpoints.addAll(map.convertRobotPointToMapPoints(map.getEndLocation()));
+		Set<Point> rpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
+		rpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
 		
-		CellState pstate = map.getCellState(p);
+		CellState pstate = mstate.getMapCellState(p);
 		// Only add obstacle/set waypoint when CellState is normal and
 		// is not intersecting current robot or endpoint
 		if(pstate == CellState.NORMAL && !rpoints.contains(p)) {
 			if(mode == MapInteractionMode.ADD_OBSTACLE)
-				map.setCellState(p, CellState.OBSTACLE);
+				mstate.setMapCellState(p, CellState.OBSTACLE);
 			else if(mode == MapInteractionMode.SET_WAYPOINT)
-				map.setCellState(p, CellState.WAYPOINT);
+				mstate.setMapCellState(p, CellState.WAYPOINT);
 		}
 		else if(mode == MapInteractionMode.ADD_OBSTACLE && pstate == CellState.OBSTACLE) {
-			map.setCellState(p, CellState.NORMAL);
+			mstate.setMapCellState(p, CellState.NORMAL);
 		}
 		
 		// Updates MDF 2 label
 		if(mode == MapInteractionMode.ADD_OBSTACLE)
-			inputpane.sync(map);
+			inputpane.sync(mstate);
 		
 		map.repaint();
 	}
@@ -225,28 +229,30 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		}
 		else if(e.getSource() == inputpane.getResetButton()) {
 			cancel();
-			map.reset();
+			map.getMapState().reset();
+			map.repaint();
 		}
 		
-		inputpane.sync(map);
+		inputpane.sync(map.getMapState());
 	}
 	
 	@Override
 	public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-		Point rlocation = map.getRobotLocation();
+		MapState mstate = map.getMapState();
+		Point rlocation = mstate.getRobotPoint();
 		
 		switch(mapdirection) {
 		case UP:
-			map.setRobotLocation(new Point(rlocation.x, rlocation.y + 1));
+			mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
 			break;
 		case DOWN:
-			map.setRobotLocation(new Point(rlocation.x, rlocation.y - 1));
+			mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
 			break;
 		case LEFT:
-			map.setRobotLocation(new Point(rlocation.x - 1, rlocation.y));
+			mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
 			break;
 		default:
-			map.setRobotLocation(new Point(rlocation.x + 1, rlocation.y));
+			mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
 			break;
 		}
 		
@@ -255,7 +261,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	
 	@Override
 	public void onCellStateUpdate(Point location, CellState state, String label) {
-		map.setCellState(location, state);
+		map.getMapState().setMapCellState(location, state);
 		map.setCellLabel(location, label);
 		
 		map.repaint();
@@ -274,23 +280,24 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private void execute() {
 		JButton executionbtn = inputpane.getExecutionButton();
 		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
+		MapState mstate = map.getMapState();
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 		
 		if(explore) {
             // Must call init() before reseting cell states to UNEXPLORED
             if(mode == ExecutionMode.SIMULATION)
-                srobot.init(this.map);
+                srobot.init(mstate);
                     
-			this.map.setCellState(CellState.UNEXPLORED);
+            mstate.setMapCellState(CellState.UNEXPLORED);
 			
-			Set<Point> exploredpoints = this.map.convertRobotPointToMapPoints(map.getRobotLocation());
-			exploredpoints.addAll(this.map.convertRobotPointToMapPoints(map.getEndLocation()));
+			Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
+			exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
 			
 			for(Point p: exploredpoints)
-				this.map.setCellState(p, CellState.NORMAL);
+				mstate.setMapCellState(p, CellState.NORMAL);
 			
 			if(explorer != null)
-				explorer.explore(map.getMapCoordinateDimension(), mode == ExecutionMode.PHYSICAL? probot: srobot, map.getRobotLocation(), map.getEndLocation());
+				explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL? probot: srobot, mstate.getRobotPoint(), mstate.getEndPoint());
 			executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
 		}
 		else {
@@ -299,7 +306,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	}
 	
 	private void cancel() {
-		this.map.setCellState(CellState.NORMAL);
+		this.map.getMapState().setMapCellState(CellState.NORMAL);
 		inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
 	}
 

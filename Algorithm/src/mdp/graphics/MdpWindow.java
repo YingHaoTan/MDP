@@ -1,5 +1,6 @@
 package mdp.graphics;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JFrame;
@@ -26,10 +27,10 @@ public class MdpWindow {
 	 * @param noOfRows
 	 * @param noOfColumns
 	 */
-	public MdpWindow(String windowTitle, int noOfRows, int noOfColumns) {
+	public MdpWindow(String windowTitle, Dimension mapdim, Dimension robotdim) {
 		frame = new JFrame();
 		maincontent = new JPanel();
-		map = new MdpMap(noOfRows, noOfColumns);
+		map = new MdpMap(mapdim, robotdim);
 		inputpane = new MainInputPane(map);
 		
 		FlowLayout layout = new FlowLayout(FlowLayout.LEADING);

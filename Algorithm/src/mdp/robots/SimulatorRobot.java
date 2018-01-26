@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import mdp.graphics.map.MdpMap;
 import mdp.models.CellState;
 import mdp.models.Direction;
+import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 
@@ -21,11 +21,9 @@ import mdp.models.SensorConfiguration;
  * @author Ying Hao
  */
 public class SimulatorRobot extends RobotBase {
-	private boolean[][] obstacles;
-	private long delay;
 	private Timer timer;
-	private Point location;
-	private Dimension rdim;
+	private MapState mstate;
+	private long delay;
 	
 	/**
 	 * Creates an instance of SimulatorRobot with a default delay timer of 1 second
@@ -34,25 +32,16 @@ public class SimulatorRobot extends RobotBase {
 	 */
 	public SimulatorRobot(Dimension dimension, Direction orientation) {
 		super(dimension, orientation);
+		delay = 1000;
 	}
 	
 	/**
 	 * Initializes this SimulatorRobot instance with simulation map data
 	 * @param map
 	 */
-	public void init(MdpMap map) {
-		Dimension mapdim = map.getMapCoordinateDimension();
-		obstacles = new boolean[mapdim.width][mapdim.height];
-		delay = 1000;
-		timer = new Timer(true);
-		location = map.getRobotMapPoint();
-		rdim = map.getRobotDimension();
-		
-		for(int x = 0; x < obstacles.length; x++) {
-			for(int y = 0; y < obstacles[x].length; y++) {
-				obstacles[x][y] = map.getCellState(new Point(x, y)) == CellState.OBSTACLE;
-			}
-		}
+	public void init(MapState mstate) {
+		this.timer = new Timer(true);
+		this.mstate = mstate.clone();
 	}
 	
 	/**
@@ -84,14 +73,16 @@ public class SimulatorRobot extends RobotBase {
 
 	@Override
 	protected void move(Direction mapdirection, RobotAction... actions) {
+		Point location = mstate.getRobotPoint();
+		
 		if(mapdirection == Direction.UP)
-			this.location = new Point(location.x, location.y + 1);
+			mstate.setRobotPoint(new Point(location.x, location.y + 1));
 		else if(mapdirection == Direction.DOWN)
-			this.location = new Point(location.x, location.y - 1);
+			mstate.setRobotPoint(new Point(location.x, location.y - 1));
 		else if(mapdirection == Direction.LEFT)
-			this.location = new Point(location.x - 1, location.y);
+			mstate.setRobotPoint(new Point(location.x - 1, location.y));
 		else
-			this.location = new Point(location.x + 1, location.x);
+			mstate.setRobotPoint(new Point(location.x + 1, location.x));
 		
 		timer.schedule(new NotifyTask(mapdirection, actions), delay);
 	}
@@ -145,6 +136,8 @@ public class SimulatorRobot extends RobotBase {
 	 * @return
 	 */
 	private Point getSensorCoordinate(SensorConfiguration sensor) {
+		Point location = mstate.getRobotPoint();
+		Dimension rdim = mstate.getRobotDimension();
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate;
 		
@@ -168,26 +161,27 @@ public class SimulatorRobot extends RobotBase {
 	private int getObstacleDistance(SensorConfiguration sensor) {
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate = this.getSensorCoordinate(sensor);
+		Dimension mdim = mstate.getMapSystemDimension();
 		int distance = 0;
 		
 		if(sdirection == Direction.UP) {
-			for(int y = scoordinate.y + 1; y < this.obstacles[scoordinate.x].length && distance == 0; y++)
-				if(this.obstacles[scoordinate.x][y])
+			for(int y = scoordinate.y + 1; y < mdim.height && distance == 0; y++)
+				if(mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE)
 					distance = y - scoordinate.y;
 		}
 		else if(sdirection == Direction.DOWN) {
 			for(int y = scoordinate.y - 1; y >= 0 && distance == 0; y--)
-				if(this.obstacles[scoordinate.x][y])
+				if(mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE)
 					distance = scoordinate.y - y;
 		}
 		else if(sdirection == Direction.LEFT) {
 			for(int x = scoordinate.x - 1; x >= 0 && distance == 0; x--)
-				if(this.obstacles[x][scoordinate.y])
+				if(mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE)
 					distance = scoordinate.x - x;
 		}
 		else {
-			for(int x = scoordinate.x + 1; x < this.obstacles.length; x++)
-				if(this.obstacles[x][scoordinate.y])
+			for(int x = scoordinate.x + 1; x < mdim.width; x++)
+				if(mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE)
 					distance = x - scoordinate.x;
 		}
 		

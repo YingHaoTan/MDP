@@ -46,7 +46,7 @@ public class MapFileHandler implements MapSaver, MapLoader {
 					mdf2 = reader.readLine();
 				}
 				
-				map.parseString(mdf1, mdf2);
+				map.getMapState().parseString(mdf1, mdf2);
 				map.repaint();
 			} catch(IOException e) {
 				// Handle case where an error occurs during file reading
@@ -61,11 +61,11 @@ public class MapFileHandler implements MapSaver, MapLoader {
 			
 			try {
 				try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filesubpath + ".mdf1")))) {
-					writer.write(map.toString(MapDescriptorFormat.MDF1));
+					writer.write(map.getMapState().toString(MapDescriptorFormat.MDF1));
 				}
 				
 				try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filesubpath + ".mdf2")))) {
-					writer.write(map.toString(MapDescriptorFormat.MDF2));
+					writer.write(map.getMapState().toString(MapDescriptorFormat.MDF2));
 				}
 			} catch(IOException e) {
 				// Handle case where an error occurs during file writing
