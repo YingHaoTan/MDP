@@ -144,7 +144,7 @@ public class SimulatorRobot extends RobotBase {
 	 * @param sensor
 	 * @return
 	 */
-	private Point getSensorCoordinate(SensorConfiguration sensor) {
+	public Point getSensorCoordinate(SensorConfiguration sensor) {
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate;
 		

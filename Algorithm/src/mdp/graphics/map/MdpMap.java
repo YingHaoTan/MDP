@@ -135,7 +135,7 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Gets the end location with reference to robot coordinates
+	 * Sets the end location with reference to robot coordinates
 	 * @param
 	 */
 	public void setEndLocation(Point location) {
