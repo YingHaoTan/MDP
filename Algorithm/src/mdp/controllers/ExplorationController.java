@@ -110,7 +110,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     // Can be optimized
     /**
-     * Checks if you can move in that direction given the current cellstate
+     * Checks if you can move in that direction given the current cell state
      *
      * @param direction
      * @return
@@ -143,9 +143,10 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         List<SensorConfiguration> sensors = getRobot().getSensors();
 
         for (SensorConfiguration sensor : sensors) {
+            
+            System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
+            
             int reading = readings.get(sensor);
-
-            System.out.println("Sensor Reading:" + readings.get(sensor));
 
             // Limits sensor range
             if (reading > sensor.getMaxDistance()) {
@@ -271,6 +272,14 @@ public class ExplorationController extends ExplorationBase implements RobotActio
                 break;
         }
 
+        sensorsScan();
+        Direction[] bestDirections = directionToGoal(this.supposedCurrentLocation, getEndpoint());
+        for (Direction d : bestDirections) {
+            if (canMove(d)) {
+                getRobot().move(d);
+                break;
+            }
+        }
         // Sense end location
     }
 

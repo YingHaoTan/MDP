@@ -91,8 +91,9 @@ public class SimulatorRobot extends RobotBase {
 		else if(mapdirection == Direction.LEFT)
 			this.location = new Point(location.x - 1, location.y);
 		else
-			this.location = new Point(location.x + 1, location.x);
+			this.location = new Point(location.x + 1, location.y);
 		
+                System.out.println(location.toString());
 		timer.schedule(new NotifyTask(mapdirection, actions), delay);
 	}
 	
@@ -147,6 +148,7 @@ public class SimulatorRobot extends RobotBase {
 	public Point getSensorCoordinate(SensorConfiguration sensor) {
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate;
+                //System.out.println(location.toString());
 		
 		if(sdirection == Direction.UP)
 			scoordinate = new Point(location.x + sensor.getCoordinate(), location.y + rdim.height / 2);
