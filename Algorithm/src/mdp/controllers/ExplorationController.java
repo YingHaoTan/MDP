@@ -24,10 +24,18 @@ import mdp.robots.RobotBase;
  */
 public class ExplorationController extends ExplorationBase implements RobotActionListener {
 
-    
+    private enum ExplorationState {
+        EXPLORING, RETURNING, BACKTRACKING
+    };
+
     ExplorationNode[][] explorationNodes;
-    Direction[] directionalPriority = { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
-    
+    int dist = 0;
+    int R = 100;
+    Point lastVisited;
+    ExplorationState currentState = ExplorationState.EXPLORING;
+
+    Direction[] directionalPriority = {Direction.LEFT, Direction.UP, Direction.RIGHT, Direction.DOWN};
+
     @Override
     public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
         super.explore(mapdim, robot, rcoordinate, ecoordinate);
@@ -56,14 +64,13 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         }
 
         // initial movement
-        
         sensorsScan();
         for (Direction d : directionalPriority) {
             if (canMove(d)) {
+                explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].traversed();
                 robot.move(d);
                 break;
-            }
-            else{
+            } else {
                 explorationNodes[internalMapState.getRobotPoint().x][internalMapState.getRobotPoint().y].setNeighbour(d, null);
             }
         }
@@ -157,8 +164,8 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         }
         return true;
     }
-    
-    private boolean hasVisited(Direction direction){
+
+    private boolean hasVisited(Direction direction) {
         return explorationNodes[nextLocation(direction).x][nextLocation(direction).y].isTraversed();
     }
 
@@ -242,8 +249,6 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     }
 
-
-
     /**
      * Returns the new location in robot coordinates if you move 1 step in the
      * specified direction, does not actually move
@@ -271,45 +276,82 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-        
+
         // update robot position
         Point robotPoint = getMapState().getRobotPoint();
         switch (mapdirection) {
             case UP:
                 getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y + 1));
+                if (currentState == ExplorationState.EXPLORING) {
+                    explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(Direction.DOWN);
+                }
                 break;
             case DOWN:
                 getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y - 1));
+                if (currentState == ExplorationState.EXPLORING) {
+                    explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(Direction.UP);
+                }
                 break;
             case LEFT:
                 getMapState().setRobotPoint(new Point(robotPoint.x - 1, robotPoint.y));
+                if (currentState == ExplorationState.EXPLORING) {
+                    explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(Direction.RIGHT);
+                }
+
                 break;
             case RIGHT:
                 getMapState().setRobotPoint(new Point(robotPoint.x + 1, robotPoint.y));
+                if (currentState == ExplorationState.EXPLORING) {
+                    explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(Direction.LEFT);
+                }
                 break;
         }
-        
-        
+
+        if (currentState == ExplorationState.EXPLORING) {
+            dist++;
+        }
+        if (dist == R) {
+            lastVisited = getMapState().getRobotPoint();
+            System.out.println("Returning");
+            currentState = ExplorationState.RETURNING;
+        }
+
+        if (getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
+            // Checked if all explored
+            System.out.println("Returned");
+            dist = 0;
+            currentState = ExplorationState.EXPLORING;
+        }
+
         explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].traversed();
-        
-        for(Point p : getMapState().convertRobotPointToMapPoints(getMapState().getRobotPoint())){
+        for (Point p : getMapState().convertRobotPointToMapPoints(getMapState().getRobotPoint())) {
             this.setCellState(p, getMapState().getMapCellState(p), "traversed");
         }
-        
+
         sensorsScan();
-       
-        for (Direction d : directionalPriority) {
-            
-            if (canMove(d) && !hasVisited(d)) {
-                System.out.println(d);
-                getRobot().move(d);
-                break;
+
+        if (currentState == ExplorationState.RETURNING) {
+            getRobot().move(explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].getParentDirection());
+            explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(null);
+
+        } 
+        else{
+            for (Direction d : directionalPriority) {
+                if (canMove(d)) {
+                    if (!hasVisited(d)) {
+                        System.out.println(d);
+                        currentState = ExplorationState.EXPLORING;
+                        getRobot().move(d);
+                        return;
+                    }
+                } else {
+                    explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setNeighbour(d, null);
+                }
             }
-            else{
-                explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setNeighbour(d, null);
-            }
+            currentState = ExplorationState.BACKTRACKING;
+            getRobot().move(explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].getParentDirection());
         }
-        // Sense end location
+
     }
 
 }

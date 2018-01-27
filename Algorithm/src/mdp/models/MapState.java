@@ -52,6 +52,7 @@ public class MapState {
     private Point robotpoint;
     private Point endpoint;
     private Point waypoint;
+    private Point startpoint;
     private CellState[][] cellstates;
 
     public MapState(Dimension mapdim, Dimension robotdim) {
@@ -109,6 +110,24 @@ public class MapState {
      */
     public void setRobotPoint(Point robotpoint) {
         this.robotpoint = robotpoint;
+    }
+    
+    /**
+     * Gets the start point point in robot coordinate system
+     *
+     * @return
+     */
+    public Point getStartPoint() {
+        return startpoint;
+    }
+
+    /**
+     * Sets the start point in robot coordinate system
+     *
+     * @param endpoint
+     */
+    public void setStartPoint(Point startpoint) {
+        this.startpoint = startpoint;
     }
 
     /**

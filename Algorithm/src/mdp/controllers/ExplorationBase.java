@@ -38,6 +38,7 @@ public abstract class ExplorationBase {
         mstate.setMapCellState(CellState.UNEXPLORED);
         mstate.setEndPoint(ecoordinate);
         mstate.setRobotPoint(rcoordinate);
+        mstate.setStartPoint(rcoordinate);
 
         for (int x = 0; x < robotdim.width; x++) {
             for (int y = 0; y < robotdim.height; y++) {

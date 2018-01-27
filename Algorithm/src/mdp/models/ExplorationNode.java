@@ -17,6 +17,9 @@ public class ExplorationNode {
     private Point down;
     private Point left;
     private Point right;
+    
+    // Move in this direction to go back to its parent
+    private Direction parentDirection;
     private boolean traversed;
     
     public ExplorationNode(){
@@ -25,6 +28,7 @@ public class ExplorationNode {
         left = null;
         right = null;
         traversed = false;
+        parentDirection = null;
     }
 
     public Point getUp() {
@@ -98,4 +102,14 @@ public class ExplorationNode {
     public boolean isTraversed(){
         return traversed;
     }
+
+    public Direction getParentDirection() {
+        return parentDirection;
+    }
+
+    public void setParentDirection(Direction parentDirection) {
+        this.parentDirection = parentDirection;
+    }
+    
+    
 }
