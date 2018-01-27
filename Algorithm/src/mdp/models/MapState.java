@@ -222,6 +222,8 @@ public class MapState {
         }
     }
 
+    
+    // I think this is wrong
     /**
      * Converts a point in map coordinate system to a set of points in robot
      * coordinate system

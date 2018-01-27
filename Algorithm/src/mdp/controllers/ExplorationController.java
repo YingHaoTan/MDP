@@ -9,6 +9,8 @@ import java.util.Set;
 import mdp.models.CellState;
 
 import mdp.models.Direction;
+import mdp.models.ExplorationNode;
+import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 import mdp.robots.RobotActionListener;
@@ -22,19 +24,47 @@ import mdp.robots.RobotBase;
  */
 public class ExplorationController extends ExplorationBase implements RobotActionListener {
 
+    
+    ExplorationNode[][] explorationNodes;
+    Direction[] directionalPriority = { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
+    
     @Override
     public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
         super.explore(mapdim, robot, rcoordinate, ecoordinate);
+
         robot.addRobotActionListener(this);
+        MapState internalMapState = getMapState();
 
-        Direction[] bestDirections = directionToGoal(rcoordinate, ecoordinate);
+        // build graph
+        explorationNodes = new ExplorationNode[internalMapState.getRobotSystemDimension().width][internalMapState.getRobotSystemDimension().height];
+        for (int y = 0; y < internalMapState.getRobotSystemDimension().height; y++) {
+            for (int x = 0; x < internalMapState.getRobotSystemDimension().width; x++) {
+                explorationNodes[x][y] = new ExplorationNode();
+                if (x - 1 > 0) {
+                    explorationNodes[x][y].setLeft(new Point(x - 1, y));
+                }
+                if (x + 1 < internalMapState.getRobotSystemDimension().width) {
+                    explorationNodes[x][y].setRight(new Point(x + 1, y));
+                }
+                if (y - 1 > 0) {
+                    explorationNodes[x][y].setDown(new Point(x, y - 1));
+                }
+                if (y + 1 < internalMapState.getRobotSystemDimension().height) {
+                    explorationNodes[x][y].setUp(new Point(x, y + 1));
+                }
+            }
+        }
+
+        // initial movement
         
-
         sensorsScan();
-        for (Direction d : bestDirections) {
+        for (Direction d : directionalPriority) {
             if (canMove(d)) {
                 robot.move(d);
                 break;
+            }
+            else{
+                explorationNodes[internalMapState.getRobotPoint().x][internalMapState.getRobotPoint().y].setNeighbour(d, null);
             }
         }
 
@@ -74,7 +104,6 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         //System.out.println("Left: " + leftAngle);
         //System.out.println("Right: " + rightAngle);
         //System.out.println("Up: " + upAngle);
-
         if (leftAngle < rightAngle && leftAngle < upAngle) {
             results[0] = Direction.LEFT;
             if (rightAngle < upAngle) {
@@ -117,16 +146,20 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
         // Checks cell state;
         CellState state = CellState.NORMAL;
-        Set<Point> points = convertRobotPointToMapPoints(nextLocation(direction));
-        
+        List<Point> points = getMapState().convertRobotPointToMapPoints(nextLocation(direction));
+
         for (Point p : points) {
             CellState pstate = getCellState(p);
- 
-            if(pstate == null || pstate == CellState.OBSTACLE){// || pstate == CellState.UNEXPLORED){
+
+            if (pstate == null || pstate == CellState.OBSTACLE) {// || pstate == CellState.UNEXPLORED){
                 return false;
             }
         }
         return true;
+    }
+    
+    private boolean hasVisited(Direction direction){
+        return explorationNodes[nextLocation(direction).x][nextLocation(direction).y].isTraversed();
     }
 
     /**
@@ -137,14 +170,12 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         List<SensorConfiguration> sensors = getRobot().getSensors();
 
         for (SensorConfiguration sensor : sensors) {
-            
+
             //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
-            
             int reading = readings.get(sensor);
 
             // Limits sensor range
             if (reading > sensor.getMaxDistance()) {
-                //System.out.println(reading);
                 reading = 0;
             }
 
@@ -211,17 +242,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     }
 
-    private Set<Point> convertRobotPointToMapPoints(Point p) {
-        Set<Point> points = new HashSet<>();
 
-        for (int x = 0; x < getRobot().getDimension().width; x++) {
-            for (int y = 0; y < getRobot().getDimension().height; y++) {
-                points.add(new Point(p.x + x, p.y + y));
-            }
-        }
-
-        return points;
-    }
 
     /**
      * Returns the new location in robot coordinates if you move 1 step in the
@@ -250,29 +271,42 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        
+        // update robot position
         Point robotPoint = getMapState().getRobotPoint();
         switch (mapdirection) {
             case UP:
-                getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y+1));
+                getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y + 1));
                 break;
             case DOWN:
-                getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y-1));
+                getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y - 1));
                 break;
             case LEFT:
-                getMapState().setRobotPoint(new Point(robotPoint.x-1, robotPoint.y));
+                getMapState().setRobotPoint(new Point(robotPoint.x - 1, robotPoint.y));
                 break;
             case RIGHT:
-                getMapState().setRobotPoint(new Point(robotPoint.x+1, robotPoint.y));
+                getMapState().setRobotPoint(new Point(robotPoint.x + 1, robotPoint.y));
                 break;
         }
-
+        
+        
+        explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].traversed();
+        
+        for(Point p : getMapState().convertRobotPointToMapPoints(getMapState().getRobotPoint())){
+            this.setCellState(p, getMapState().getMapCellState(p), "traversed");
+        }
+        
         sensorsScan();
-        Direction[] bestDirections = directionToGoal(getMapState().getRobotPoint(), this.getMapState().getEndPoint());
-        for (Direction d : bestDirections) {
-            if (canMove(d)) {
+       
+        for (Direction d : directionalPriority) {
+            
+            if (canMove(d) && !hasVisited(d)) {
                 System.out.println(d);
                 getRobot().move(d);
                 break;
+            }
+            else{
+                explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setNeighbour(d, null);
             }
         }
         // Sense end location
