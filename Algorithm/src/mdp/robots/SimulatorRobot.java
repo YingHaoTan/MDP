@@ -82,7 +82,7 @@ public class SimulatorRobot extends RobotBase {
 		else if(mapdirection == Direction.LEFT)
 			mstate.setRobotPoint(new Point(location.x - 1, location.y));
 		else
-			mstate.setRobotPoint(new Point(location.x + 1, location.x));
+			mstate.setRobotPoint(new Point(location.x + 1, location.y));
 		
 		timer.schedule(new NotifyTask(mapdirection, actions), delay);
 	}
@@ -135,8 +135,11 @@ public class SimulatorRobot extends RobotBase {
 	 * @param sensor
 	 * @return
 	 */
-	private Point getSensorCoordinate(SensorConfiguration sensor) {
-		Point location = mstate.getRobotPoint();
+	public Point getSensorCoordinate(SensorConfiguration sensor) {
+                       
+                List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
+		Point location = points.get(points.size() / 2);
+                
 		Dimension rdim = mstate.getRobotDimension();
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate;
