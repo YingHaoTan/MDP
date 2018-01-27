@@ -93,7 +93,6 @@ public class SimulatorRobot extends RobotBase {
 		else
 			this.location = new Point(location.x + 1, location.y);
 		
-                System.out.println(location.toString());
 		timer.schedule(new NotifyTask(mapdirection, actions), delay);
 	}
 	

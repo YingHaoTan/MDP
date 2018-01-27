@@ -201,6 +201,7 @@ public class MdpMap extends JPanel {
 			for(Point p: points) {
 				CellState pstate = getCellState(p);
 				
+                                // May need to review this logic again
 				if(pstate == CellState.UNEXPLORED || 
 						(pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED) ||
 						(pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE))

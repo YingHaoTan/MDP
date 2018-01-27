@@ -73,9 +73,9 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         double rightAngle = angleBetween(goalVector, rightVector);
         double upAngle = angleBetween(goalVector, upVector);
 
-        System.out.println("Left: " + leftAngle);
-        System.out.println("Right: " + rightAngle);
-        System.out.println("Up: " + upAngle);
+        //System.out.println("Left: " + leftAngle);
+        //System.out.println("Right: " + rightAngle);
+        //System.out.println("Up: " + upAngle);
 
         if (leftAngle < rightAngle && leftAngle < upAngle) {
             results[0] = Direction.LEFT;
@@ -120,17 +120,13 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         // Checks cell state;
         CellState state = CellState.NORMAL;
         Set<Point> points = convertRobotPointToMapPoints(nextLocation(direction));
+        
         for (Point p : points) {
             CellState pstate = getCellState(p);
-
-            if (pstate == CellState.UNEXPLORED
-                    || (pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED)
-                    || (pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE)) {
-                state = pstate;
+ 
+            if(pstate == null || pstate == CellState.OBSTACLE){// || pstate == CellState.UNEXPLORED){
+                return false;
             }
-        }
-        if (state == CellState.OBSTACLE) {
-            return false;
         }
         return true;
     }
@@ -144,13 +140,13 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
         for (SensorConfiguration sensor : sensors) {
             
-            System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
+            //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
             
             int reading = readings.get(sensor);
 
             // Limits sensor range
             if (reading > sensor.getMaxDistance()) {
-                System.out.println(reading);
+                //System.out.println(reading);
                 reading = 0;
             }
 
@@ -276,6 +272,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         Direction[] bestDirections = directionToGoal(this.supposedCurrentLocation, getEndpoint());
         for (Direction d : bestDirections) {
             if (canMove(d)) {
+                System.out.println(d);
                 getRobot().move(d);
                 break;
             }

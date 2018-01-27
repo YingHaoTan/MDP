@@ -95,7 +95,10 @@ public abstract class ExplorationBase {
      * @return
      */
     protected CellState getCellState(Point coordinate) {
-        return this.cellstates[coordinate.x][coordinate.y];
+        if (coordinate.x >= 0 && coordinate.y >= 0 && coordinate.x < this.cellstates.length && coordinate.y < this.cellstates[0].length) {
+            return this.cellstates[coordinate.x][coordinate.y];
+        }
+        return null;
     }
 
     protected RobotBase getRobot() {
