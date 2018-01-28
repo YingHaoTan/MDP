@@ -8,12 +8,22 @@
 
     <TextView
         android:id="@+id/deviceName"
-        android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="normal|bold"
+        android:paddingBottom="0.5dp"
         android:paddingTop="2dp"
-        android:paddingBottom="0.5dp"/>
+        android:text="TextView"
+        android:textSize="20sp"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:id="@+id/deviceAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:paddingTop="2dp"
+        android:paddingBottom="0.5dp"
+        android:text="TextView"/>
 
 </LinearLayout>

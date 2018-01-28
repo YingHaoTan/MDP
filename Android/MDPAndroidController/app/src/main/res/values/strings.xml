@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">MDPAndroidController</string>
     <string name="connectionBtnDefaultText">Connect</string>
+    <string name="connectionBtnDisconnectText">Disconnect</string>
     <string name="connectionStringDefaultText">No device connected</string>
     <string name="title_activity_device_select">DeviceSelectActivity</string>
     <string name="known_devices">Known devices: </string>
     <string name="nearby_devices">Nearby devices: </string>
     <string name="scan_devices">Scan Device</string>
     <string name="scanning_devices">Scanning</string>
+    <string name="no_device">No Devices</string>
+    <string name="no_device_address">NIL</string>
 </resources>
