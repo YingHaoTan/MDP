@@ -32,6 +32,7 @@ public class BluetoothService {
 
 
     // Unique UUID for this application
+    // If new UUID is needed, obtain one from online UUID generation tool
     private static final UUID MY_UUID = UUID.fromString("124b4e1a-9b5f-4191-a129-90e7947acacd");
 
     // Member fields
