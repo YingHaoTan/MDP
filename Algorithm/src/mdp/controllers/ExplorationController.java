@@ -30,7 +30,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
     ExplorationNode[][] explorationNodes;
     int dist = 0;
-    int R = 100;
+    int R = 1000;
     Point lastVisited;
     ExplorationState currentState = ExplorationState.EXPLORING;
 
@@ -180,7 +180,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
 
             //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
             int reading = readings.get(sensor);
-
+            int test = reading;
             // Limits sensor range
             if (reading > sensor.getMaxDistance()) {
                 reading = 0;
@@ -235,11 +235,13 @@ public class ExplorationController extends ExplorationBase implements RobotActio
                         break;
                     case LEFT:
                         for (int range = 1; range <= maxRange; range++) {
+
                             this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
                         }
                         break;
                     case RIGHT:
                         for (int range = 1; range <= maxRange; range++) {
+
                             this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
                         }
                         break;
@@ -317,27 +319,35 @@ public class ExplorationController extends ExplorationBase implements RobotActio
         }
 
         if (getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
-            // Checked if all explored
             System.out.println("Returned");
             dist = 0;
             currentState = ExplorationState.EXPLORING;
+
+            // Checked if all explored
+            // else find fastest path to last visited node
         }
 
         explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].traversed();
-        for (Point p : getMapState().convertRobotPointToMapPoints(getMapState().getRobotPoint())) {
+        /*for (Point p : getMapState().convertRobotPointToMapPoints(getMapState().getRobotPoint())) {
             this.setCellState(p, getMapState().getMapCellState(p), "traversed");
-        }
+        }*/
 
         sensorsScan();
 
         if (currentState == ExplorationState.RETURNING) {
+
+            // If there exists a path back to starting point (CellState.NORMAL) 
+            // fastest path back
+            // Else retrace
             getRobot().move(explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].getParentDirection());
             explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(null);
 
-        } 
-        else{
+        } else {
             for (Direction d : directionalPriority) {
                 if (canMove(d)) {
+                    for (Point p : getMapState().convertRobotPointToMapPoints(nextLocation(d))) {
+                        this.setCellState(p, getMapState().getMapCellState(p), "can move");
+                    }
                     if (!hasVisited(d)) {
                         System.out.println(d);
                         currentState = ExplorationState.EXPLORING;

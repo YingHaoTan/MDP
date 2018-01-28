@@ -32,7 +32,7 @@ public class SimulatorRobot extends RobotBase {
 	 */
 	public SimulatorRobot(Dimension dimension, Direction orientation) {
 		super(dimension, orientation);
-		delay = 1000;
+		delay = 100;
 	}
 	
 	/**
@@ -183,7 +183,7 @@ public class SimulatorRobot extends RobotBase {
 					distance = scoordinate.x - x;
 		}
 		else {
-			for(int x = scoordinate.x + 1; x < mdim.width; x++)
+			for(int x = scoordinate.x + 1; x < mdim.width  && distance == 0; x++)
 				if(mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE)
 					distance = x - scoordinate.x;
 		}
