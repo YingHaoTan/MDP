@@ -115,8 +115,8 @@ public class MdpMap extends JPanel {
 		
 		int totalcellW = msystemdim.width * this.cellsize.width;
 		int totalcellH = msystemdim.height * this.cellsize.height;
-		int totalmarginW = (msystemdim.width + 1) * 1;
-		int totalmarginH = (msystemdim.height + 1) * 1;
+		int totalmarginW = msystemdim.width + 1;
+		int totalmarginH = msystemdim.height + 1;
 		
 		return new Dimension(totalcellW + totalmarginW, totalcellH + totalmarginH);
 	}
