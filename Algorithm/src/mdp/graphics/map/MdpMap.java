@@ -7,51 +7,18 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import mdp.models.CellState;
+import mdp.models.MapState;
+
 /**
  * MdpMap class encapsulates the map graphics user interface<br />
- * MdpMap operates in 2 coordinate systems, map coordinate system and robot coordinate system<br /><br />
- * 
- * Example:
- * <pre>
- * Assuming a robot dimension of (3, 3) with a map coordinate system of size (4 x 5) 
- * will be reduced to (2 x 3) robot coordinate system
- * 
- * Map Coordinate System (4 x 5)
- * ------------------------------------
- * | 0, 3 | 1, 3 | 2, 3 | 3, 3 | 4, 3 |
- * ------------------------------------
- * | 0, 2 | 1, 2 | 2, 2 | 3, 2 | 4, 2 |
- * ------------------------------------
- * | 0, 1 | 1, 1 | 2, 1 | 3, 1 | 4, 1 |
- * ------------------------------------
- * | 0, 0 | 1, 0 | 2, 0 | 3, 0 | 4, 0 |
- * ------------------------------------
- * 
- * Robot Coordinate System (2 x 3)
- * 
- * -----------------------------
- * | 0, 1 | 1, 1 | 2, 1 | 3, 1 |
- * -----------------------------
- * | 0, 0 | 1, 0 | 2, 0 | 3, 0 |
- * -----------------------------
- * 
- * Where the following mapping between Map Coordinate System <=> Robot Coordinate System exists:
- * {(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (2, 2)} <=> (0, 0)
- * {(1, 0), (2, 0), (3, 0), (1, 1), (2, 1), (3, 1), (1, 2), (2, 2), (3, 2)} <=> (1, 0)
- * {(0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (2, 2), (0, 3), (1, 3), (2, 3)} <=> (0, 1)
- * 
- * </pre>
  * 
  * @author Ying Hao
  */
@@ -61,35 +28,10 @@ public class MdpMap extends JPanel {
 	 */
 	private static final long serialVersionUID = -5182200928126366649L;
 	private static final Dimension DEFAULT_CELL_SIZE = new Dimension(40, 40);
-	private static final Dimension DEFAULT_ROBOT_DIMENSION = new Dimension(3, 3);
 	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive cell states
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum CellState {
-		UNEXPLORED, OBSTACLE, NORMAL, WAYPOINT
-	}
-	
-	/**
-	 * MapDescriptorFormat contains the enumeration of all possible mutually exclusive map descriptor formats
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum MapDescriptorFormat {
-		MDF1, MDF2
-	}
-	
-	private int row;
-	private int column;
+	private MapState mstate;
 	private Dimension cellsize;
-	private Dimension robotdim;
-	private Point robotlocation;
-	private Point endlocation;
 	private String[][] celllabels;
-	private CellState[][] cellstates;
-	private Point waypoint;
 	
 	/**
 	 * Creates an instance of MdpMap with the specified map size in rows and columns
@@ -97,16 +39,20 @@ public class MdpMap extends JPanel {
 	 * @param row
 	 * @param column
 	 */
-	public MdpMap(int row, int column) {
-		this.row = row;
-		this.column = column;
+	public MdpMap(Dimension mapdim, Dimension robotdim) {
 		this.cellsize = DEFAULT_CELL_SIZE;
-		this.celllabels = new String[column][row];
-		this.cellstates = new CellState[column][row];
+		this.celllabels = new String[mapdim.width][mapdim.height];
 		
 		this.setBackground(Color.WHITE);
-		this.setRobotDimension(DEFAULT_ROBOT_DIMENSION);
-		reset();
+		this.mstate = new MapState(mapdim, robotdim);
+	}
+	
+	/**
+	 * Gets the map state
+	 * @return
+	 */
+	public MapState getMapState() {
+		return this.mstate;
 	}
 
 	/**
@@ -123,62 +69,6 @@ public class MdpMap extends JPanel {
 	 */
 	public void setMapCellSize(Dimension dimension) {
 		this.cellsize = dimension;
-	}
-	
-	/**
-	 * Gets the robot dimension in map coordinate
-	 * @return
-	 */
-	public Dimension getRobotDimension() {
-		return this.robotdim;
-	}
-	
-	/**
-	 * Sets the robot dimension in map coordinate
-	 * @param dim
-	 */
-	public void setRobotDimension(Dimension dim) {
-		this.robotdim = dim;
-	}
-	
-	/**
-	 * Gets the end location with reference to robot coordinates
-	 * @return
-	 */
-	public Point getEndLocation() {
-		return this.endlocation;
-	}
-	
-	/**
-	 * Gets the end location with reference to robot coordinates
-	 * @param
-	 */
-	public void setEndLocation(Point location) {
-		if(this.endlocation != null)
-			setCellLabel(getEndMapPoint(), null);
-		
-		this.endlocation = location;
-		setCellLabel(getEndMapPoint(), "Endpoint");
-	}
-	
-	/**
-	 * Gets the location of robot with reference to robot coordinates
-	 * @return
-	 */
-	public Point getRobotLocation() {
-		return this.robotlocation;
-	}
-	
-	/**
-	 * Sets the location of robot with reference to robot coordinates
-	 * @param location
-	 */
-	public void setRobotLocation(Point location) {
-		if(this.robotlocation != null)
-			setCellLabel(getRobotMapPoint(), null);
-		
-		this.robotlocation = location;
-		setCellLabel(getRobotMapPoint(), "Robot");
 	}
 	
 	/**
@@ -200,99 +90,15 @@ public class MdpMap extends JPanel {
 	}
 	
 	/**
-	 * Gets the cell state at the specified location
-	 * @param location
-	 * @param mapcoordinates - Indicates to use map coordinates or robot coordinates
-	 * @return
-	 */
-	public CellState getCellState(Point location, boolean mapcoordinates) {
-		CellState state = CellState.NORMAL;
-		
-		if(mapcoordinates) {
-			state = getCellState(location);
-		}
-		else {
-			Set<Point> points = this.convertRobotPointToMapPoints(location);
-			for(Point p: points) {
-				CellState pstate = getCellState(p);
-				
-				if(pstate == CellState.UNEXPLORED || 
-						(pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED) ||
-						(pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE))
-					state = pstate;
-			}
-		}
-		
-		return state;
-	}
-	
-	/**
-	 * Gets the cell state at the specified location using map coordinates
-	 * @param location
-	 * @return
-	 */
-	public CellState getCellState(Point location) {
-		return this.cellstates[location.x][location.y];
-	}
-	
-	/**
-	 * Sets the cell state at the specified location using map coordinates
-	 * @param location
-	 * @param value
-	 */
-	public void setCellState(Point location, CellState state) {
-		this.cellstates[location.x][location.y] = state;
-		
-		if(state == CellState.WAYPOINT) {
-			// Clears previous waypoint
-			if(this.waypoint != null && this.waypoint != location)
-				this.setCellState(waypoint, CellState.NORMAL);
-			
-			// Set waypoint value
-			this.waypoint = location;
-		}
-	}
-	
-	/**
-	 * Gets the robot center location in map coordinate
-	 * @return
-	 */
-	public Point getRobotMapPoint() {
-		return new Point(robotlocation.x + (robotdim.width / 2), robotlocation.y + (robotdim.height / 2));
-	}
-	
-	/**
-	 * Gets the end center location in map coordinate
-	 * @return
-	 */
-	public Point getEndMapPoint() {
-		return new Point(endlocation.x + (robotdim.width / 2), endlocation.y + (robotdim.height / 2));
-	}
-	
-	/**
-	 * Sets the cell state for all cells
-	 * @param state
-	 */
-	public void setCellState(CellState state) {
-		for(int x = 0; x < this.cellstates.length; x++) {
-			for(int y = 0; y < this.cellstates[x].length; y++) {
-				this.setCellState(new Point(x, y), state);
-			}
-		}
-		
-		this.repaint();
-	}
-	
-	/**
 	 * Converts a map coordinate to screen coordinate
 	 * @param p
 	 * @return
 	 */
 	public Point convertMapPointToScreenPoint(Point p) {
 		return new Point(p.x * (1 + this.cellsize.width) + 1, 
-				(this.row - p.y - 1) * (1 + this.cellsize.height) + 1);
+				(this.mstate.getMapSystemDimension().height - p.y - 1) * (1 + this.cellsize.height) + 1);
 	}
-	
+
 	/**
 	 * Converts a screen coordinate to map coordinate
 	 * @param p
@@ -300,80 +106,17 @@ public class MdpMap extends JPanel {
 	 */
 	public Point convertScreenPointToMapPoint(Point p) {
 		return new Point((p.x - 1) / (1 + this.cellsize.width), 
-				this.row - (this.cellsize.height + p.y) / (1 + this.cellsize.height));
-	}
-	
-	/**
-	 * Converts a robot point in robot coordinate to a list of matching map point in map coordinate
-	 * @param p
-	 * @return
-	 */
-	public Set<Point> convertRobotPointToMapPoints(Point p) {
-		Set<Point> points = new HashSet<>();
-		
-		for(int x = 0; x < robotdim.width; x++)
-			for(int y = 0; y < robotdim.height; y++)
-				points.add(new Point(p.x + x, p.y + y));
-	
-		return points;
-	}
-	
-	/**
-	 * Gets the bounding rectangle of the robot coordinates
-	 * @return
-	 */
-	public Rectangle getRobotCoordinateBounds() {
-		return new Rectangle(0, 0, this.column - this.robotdim.width + 1, this.row - this.robotdim.height + 1);
-	}
-	
-	/**
-	 * Resets this map by removing all cell labels, obstacles, way points, unexplored states
-	 * @param Indicates if start point and end points must be reset
-	 */
-	public void reset() {
-		Rectangle rbound = this.getRobotCoordinateBounds();
-		
-		for(String[] rowlabels: this.celllabels)
-			Arrays.fill(rowlabels, null);
-		for(CellState[] rowStates: this.cellstates)
-			Arrays.fill(rowStates, CellState.NORMAL);
-		
-		this.setRobotLocation(new Point(0, 0));
-		this.setEndLocation(new Point(rbound.width - 1, rbound.height - 1));
-		this.repaint();
-	}
-	
-	/**
-	 * Returns a string representation of this map based on the MapDescriptorFormat specified in hexadecimal
-	 * @param format
-	 * @return
-	 */
-	public String toString(MapDescriptorFormat format) {
-		String descriptor = new String();
-		
-		for(int x = 0; x < this.column; x++) {
-			for(int y = 0; y < this.row; y++) {
-				boolean explored = this.cellstates[x][y] != CellState.UNEXPLORED;
-				
-				if(format == MapDescriptorFormat.MDF1)
-					descriptor += explored? "1": "0";
-				else if(explored)
-					descriptor += this.cellstates[x][y] == CellState.OBSTACLE? "1": "0";
-			}
-		}
-		
-		if(format == MapDescriptorFormat.MDF1)
-			descriptor = "11" + descriptor + "11";
-		
-		return new BigInteger(descriptor, 2).toString(16).toUpperCase();
+				this.mstate.getMapSystemDimension().height - (this.cellsize.height + p.y) / (1 + this.cellsize.height));
 	}
 
 	@Override
 	public Dimension getPreferredSize() {
-		int totalcellW = this.column * this.cellsize.width;
-		int totalcellH = this.row * this.cellsize.height;
-		int totalmarginW = (this.column + 1) * 1;
-		int totalmarginH = (this.row + 1) * 1;
+		Dimension msystemdim = this.mstate.getMapSystemDimension();
+		
+		int totalcellW = msystemdim.width * this.cellsize.width;
+		int totalcellH = msystemdim.height * this.cellsize.height;
+		int totalmarginW = (msystemdim.width + 1) * 1;
+		int totalmarginH = (msystemdim.height + 1) * 1;
 		
 		return new Dimension(totalcellW + totalmarginW, totalcellH + totalmarginH);
 	}
@@ -397,13 +140,14 @@ public class MdpMap extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
+		Dimension msystemdim = this.mstate.getMapSystemDimension();
 		int rowoffset = 1 + this.cellsize.height;
 		int coloffset = 1 + this.cellsize.width;
 		
-		for(int i = 0; i < this.row + 1; i++)
+		for(int i = 0; i < msystemdim.height + 1; i++)
 			g.drawLine(0, i * rowoffset, this.getWidth(), i * rowoffset);
 		
-		for(int i = 0; i < this.column + 1; i++)
+		for(int i = 0; i < msystemdim.width + 1; i++)
 			g.drawLine(i * coloffset, 0, i * coloffset, this.getHeight());
 	}
 	
@@ -420,9 +164,11 @@ public class MdpMap extends JPanel {
 	}
 	
 	private void paintCellState(Graphics g) {
-		for(int x = 0; x < this.cellstates.length; x++) {
-			for(int y = 0; y < this.cellstates[x].length; y++) {
-				CellState state = this.cellstates[x][y];
+		Dimension msystemdim = this.mstate.getMapSystemDimension();
+		
+		for(int x = 0; x < msystemdim.width; x++) {
+			for(int y = 0; y < msystemdim.height; y++) {
+				CellState state = this.mstate.getMapCellState(new Point(x, y));
 				Point point = convertMapPointToScreenPoint(new Point(x, y));
 				
 				if(state != CellState.NORMAL) {
@@ -454,23 +200,48 @@ public class MdpMap extends JPanel {
 	}
 	
 	private void paintRobot(Graphics g) {
-		Point robotMapPoint = getRobotMapPoint();
+		Dimension robotdim = this.mstate.getRobotDimension();
+		
+		List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
+		Point robotMapPoint = points.get(points.size() / 2);
 		Point robotScreenPoint = convertMapPointToScreenPoint(new Point(robotMapPoint.x - (robotdim.width / 2), robotMapPoint.y + (robotdim.height / 2)));
+		
 		int robotWidth = robotdim.width * (this.cellsize.width + 1) - 2;
 		int robotHeight = robotdim.height * (this.cellsize.height + 1) - 2;
 		
 		g.setColor(new Color(84, 189, 84));
 		g.fillOval(robotScreenPoint.x, robotScreenPoint.y, robotWidth, robotHeight);
+		
+		g.setColor(Color.BLACK);
+		FontMetrics metrics = g.getFontMetrics();
+		String label = "Robot";
+		
+		Point labelScreenPoint = convertMapPointToScreenPoint(robotMapPoint);
+		g.drawString(label, 
+				(int)((this.cellsize.width - metrics.stringWidth(label)) / 2) + labelScreenPoint.x, 
+				this.cellsize.height / 2 + labelScreenPoint.y);
 	}
 	
 	private void paintEndLocation(Graphics g) {
-		Point endMapPoint = getEndMapPoint();
+		Dimension robotdim = this.mstate.getRobotDimension();
+		
+		List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getEndPoint());
+		Point endMapPoint = points.get(points.size() / 2);
 		Point endScreenPoint = convertMapPointToScreenPoint(new Point(endMapPoint.x - (robotdim.width / 2), endMapPoint.y + (robotdim.height / 2)));
 		int robotWidth = robotdim.width * (this.cellsize.width + 1) - 1;
 		int robotHeight = robotdim.height * (this.cellsize.height + 1) - 1;
 		
 		g.setColor(new Color(64, 224, 208));
 		g.fillRect(endScreenPoint.x, endScreenPoint.y, robotWidth, robotHeight);
+		
+		g.setColor(Color.BLACK);
+		FontMetrics metrics = g.getFontMetrics();
+		String label = "Endpoint";
+		
+		Point labelScreenPoint = convertMapPointToScreenPoint(endMapPoint);
+		g.drawString(label, 
+			(int)((this.cellsize.width - metrics.stringWidth(label)) / 2) + labelScreenPoint.x, 
+			this.cellsize.height / 2 + labelScreenPoint.y);
 	}
 	
 	private void paintLabel(Graphics g) {

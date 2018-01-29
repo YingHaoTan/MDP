@@ -10,8 +10,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import mdp.graphics.ExecutionMode;
+import mdp.graphics.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
-import mdp.graphics.map.MdpMap.MapDescriptorFormat;
+import mdp.models.MapDescriptorFormat;
+import mdp.models.MapState;
 
 /**
  * CoordinateInputPane encapsulates input controls necessary for all user inputs
@@ -23,24 +26,6 @@ public class MainInputPane extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -4895645877543278267L;
-	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive map interaction modes
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum MapInteractionMode {
-		NONE, ADD_OBSTACLE, SET_WAYPOINT
-	}
-	
-	/**
-	 * CellState contains the enumeration of all possible mutually exclusive execution modes
-	 * 
-	 * @author Ying Hao
-	 */
-	public enum ExecutionMode {
-		SIMULATION, PHYSICAL
-	}
 	
 	private CoordinateInputPane startinput;
 	private CoordinateInputPane endinput;
@@ -59,14 +44,15 @@ public class MainInputPane extends JPanel {
 		this.setLayout(layout);
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
-		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateBounds(), map.getRobotLocation());
-		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateBounds(), map.getEndLocation());
+		MapState mstate = map.getMapState();
+		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", mstate.getRobotSystemDimension());
+		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", mstate.getRobotSystemDimension());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
 		
 		JPanel mdf1panel = new JPanel();
 		mdf1panel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		this.mdf1 = new JTextArea(map.toString(MapDescriptorFormat.MDF1));
+		this.mdf1 = new JTextArea();
 		this.mdf1.setPreferredSize(new Dimension(300, 50));
 		this.mdf1.setLineWrap(true);
 		this.mdf1.setEditable(false);
@@ -75,7 +61,7 @@ public class MainInputPane extends JPanel {
 		
 		JPanel mdf2panel = new JPanel();
 		mdf2panel.setLayout(new FlowLayout(FlowLayout.LEADING));
-		this.mdf2 = new JTextArea(map.toString(MapDescriptorFormat.MDF2));
+		this.mdf2 = new JTextArea();
 		this.mdf2.setPreferredSize(new Dimension(300, 50));
 		this.mdf2.setLineWrap(true);
 		this.mdf2.setEditable(false);
@@ -106,6 +92,8 @@ public class MainInputPane extends JPanel {
 		this.add(mdf1panel);
 		this.add(mdf2panel);
 		this.add(executionpane);
+		
+		this.sync(mstate);
 	}
 	
 	/**
@@ -194,6 +182,17 @@ public class MainInputPane extends JPanel {
 	 */
 	public JButton getResetButton() {
 		return this.resetbtn;
+	}
+	
+	/**
+	 * Syncrhonizes the current MainInputPane displays with the provided map state instance
+	 * @param map
+	 */
+	public void sync(MapState mstate) {
+		this.startinput.setCoordinate(mstate.getRobotPoint());
+		this.endinput.setCoordinate(mstate.getEndPoint());
+		this.mdf1.setText(mstate.toString(MapDescriptorFormat.MDF1));
+		this.mdf2.setText(mstate.toString(MapDescriptorFormat.MDF2));
 	}
 
 	@Override
