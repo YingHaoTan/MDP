@@ -263,7 +263,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
             case LEFT:
                 mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
                 break;
-            default:
+            case RIGHT:
                 mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
                 break;
         }

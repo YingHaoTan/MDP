@@ -355,6 +355,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
                         return;
                     }
                 } else {
+                    
                     explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setNeighbour(d, null);
                 }
             }

@@ -142,6 +142,14 @@ public abstract class RobotBase {
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
     }
+    
+    public void move(RobotAction action){
+        if(action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT)
+            move(null, action);
+        else{
+            move(orientation, action);
+        }
+    }
 
     /**
      * Notifies all RobotActionListener instances registered to this Robot
