@@ -17,11 +17,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTED;
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTING;
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_LISTEN;
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
+
 /**
  * Implement Handler() interface and pass to BluetoothService upon creation.
  *
  * Created by Zhenghao on 28/1/18.
  */
+// TODO: refactor as a singleton
 
 public class BluetoothService {
 
@@ -30,6 +36,8 @@ public class BluetoothService {
     // Name for the SDP record when creating server socket
     private static final String NAME = "BluetoothService";
 
+    // The connected bluetooth device
+    private BluetoothDevice device = null;
 
     // Unique UUID for this application
     // If new UUID is needed, obtain one from online UUID generation tool
@@ -42,12 +50,6 @@ public class BluetoothService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
-
-    // Constants that indicate the current connection state
-    public static final int STATE_NONE = 0;       // we're doing nothing
-    public static final int STATE_LISTEN = 1;     // now listening for incoming connections
-    public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
-    public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     /**
      * Constructor. Prepares a new Bluetooth service.
@@ -70,6 +72,14 @@ public class BluetoothService {
         return mState;
     }
 
+    public void setDevice(BluetoothDevice device) {
+        this.device = device;
+    }
+
+    public BluetoothDevice getDevice() {
+        return device;
+    }
+
     /**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
@@ -89,6 +99,10 @@ public class BluetoothService {
         if (mAcceptThread == null) {
             mAcceptThread = new AcceptThread();
             mAcceptThread.start();
+        }
+        // Reset connected device
+        if (this.device != null) {
+            this.device = null;
         }
         setState(STATE_LISTEN);
     }
@@ -142,15 +156,32 @@ public class BluetoothService {
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
+        this.device = device;
 
-        // TODO: change UI Activity to MainActivity
-        // Send the name of the connected device back to the UI Activity
+        // Send the name of the connected device back to the parent Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.DEVICE_NAME, device.getName());
         msg.setData(bundle);
         mHandler.sendMessage(msg);
         setState(STATE_CONNECTED);
+    }
+
+    public synchronized void disconnect() {
+        if (mState != STATE_CONNECTED || mConnectedThread == null){
+            Log.w(TAG, "disconnect: the device is not connected or has already been disconnected");
+            BluetoothService.this.start();
+        }
+        else if (this.device == null) {
+            Log.w(TAG, "disconnect: no connected device found");
+            BluetoothService.this.start();
+        }
+        else {
+            mConnectedThread.cancel();
+            mState = STATE_LISTEN;
+            this.device = null;
+            BluetoothService.this.start();
+        }
     }
 
     /**
@@ -169,6 +200,7 @@ public class BluetoothService {
             mAcceptThread.cancel();
             mAcceptThread = null;
         }
+        this.device = null;
         setState(STATE_NONE);
     }
 
@@ -211,12 +243,14 @@ public class BluetoothService {
      */
     private void connectionLost() {
         setState(STATE_LISTEN);
+        this.device = null;
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.TOAST, "Device connection was lost");
         msg.setData(bundle);
         mHandler.sendMessage(msg);
+        this.device = null;
     }
 
     /**
@@ -280,7 +314,6 @@ public class BluetoothService {
                 }
             }
             Log.d(TAG, "END mAcceptThread");
-
         }
 
         public void cancel() {
@@ -399,6 +432,7 @@ public class BluetoothService {
 
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                    Log.d(TAG, "ConnectedThread: read string - " + new String(buffer));
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -426,6 +460,8 @@ public class BluetoothService {
 
         public void cancel() {
             try {
+                mmInStream.close();
+                mmOutStream.close();
                 mmSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);

@@ -18,6 +18,12 @@ public class Constants {
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
+    // Constants that indicate the current connection state
+    public static final int STATE_NONE = 0;       // we're doing nothing
+    public static final int STATE_LISTEN = 1;     // now listening for incoming connections
+    public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
+    public static final int STATE_CONNECTED = 3;  // now connected to a remote device
+
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
