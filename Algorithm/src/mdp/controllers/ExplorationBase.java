@@ -17,17 +17,18 @@ import mdp.robots.RobotBase;
 public abstract class ExplorationBase {
 
     private MapState mstate;
-    private List<CellStateUpdateListener> listeners;
+    private List<CellStateUpdateListener> cslisteners;
+    private List<ExplorationCompletedListener> eclisteners;
     private RobotBase robot;
 
     public ExplorationBase() {
-        this.listeners = new ArrayList<>();
+        this.cslisteners = new ArrayList<>();
+        this.eclisteners = new ArrayList<>();
     }
 
     /**
      * Performs exploration with the provided robot and current coordinate of
      * the robot in robot coordinate system
-     *
      * @param robot
      * @param start
      */
@@ -49,42 +50,58 @@ public abstract class ExplorationBase {
 
     /**
      * Adds CellStateUpdateListener
-     *
      * @param listener
      */
     public void addCellStateUpdateListener(CellStateUpdateListener listener) {
-        this.listeners.add(listener);
+        this.cslisteners.add(listener);
     }
 
     /**
      * Removes CellStateUpdateListener
-     *
      * @param listener
      */
     public void removeCellStateUpdateListener(CellStateUpdateListener listener) {
-        this.listeners.remove(listener);
+        this.cslisteners.remove(listener);
+    }
+    
+    /**
+     * Adds ExplorationCompletedListener
+     * @param listener
+     */
+    public void addExplorationCompletedListener(ExplorationCompletedListener listener) {
+    	this.eclisteners.add(listener);
+    }
+    
+    /**
+     * Removes ExplorationCompletedListener
+     * @param listener
+     */
+    public void removeExplorationCompletedListener(ExplorationCompletedListener listener) {
+    	this.eclisteners.remove(listener);
+    }
+    
+    /**
+     * Notifies listeners of completion of exploration
+     */
+    protected void complete() {
+    	for(ExplorationCompletedListener listener: eclisteners)
+    		listener.onExplorationComplete();
     }
 
     /**
      * Sets the CellState at a particular coordinate
-     *
      * @param coordinate
      * @param state
      * @param label
      */
     protected void setCellState(Point coordinate, CellState state, String label) {
-
-        if (mstate.setMapCellState(coordinate, state)) {
-
-            for (CellStateUpdateListener listener : listeners) {
+        if (mstate.setMapCellState(coordinate, state))
+            for (CellStateUpdateListener listener : cslisteners)
                 listener.onCellStateUpdate(coordinate, state, label);
-            }
-        }
     }
 
     /**
      * Gets the CellState at a particular coordinate
-     *
      * @param coordinate
      * @return
      */
@@ -95,13 +112,16 @@ public abstract class ExplorationBase {
 
     /**
      * Gets the map state
-     *
      * @return
      */
     protected MapState getMapState() {
         return mstate;
     }
 
+    /**
+     * Gets the robot
+     * @return
+     */
     protected RobotBase getRobot() {
         return robot;
     }

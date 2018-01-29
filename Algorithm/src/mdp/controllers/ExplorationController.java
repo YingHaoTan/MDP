@@ -2,10 +2,8 @@ package mdp.controllers;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import mdp.models.CellState;
 
 import mdp.models.Direction;
@@ -341,7 +339,6 @@ public class ExplorationController extends ExplorationBase implements RobotActio
             // Else retrace
             getRobot().move(explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].getParentDirection());
             explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(null);
-
         } else {
             for (Direction d : directionalPriority) {
                 if (canMove(d)) {

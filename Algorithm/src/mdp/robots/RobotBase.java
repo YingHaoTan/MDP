@@ -146,9 +146,8 @@ public abstract class RobotBase {
     public void move(RobotAction action){
         if(action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT)
             move(null, action);
-        else{
+        else
             move(orientation, action);
-        }
     }
 
     /**

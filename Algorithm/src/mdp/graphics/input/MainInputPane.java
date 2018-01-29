@@ -194,6 +194,24 @@ public class MainInputPane extends JPanel {
 		this.mdf1.setText(mstate.toString(MapDescriptorFormat.MDF1));
 		this.mdf2.setText(mstate.toString(MapDescriptorFormat.MDF2));
 	}
+	
+	/**
+	 * Enables input pane
+	 */
+	public void enable() {
+		executionbtn.setEnabled(true);
+		cancelbtn.setEnabled(true);
+		resetbtn.setEnabled(true);
+	}
+	
+	/**
+	 * Disables input pane
+	 */
+	public void disable() {
+		executionbtn.setEnabled(false);
+		cancelbtn.setEnabled(false);
+		resetbtn.setEnabled(false);
+	}
 
 	@Override
 	public BaselineResizeBehavior getBaselineResizeBehavior() {
