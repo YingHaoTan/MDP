@@ -158,8 +158,8 @@ public class MdpMap extends JPanel {
 	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		
 	    paintCellState(g);
+	    paintEndLocation(g);
 		paintRobot(g);
-		paintEndLocation(g);
 		paintLabel(g);
 	}
 	
