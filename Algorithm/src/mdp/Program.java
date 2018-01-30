@@ -5,13 +5,12 @@ import java.awt.Dimension;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
-import mdp.controllers.ExplorationBase;
-import mdp.controllers.FastestPathBase;
-import mdp.controllers.FastestPathController;
-import mdp.controllers.HugRightExplorationController;
-import mdp.controllers.SnakeExplorationController;
 
 import mdp.controllers.MdpWindowController;
+import mdp.controllers.explorer.ExplorationBase;
+import mdp.controllers.explorer.HugRightExplorationController;
+import mdp.controllers.fp.FastestPathBase;
+import mdp.controllers.fp.FastestPathController;
 import mdp.files.MapFileHandler;
 import mdp.graphics.MdpWindow;
 import mdp.models.Direction;
@@ -46,6 +45,7 @@ public class Program {
         controller.setMapLoader(filehandler);
         controller.setMapSaver(filehandler);
         controller.setSimulatorRobot(srobot);
+        controller.setFastestPathPlanner(new FastestPathController());
         /*
         FastestPath fp = new FastestPath();
         FastestPath fp2 = new FastestPath();

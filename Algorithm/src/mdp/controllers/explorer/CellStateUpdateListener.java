@@ -1,4 +1,4 @@
-package mdp.controllers;
+package mdp.controllers.explorer;
 
 import java.awt.Point;
 

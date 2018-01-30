@@ -1,4 +1,4 @@
-package mdp.controllers;
+package mdp.controllers.fp;
 
 import java.awt.Point;
 import java.util.ArrayList;

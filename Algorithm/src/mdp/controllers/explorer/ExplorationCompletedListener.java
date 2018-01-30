@@ -1,4 +1,4 @@
-package mdp.controllers;
+package mdp.controllers.explorer;
 
 /**
  * ExplorationCompletedListener provides method needed for exploration planner to perform notification

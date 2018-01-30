@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mdp.controllers;
+package mdp.controllers.explorer;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
 import java.util.Map;
+
+import mdp.controllers.fp.FastestPathBase;
 import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.RobotAction;

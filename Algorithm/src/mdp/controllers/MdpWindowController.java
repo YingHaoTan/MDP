@@ -9,6 +9,11 @@ import java.util.Set;
 
 import javax.swing.JButton;
 
+import mdp.controllers.explorer.CellStateUpdateListener;
+import mdp.controllers.explorer.ExplorationBase;
+import mdp.controllers.explorer.ExplorationCompletedListener;
+import mdp.controllers.fp.FastestPathBase;
+import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.graphics.ExecutionMode;
 import mdp.graphics.MapInteractionMode;
 import mdp.graphics.MdpWindow;

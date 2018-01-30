@@ -1,4 +1,4 @@
-package mdp.controllers;
+package mdp.controllers.fp;
 
 /**
  * FastestPathCompletedListener provides method needed for fastest path to perform notification

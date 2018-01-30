@@ -1,9 +1,10 @@
-package mdp.controllers;
+package mdp.controllers.explorer;
 
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
 import java.util.Map;
+
 import mdp.models.CellState;
 
 import mdp.models.Direction;
@@ -93,7 +94,8 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
      * @param ecoordinate
      * @return Array of directions
      */
-    private Direction[] directionToGoal(Point rcoordinate, Point ecoordinate) {
+    @SuppressWarnings("unused")
+	private Direction[] directionToGoal(Point rcoordinate, Point ecoordinate) {
 
         Direction[] results = new Direction[3];
 
