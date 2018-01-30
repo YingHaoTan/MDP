@@ -20,7 +20,7 @@ import mdp.robots.RobotBase;
  *
  * @author Ying Hao
  */
-public class ExplorationController extends ExplorationBase implements RobotActionListener {
+public class SnakeExplorationController extends ExplorationBase implements RobotActionListener {
 
     private enum ExplorationState {
         EXPLORING, RETURNING, BACKTRACKING

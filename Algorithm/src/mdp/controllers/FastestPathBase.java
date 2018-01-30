@@ -48,7 +48,7 @@ public abstract class FastestPathBase {
 	public void move(MapState mstate, RobotBase robot, Point destination) {
 		this.mstate = mstate;
 		this.robot = robot;
-		this.destination = destination;
+		this.destination = destination;                
 	}
 	
 	/**
