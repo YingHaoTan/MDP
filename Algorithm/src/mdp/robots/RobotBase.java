@@ -142,12 +142,50 @@ public abstract class RobotBase {
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
     }
-    
-    public void move(RobotAction action){
-        if(action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT)
+
+    public void move(RobotAction action) {
+        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
             move(null, action);
-        else
+            Direction newDirection = null;
+
+            if (action == RobotAction.TURN_RIGHT) {
+                switch (getCurrentOrientation()) {
+                    case UP:
+                        newDirection = Direction.RIGHT;
+                        break;
+                    case DOWN:
+                        newDirection = Direction.LEFT;
+                        break;
+                    case LEFT:
+                        newDirection = Direction.UP;
+                        break;
+                    case RIGHT:
+                        newDirection = Direction.DOWN;
+                        break;
+
+                }
+            } else {
+                switch (getCurrentOrientation()) {
+                    case UP:
+                        newDirection = Direction.LEFT;
+                        break;
+                    case DOWN:
+                        newDirection = Direction.RIGHT;
+                        break;
+                    case LEFT:
+                        newDirection = Direction.DOWN;
+                        break;
+                    case RIGHT:
+                        newDirection = Direction.UP;
+                        break;
+                }
+            }
+            
+            setCurrentOrientation(newDirection);
+
+        } else {
             move(orientation, action);
+        }
     }
 
     /**

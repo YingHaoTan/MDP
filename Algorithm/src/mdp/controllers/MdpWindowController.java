@@ -266,19 +266,21 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
         MapState mstate = map.getMapState();
         Point rlocation = mstate.getRobotPoint();
 
-        switch (mapdirection) {
-            case UP:
-                mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
-                break;
-            case DOWN:
-                mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
-                break;
-            case LEFT:
-                mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
-                break;
-            case RIGHT:
-                mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
-                break;
+        if(mapdirection != null){
+            switch (mapdirection) {
+                case UP:
+                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
+                    break;
+                case DOWN:
+                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
+                    break;
+                case LEFT:
+                    mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
+                    break;
+                case RIGHT:
+                    mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
+                    break;
+            }
         }
 
         map.repaint();

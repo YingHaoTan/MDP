@@ -95,9 +95,10 @@ public abstract class ExplorationBase {
      * @param label
      */
     protected void setCellState(Point coordinate, CellState state, String label) {
-        if (mstate.setMapCellState(coordinate, state))
+        if (mstate.setMapCellState(coordinate, state)){
             for (CellStateUpdateListener listener : cslisteners)
                 listener.onCellStateUpdate(coordinate, state, label);
+        }
     }
 
     /**

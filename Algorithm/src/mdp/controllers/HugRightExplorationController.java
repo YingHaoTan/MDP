@@ -20,23 +20,98 @@ import mdp.robots.RobotBase;
  *
  * @author JINGYANG
  */
-public class HugRightExplorationController extends ExplorationBase implements RobotActionListener{
+public class HugRightExplorationController extends ExplorationBase implements RobotActionListener {
 
-    RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
+    enum States {
+        BOUNDARY, ABOUT_TURN, EXPLORATION
+    };
+
+    FastestPathBase fastestPath;
     
+    RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
+
+    int aboutTurn = 0;
+    boolean justTurned = false;
+    boolean leftStartPoint = false;
+    States currentState = States.BOUNDARY;
+
+    
+    public HugRightExplorationController(FastestPathBase fastestPath){
+        super();
+        this.fastestPath = fastestPath;
+    }
     
     @Override
     public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
         super.explore(mapdim, robot, rcoordinate, ecoordinate);
         robot.addRobotActionListener(this);
-        
         sensorsScan();
-        
-        
-        
-    
+
+        for (RobotAction action : actionPriority) {
+            if (canMove(actionToMapDirection(action))) {
+                if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                    justTurned = true;
+                } else {
+                    justTurned = false;
+                }
+                getRobot().move(action);
+                break;
+            }
+        }
+
     }
-    
+
+    /**
+     * For TURN_RIGHT and TURN_LEFT, will return the map direction the robot is
+     * facing after turning For FORWARD and REVERSE, returns the map direction
+     * that the robot will moving 1 step towards
+     *
+     * @param action
+     * @return Direction from the perspective of the map
+     */
+    private Direction actionToMapDirection(RobotAction action) {
+        switch (action) {
+            case TURN_RIGHT:
+                switch (getRobot().getCurrentOrientation()) {
+                    case UP:
+                        return Direction.RIGHT;
+                    case DOWN:
+                        return Direction.LEFT;
+                    case LEFT:
+                        return Direction.UP;
+                    case RIGHT:
+                        return Direction.DOWN;
+
+                }
+                break;
+            case TURN_LEFT:
+                switch (getRobot().getCurrentOrientation()) {
+                    case UP:
+                        return Direction.LEFT;
+                    case DOWN:
+                        return Direction.RIGHT;
+                    case LEFT:
+                        return Direction.DOWN;
+                    case RIGHT:
+                        return Direction.UP;
+                }
+            case FORWARD:
+                return getRobot().getCurrentOrientation();
+            case REVERSE:
+                switch (getRobot().getCurrentOrientation()) {
+                    case UP:
+                        return Direction.DOWN;
+                    case DOWN:
+                        return Direction.UP;
+                    case LEFT:
+                        return Direction.RIGHT;
+                    case RIGHT:
+                        return Direction.LEFT;
+                }
+        }
+        return null;
+    }
+
     // Can be optimized
     /**
      * Checks if you can move in that direction given the current cell state
@@ -45,7 +120,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
      * @return
      */
     private boolean canMove(Direction direction) {
-
         // Checks cell state;
         CellState state = CellState.NORMAL;
         List<Point> points = getMapState().convertRobotPointToMapPoints(nextLocation(direction));
@@ -59,7 +133,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return true;
     }
-    
+
     /**
      * Returns the new location in robot coordinates if you move 1 step in the
      * specified direction, does not actually move
@@ -86,11 +160,100 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
     
     
+    /**
+     * Returns true if specified robotPoint does not have any obstacles and have unexplored cells
+     * @param robotPoint
+     * @return 
+     */
+    private boolean isUnexplored(Point robotPoint){
+        List<Point> points = getMapState().convertRobotPointToMapPoints(robotPoint);
+        boolean hasUnexplored = false;
+        for(Point point : points){
+            if(getMapState().getMapCellState(point) == CellState.OBSTACLE){
+                return false;
+            }
+            if(getMapState().getMapCellState(point) == CellState.UNEXPLORED){
+                hasUnexplored = true;
+            }
+        }
+        return hasUnexplored;
+    }
+
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Point robotPoint = getMapState().getRobotPoint();
+        if (mapdirection != null) {
+            leftStartPoint = true;
+            switch (mapdirection) {
+                case UP:
+                    getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y + 1));
+                    break;
+                case DOWN:
+                    getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y - 1));
+                    break;
+                case LEFT:
+                    getMapState().setRobotPoint(new Point(robotPoint.x - 1, robotPoint.y));
+                    break;
+                case RIGHT:
+                    getMapState().setRobotPoint(new Point(robotPoint.x + 1, robotPoint.y));
+                    break;
+            }
+        }
+
+        sensorsScan();
+
+        if (currentState == States.BOUNDARY) {
+            if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
+                currentState = States.EXPLORATION;
+            } else {
+                for (RobotAction action : actionPriority) {
+                    if (canMove(actionToMapDirection(action))) {
+
+                        // Do not turn twice in a row while exploring boundary
+                        if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                            if (justTurned) {
+                                continue;
+                            }
+                        }
+
+                        getRobot().move(action);
+                        if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                            justTurned = true;
+                        } else {
+                            justTurned = false;
+                        }
+                        return;
+                    }
+                }
+
+                currentState = States.ABOUT_TURN;
+            }
+        }
+        if (currentState == States.ABOUT_TURN) {
+            getRobot().move(RobotAction.TURN_RIGHT);
+            aboutTurn++;
+            if (aboutTurn == 2) {
+                currentState = States.BOUNDARY;
+                aboutTurn = 0;
+            }
+        }
+        if (currentState == States.EXPLORATION) {
+            for(int y = 0; y < getMapState().getRobotSystemDimension().height; y++){
+                for(int x = 0; x < getMapState().getRobotSystemDimension().width; x++){
+                    Point tempPoint = new Point(x,y);
+                   
+                    if(isUnexplored(tempPoint)){
+                        System.out.println(tempPoint);
+                        fastestPath.move(getMapState(), getRobot(), tempPoint);
+                    }
+                }
+            }
+            
+            this.complete();
+        }
+
     }
-    
+
     /**
      * Scan area using sensors and updates cell states
      */
@@ -172,5 +335,5 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
     }
-    
+
 }
