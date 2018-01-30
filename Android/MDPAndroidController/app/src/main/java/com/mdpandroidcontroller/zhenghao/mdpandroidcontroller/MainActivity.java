@@ -18,6 +18,7 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.Bluetoot
 import java.util.ArrayList;
 import java.util.Set;
 
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTED;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
 
 
@@ -136,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onActivityResult: selected device - " + deviceName + " " + deviceAddress);
 
             connectDevice(deviceAddress);
-            updateConnectionUI(deviceName, deviceAddress);
         }
     }
 
@@ -169,6 +169,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),
                             "Connected to " + msg.getData().getString(Constants.DEVICE_NAME),
                             Toast.LENGTH_SHORT).show();
+                    updateConnectionUI(mBluetoothService.getDevice().getName(),
+                            mBluetoothService.getDevice().getAddress());
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;

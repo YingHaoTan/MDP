@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.ClickListenerInterface;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.bluetoothDevicesAdapter;
-import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 
 import java.util.ArrayList;
 

@@ -366,9 +366,11 @@ public class BluetoothService {
                 // Close the socket
                 try {
                     Log.e(TAG, "ConnectThread::run() - IOException then trying to connect to device");
+                    e.printStackTrace();
                     mmSocket.close();
                 } catch (IOException e2) {
                     Log.e(TAG, "unable to close() during connection failure", e2);
+                    e2.printStackTrace();
                 }
                 connectionFailed();
                 return;
