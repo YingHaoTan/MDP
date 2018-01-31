@@ -1,8 +1,8 @@
 package mdp.controllers.fp;
 
 import java.awt.Point;
-
 import mdp.models.Direction;
+
 import mdp.models.MapState;
 import mdp.robots.RobotBase;
 
@@ -20,7 +20,8 @@ public class FastestPathController extends FastestPathBase{
 	
     @Override
     public void move(MapState mstate, RobotBase robot, Point destination){
-    	Point rpoint = mstate.getRobotPoint();
+    	// Cannot just for loop move, need a call back
+        /*Point rpoint = mstate.getRobotPoint();
         
     	int dx = destination.x - rpoint.x;
     	int dy = destination.y - rpoint.y;
@@ -37,8 +38,10 @@ public class FastestPathController extends FastestPathBase{
     			robot.move(Direction.UP);
     	else if(dy < 0)
     		for(int i = dy; i < 0; i++)
-    			robot.move(Direction.DOWN);
-        //should sensorsScan() when moving too
+    			robot.move(Direction.DOWN);*/
+        
+        
+        //notifyMovementComplete();
     }
     
 }

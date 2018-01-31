@@ -32,7 +32,7 @@ public class SimulatorRobot extends RobotBase {
 	 */
 	public SimulatorRobot(Dimension dimension, Direction orientation) {
 		super(dimension, orientation);
-		delay = 100;
+		delay = 10;
 	}
 	
 	/**

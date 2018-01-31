@@ -7,10 +7,12 @@ package mdp.controllers.explorer;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import mdp.controllers.fp.FastestPathBase;
+import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.RobotAction;
@@ -22,27 +24,30 @@ import mdp.robots.RobotBase;
  *
  * @author JINGYANG
  */
-public class HugRightExplorationController extends ExplorationBase implements RobotActionListener {
+public class HugRightExplorationController extends ExplorationBase implements RobotActionListener, FastestPathCompletedListener {
 
     enum States {
-        BOUNDARY, ABOUT_TURN, EXPLORATION
+        BOUNDARY, ABOUT_TURN, EXPLORATION, EXPLORING
     };
 
     FastestPathBase fastestPath;
-    
-    RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
 
+    RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
+    List<Point> unexploredPoints;
+
+    int exploringUnexplored = 0;
     int aboutTurn = 0;
     boolean justTurned = false;
     boolean leftStartPoint = false;
     States currentState = States.BOUNDARY;
 
-    
-    public HugRightExplorationController(FastestPathBase fastestPath){
+    public HugRightExplorationController(FastestPathBase fastestPath) {
         super();
+        fastestPath.addFastestPathCompletedListener(this);
         this.fastestPath = fastestPath;
+        this.unexploredPoints = new ArrayList();
     }
-    
+
     @Override
     public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
         super.explore(mapdim, robot, rcoordinate, ecoordinate);
@@ -160,21 +165,22 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return newPoint;
     }
-    
-    
+
     /**
-     * Returns true if specified robotPoint does not have any obstacles and have unexplored cells
+     * Returns true if specified robotPoint does not have any obstacles and have
+     * unexplored cells
+     *
      * @param robotPoint
-     * @return 
+     * @return
      */
-    private boolean isUnexplored(Point robotPoint){
+    private boolean isUnexplored(Point robotPoint) {
         List<Point> points = getMapState().convertRobotPointToMapPoints(robotPoint);
         boolean hasUnexplored = false;
-        for(Point point : points){
-            if(getMapState().getMapCellState(point) == CellState.OBSTACLE){
+        for (Point point : points) {
+            if (getMapState().getMapCellState(point) == CellState.OBSTACLE) {
                 return false;
             }
-            if(getMapState().getMapCellState(point) == CellState.UNEXPLORED){
+            if (getMapState().getMapCellState(point) == CellState.UNEXPLORED) {
                 hasUnexplored = true;
             }
         }
@@ -240,20 +246,50 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
         }
         if (currentState == States.EXPLORATION) {
-            for(int y = 0; y < getMapState().getRobotSystemDimension().height; y++){
-                for(int x = 0; x < getMapState().getRobotSystemDimension().width; x++){
-                    Point tempPoint = new Point(x,y);
-                   
-                    if(isUnexplored(tempPoint)){
-                        System.out.println(tempPoint);
-                        fastestPath.move(getMapState(), getRobot(), tempPoint);
+            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
+                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+                    Point tempPoint = new Point(x, y);
+
+                    if (isUnexplored(tempPoint)) {
+                        unexploredPoints.add(tempPoint);
+                        //System.out.println(tempPoint);
+                        //fastestPath.move(getMapState(), getRobot(), tempPoint);
                     }
                 }
             }
-            
+
+            if (unexploredPoints.size() > 0) {
+                currentState = States.EXPLORING;
+                fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+                
+            } else {
+                this.complete();
+            }
+        }
+    }
+
+    @Override
+    public void onFastestPathCompleted() {
+        exploringUnexplored++;
+        if (exploringUnexplored < unexploredPoints.size()) {
+            while(!isUnexplored(unexploredPoints.get(exploringUnexplored))){
+                exploringUnexplored++;
+            }
+            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+        } else {
             this.complete();
         }
+    }
 
+    @Override
+    public void complete() {
+        currentState = States.BOUNDARY;
+        unexploredPoints = new ArrayList<Point>();
+        exploringUnexplored = 0;
+        aboutTurn = 0;
+        justTurned = false;
+        leftStartPoint = false;
+        super.complete();
     }
 
     /**
