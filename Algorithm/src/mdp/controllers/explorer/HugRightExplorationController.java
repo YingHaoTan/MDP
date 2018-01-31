@@ -27,7 +27,7 @@ import mdp.robots.RobotBase;
 public class HugRightExplorationController extends ExplorationBase implements RobotActionListener, FastestPathCompletedListener {
 
     enum States {
-        BOUNDARY, ABOUT_TURN, EXPLORATION, EXPLORING
+        BOUNDARY, ABOUT_TURN, EXPLORATION, EXPLORING, COMPLETED
     };
 
     FastestPathBase fastestPath;
@@ -35,11 +35,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
     List<Point> unexploredPoints;
 
-    int exploringUnexplored = 0;
-    int aboutTurn = 0;
-    boolean justTurned = false;
-    boolean leftStartPoint = false;
-    States currentState = States.BOUNDARY;
+    int exploringUnexplored;
+    int aboutTurn;
+    boolean justTurned;
+    boolean leftStartPoint;
+    States currentState;
 
     public HugRightExplorationController(FastestPathBase fastestPath) {
         super();
@@ -54,6 +54,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         robot.addRobotActionListener(this);
         sensorsScan();
 
+        currentState = States.BOUNDARY;
+        unexploredPoints = new ArrayList<Point>();
+        exploringUnexplored = 0;
+        aboutTurn = 0;
+        justTurned = false;
+        leftStartPoint = false;
+                
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -266,6 +273,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 this.complete();
             }
         }
+        if(currentState == States.EXPLORING){
+            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+        }
     }
 
     @Override
@@ -274,6 +284,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (exploringUnexplored < unexploredPoints.size()) {
             while(!isUnexplored(unexploredPoints.get(exploringUnexplored))){
                 exploringUnexplored++;
+                if(exploringUnexplored==unexploredPoints.size()){
+                    this.complete();
+                    return;
+                }
             }
             fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
         } else {
@@ -283,12 +297,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void complete() {
-        currentState = States.BOUNDARY;
-        unexploredPoints = new ArrayList<Point>();
-        exploringUnexplored = 0;
-        aboutTurn = 0;
-        justTurned = false;
-        leftStartPoint = false;
+        currentState = States.COMPLETED;
+
         super.complete();
     }
 
