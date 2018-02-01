@@ -10,4 +10,8 @@
     <string name="scanning_devices">Scanning</string>
     <string name="no_device">No Devices</string>
     <string name="no_device_address">NIL</string>
+
+    <!-- added by Ernest-->
+    <string name="modeText">Auto</string>
+    <string name="updateButtonText">Update</string>
 </resources>
