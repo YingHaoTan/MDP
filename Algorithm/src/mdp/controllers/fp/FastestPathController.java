@@ -4,6 +4,8 @@ import java.awt.Point;
 import mdp.models.Direction;
 
 import mdp.models.MapState;
+import mdp.models.RobotAction;
+import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 
 /*
@@ -15,7 +17,7 @@ import mdp.robots.RobotBase;
  *
  * @author JINGYANG
  */
-public class FastestPathController extends FastestPathBase {
+public class FastestPathController extends FastestPathBase implements RobotActionListener{
 
     @Override
     public void move(MapState mstate, RobotBase robot, Point destination) {
@@ -50,6 +52,17 @@ public class FastestPathController extends FastestPathBase {
         }
 
         notifyMovementComplete();
+    }
+
+    @Override
+    public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        
+        
+        // need to update location of robot on mapstate too
+        // need to do a sensor scan here
+        
+        // since this is so similar to the ExplorationController's onRobotActionCompleted, should FastestPathBase and ExplorationBase have the same parent class?
+        
     }
 
 }
