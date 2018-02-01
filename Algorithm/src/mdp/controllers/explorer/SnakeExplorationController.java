@@ -1,11 +1,10 @@
-package mdp.controllers;
+package mdp.controllers.explorer;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import mdp.models.CellState;
 
 import mdp.models.Direction;
@@ -22,7 +21,7 @@ import mdp.robots.RobotBase;
  *
  * @author Ying Hao
  */
-public class ExplorationController extends ExplorationBase implements RobotActionListener {
+public class SnakeExplorationController extends ExplorationBase implements RobotActionListener {
 
     private enum ExplorationState {
         EXPLORING, RETURNING, BACKTRACKING
@@ -95,7 +94,8 @@ public class ExplorationController extends ExplorationBase implements RobotActio
      * @param ecoordinate
      * @return Array of directions
      */
-    private Direction[] directionToGoal(Point rcoordinate, Point ecoordinate) {
+    @SuppressWarnings("unused")
+	private Direction[] directionToGoal(Point rcoordinate, Point ecoordinate) {
 
         Direction[] results = new Direction[3];
 
@@ -341,7 +341,6 @@ public class ExplorationController extends ExplorationBase implements RobotActio
             // Else retrace
             getRobot().move(explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].getParentDirection());
             explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setParentDirection(null);
-
         } else {
             for (Direction d : directionalPriority) {
                 if (canMove(d)) {
@@ -355,6 +354,7 @@ public class ExplorationController extends ExplorationBase implements RobotActio
                         return;
                     }
                 } else {
+                    
                     explorationNodes[getMapState().getRobotPoint().x][getMapState().getRobotPoint().y].setNeighbour(d, null);
                 }
             }

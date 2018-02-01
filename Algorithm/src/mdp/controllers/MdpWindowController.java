@@ -9,6 +9,11 @@ import java.util.Set;
 
 import javax.swing.JButton;
 
+import mdp.controllers.explorer.CellStateUpdateListener;
+import mdp.controllers.explorer.ExplorationBase;
+import mdp.controllers.explorer.ExplorationCompletedListener;
+import mdp.controllers.fp.FastestPathBase;
+import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.graphics.ExecutionMode;
 import mdp.graphics.MapInteractionMode;
 import mdp.graphics.MdpWindow;
@@ -30,7 +35,7 @@ import mdp.robots.SimulatorRobot;
  *
  * @author Ying Hao
  */
-public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener {
+public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener, ExplorationCompletedListener, FastestPathCompletedListener {
 
     /**
      * ExecutionState contains the enumeration of all possible mutually
@@ -58,6 +63,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
     private SimulatorRobot srobot;
     private RobotBase probot;
     private ExplorationBase explorer;
+    private FastestPathBase planner;
 
     public MdpWindowController(MdpWindow window) {
         this.map = window.getMap();
@@ -75,7 +81,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Gets the map loader
-     *
      * @return
      */
     public MapLoader getMapLoader() {
@@ -84,7 +89,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Sets the map loader
-     *
      * @param loader
      */
     public void setMapLoader(MapLoader loader) {
@@ -93,7 +97,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Gets the map saver
-     *
      * @return
      */
     public MapSaver getMapSaver() {
@@ -102,7 +105,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Sets the map saver
-     *
      * @param saver
      */
     public void setMapSaver(MapSaver saver) {
@@ -111,7 +113,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Gets the simulator robot
-     *
      * @return
      */
     public SimulatorRobot getSimulatorRobot() {
@@ -120,7 +121,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Sets the simulator robot
-     *
      * @param srobot
      */
     public void setSimulatorRobot(SimulatorRobot srobot) {
@@ -134,7 +134,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Gets the physical robot
-     *
      * @return
      */
     public RobotBase getPhysicalRobot() {
@@ -143,7 +142,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Sets the physical robot
-     *
      * @param probot
      */
     public void setPhysicalRobot(RobotBase probot) {
@@ -157,7 +155,6 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Sets the explorer
-     *
      * @return
      */
     public ExplorationBase getExplorer() {
@@ -166,16 +163,37 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     /**
      * Gets the explorer
-     *
      * @param explorer
      */
     public void setExplorer(ExplorationBase explorer) {
         if (this.explorer != null) {
             this.explorer.removeCellStateUpdateListener(this);
+            this.explorer.removeExplorationCompletedListener(this);
         }
 
         this.explorer = explorer;
         this.explorer.addCellStateUpdateListener(this);
+        this.explorer.addExplorationCompletedListener(this);
+    }
+    
+    /**
+     * Gets the fastest path planner
+     * @return
+     */
+    public FastestPathBase getFastestPathPlanner() {
+    	return planner;
+    }
+    
+    /**
+     * Sets the fastest path planner
+     * @param planner
+     */
+    public void setFastestPathPlanner(FastestPathBase planner) {
+    	if(this.planner != null)
+    		this.planner.removeFastestPathCompletedListener(this);
+    	
+    	this.planner = planner;
+    	this.planner.addFastestPathCompletedListener(this);
     }
 
     @Override
@@ -253,19 +271,21 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
         MapState mstate = map.getMapState();
         Point rlocation = mstate.getRobotPoint();
 
-        switch (mapdirection) {
-            case UP:
-                mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
-                break;
-            case DOWN:
-                mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
-                break;
-            case LEFT:
-                mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
-                break;
-            default:
-                mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
-                break;
+        if(mapdirection != null){
+            switch (mapdirection) {
+                case UP:
+                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
+                    break;
+                case DOWN:
+                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
+                    break;
+                case LEFT:
+                    mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
+                    break;
+                case RIGHT:
+                    mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
+                    break;
+            }
         }
 
         map.repaint();
@@ -273,11 +293,30 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
     @Override
     public void onCellStateUpdate(Point location, CellState state, String label) {
-        map.getMapState().setMapCellState(location, state);
+    	MapState mstate = map.getMapState();
+    	
+    	mstate.setMapCellState(location, state);
         map.setCellLabel(location, label);
-
+        
+        inputpane.sync(mstate);
         map.repaint();
     }
+    
+    @Override
+	public void onExplorationComplete() {
+    	JButton executionbtn = inputpane.getExecutionButton();
+    	
+    	executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
+    	inputpane.enable();
+	}
+    
+    @Override
+	public void onFastestPathCompleted() {
+    	JButton executionbtn = inputpane.getExecutionButton();
+    	
+    	executionbtn.setText(ExecutionState.EXPLORE.toString());
+    	inputpane.enable();
+	}
 
     private void loadmap() {
         if (this.maploader != null) {
@@ -298,33 +337,32 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
         boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 
         if (explore) {
-            // Must call init() before reseting cell states to UNEXPLORED
-            if (mode == ExecutionMode.SIMULATION) {
+            if (mode == ExecutionMode.SIMULATION)
                 srobot.init(mstate);
-            }
 
             mstate.setMapCellState(CellState.UNEXPLORED);
 
             Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
             exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
 
-            for (Point p : exploredpoints) {
+            for (Point p : exploredpoints)
                 mstate.setMapCellState(p, CellState.NORMAL);
-            }
 
             map.repaint();
 
-            if (explorer != null) {
+            if (explorer != null)
                 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint());
-            }
-            executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
+            
         } else {
-            executionbtn.setText(ExecutionState.EXPLORE.toString());
+        	planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint());
         }
+        
+        inputpane.disable();
     }
 
     private void cancel() {
         this.map.getMapState().setMapCellState(CellState.NORMAL);
         inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
     }
+    
 }

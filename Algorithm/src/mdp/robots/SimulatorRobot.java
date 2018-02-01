@@ -32,7 +32,7 @@ public class SimulatorRobot extends RobotBase {
 	 */
 	public SimulatorRobot(Dimension dimension, Direction orientation) {
 		super(dimension, orientation);
-		delay = 100;
+		delay = 10;
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class SimulatorRobot extends RobotBase {
 			mstate.setRobotPoint(new Point(location.x, location.y - 1));
 		else if(mapdirection == Direction.LEFT)
 			mstate.setRobotPoint(new Point(location.x - 1, location.y));
-		else
+                else if(mapdirection == Direction.RIGHT)
 			mstate.setRobotPoint(new Point(location.x + 1, location.y));
 		
 		timer.schedule(new NotifyTask(mapdirection, actions), delay);
