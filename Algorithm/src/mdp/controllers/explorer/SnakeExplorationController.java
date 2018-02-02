@@ -172,7 +172,7 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
     /**
      * Scan area using sensors and updates cell states
      */
-    private void sensorsScan() {
+    /*private void sensorsScan() {
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = getRobot().getSensors();
 
@@ -249,7 +249,7 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
             }
         }
 
-    }
+    }*/
 
     /**
      * Returns the new location in robot coordinates if you move 1 step in the

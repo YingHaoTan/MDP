@@ -170,8 +170,8 @@ public class MapState {
         for (Point p : points) {
             CellState pstate = getMapCellState(p);
 
-            if (pstate == CellState.UNEXPLORED
-                    || (pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED)
+            if (pstate == CellState.OBSTACLE
+                    || (pstate == CellState.UNEXPLORED && state != CellState.OBSTACLE)
                     || (pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE)) {
                 state = pstate;
             }

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import mdp.controllers.fp.MovementBase;
 
 import mdp.models.CellState;
 import mdp.models.MapState;
@@ -14,15 +15,11 @@ import mdp.robots.RobotBase;
  *
  * @author Ying Hao
  */
-public abstract class ExplorationBase {
+public abstract class ExplorationBase extends MovementBase{
 
-    private MapState mstate;
-    private List<CellStateUpdateListener> cslisteners;
     private List<ExplorationCompletedListener> eclisteners;
-    private RobotBase robot;
 
     public ExplorationBase() {
-        this.cslisteners = new ArrayList<>();
         this.eclisteners = new ArrayList<>();
     }
 
@@ -34,12 +31,13 @@ public abstract class ExplorationBase {
      */
     public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
         Dimension robotdim = robot.getDimension();
-        this.robot = robot;
-        mstate = new MapState(mapdim, robot.getDimension());
+        setRobot(robot);
+        MapState mstate = new MapState(mapdim, robot.getDimension());
         mstate.setMapCellState(CellState.UNEXPLORED);
         mstate.setEndPoint(ecoordinate);
         mstate.setRobotPoint(rcoordinate);
         mstate.setStartPoint(rcoordinate);
+        setMapState(mstate);
 
         for (int x = 0; x < robotdim.width; x++) {
             for (int y = 0; y < robotdim.height; y++) {
@@ -48,21 +46,7 @@ public abstract class ExplorationBase {
         }
     }
 
-    /**
-     * Adds CellStateUpdateListener
-     * @param listener
-     */
-    public void addCellStateUpdateListener(CellStateUpdateListener listener) {
-        this.cslisteners.add(listener);
-    }
-
-    /**
-     * Removes CellStateUpdateListener
-     * @param listener
-     */
-    public void removeCellStateUpdateListener(CellStateUpdateListener listener) {
-        this.cslisteners.remove(listener);
-    }
+    
     
     /**
      * Adds ExplorationCompletedListener
@@ -87,44 +71,4 @@ public abstract class ExplorationBase {
     	for(ExplorationCompletedListener listener: eclisteners)
     		listener.onExplorationComplete();
     }
-
-    /**
-     * Sets the CellState at a particular coordinate
-     * @param coordinate
-     * @param state
-     * @param label
-     */
-    protected void setCellState(Point coordinate, CellState state, String label) {
-        if (mstate.setMapCellState(coordinate, state)){
-            for (CellStateUpdateListener listener : cslisteners)
-                listener.onCellStateUpdate(coordinate, state, label);
-        }
-    }
-
-    /**
-     * Gets the CellState at a particular coordinate
-     * @param coordinate
-     * @return
-     */
-    protected CellState getCellState(Point coordinate) {
-
-        return mstate.getMapCellState(coordinate);
-    }
-
-    /**
-     * Gets the map state
-     * @return
-     */
-    protected MapState getMapState() {
-        return mstate;
-    }
-
-    /**
-     * Gets the robot
-     * @return
-     */
-    protected RobotBase getRobot() {
-        return robot;
-    }
-
 }

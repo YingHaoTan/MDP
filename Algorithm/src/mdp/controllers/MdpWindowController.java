@@ -211,9 +211,11 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
             map.repaint();
         } else if (source == sinput) {
-            sinput.setCoordinate(mstate.getRobotPoint());
+            if(!point.equals(mstate.getRobotPoint()))
+                sinput.setCoordinate(mstate.getRobotPoint());
         } else {
-            einput.setCoordinate(mstate.getEndPoint());
+            if(!point.equals(mstate.getEndPoint()))
+                einput.setCoordinate(mstate.getEndPoint());
         }
     }
 

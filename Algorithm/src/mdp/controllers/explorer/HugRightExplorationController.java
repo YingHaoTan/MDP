@@ -193,7 +193,12 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return hasUnexplored;
     }
-
+    
+    private List<Point> nearbyRobotPoints(Point rPoint){
+        List<Point> nearbyRobotPoints = new ArrayList<Point>();
+        return nearbyRobotPoints;
+    }
+    
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
         Point robotPoint = getMapState().getRobotPoint();
@@ -259,7 +264,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
-                        //System.out.println(tempPoint);
                         //fastestPath.move(getMapState(), getRobot(), tempPoint);
                     }
                 }
@@ -267,16 +271,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                getRobot().removeRobotActionListener(this);
+                
                 fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
                 
             } else {
                 this.complete();
             }
         }
-        /*if(currentState == States.EXPLORING){
-            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
-        }*/
     }
 
     @Override
@@ -299,90 +300,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         currentState = States.COMPLETED;
-
+        fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint());
         super.complete();
     }
 
-    /**
-     * Scan area using sensors and updates cell states
-     */
-    private void sensorsScan() {
-        Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
-        List<SensorConfiguration> sensors = getRobot().getSensors();
-
-        for (SensorConfiguration sensor : sensors) {
-
-            //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
-            int reading = readings.get(sensor);
-            int test = reading;
-            // Limits sensor range
-            if (reading > sensor.getMaxDistance()) {
-                reading = 0;
-            }
-
-            // If detects an obstacle
-            if (reading > 0) {
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
-
-                // Should also check for out-of-bounds (more applicable in physical robot)
-                switch (sDirection) {
-                    case UP:
-                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y + reading), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case DOWN:
-                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y - reading), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case LEFT:
-                        this.setCellState(new Point(sCoordinate.x - reading, sCoordinate.y), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                    case RIGHT:
-                        this.setCellState(new Point(sCoordinate.x + reading, sCoordinate.y), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                }
-            } else {
-                int maxRange = sensor.getMaxDistance();
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
-                switch (sDirection) {
-                    case UP:
-                        for (int range = 1; range <= maxRange; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case DOWN:
-                        for (int range = 1; range <= maxRange; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case LEFT:
-                        for (int range = 1; range <= maxRange; range++) {
-
-                            this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                    case RIGHT:
-                        for (int range = 1; range <= maxRange; range++) {
-
-                            this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                }
-            }
-        }
-
-    }
+    
 
 }
