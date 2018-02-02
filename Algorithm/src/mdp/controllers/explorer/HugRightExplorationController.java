@@ -196,11 +196,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     
     private List<Point> nearbyRobotPoints(Point rPoint){
         List<Point> nearbyRobotPoints = new ArrayList<Point>();
+        for(int x = -1; x<2; x++){
+            for(int y = -1; y<2; y++){
+                //if()
+            }
+        }
         return nearbyRobotPoints;
     }
     
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        // Update internal map state
         Point robotPoint = getMapState().getRobotPoint();
         if (mapdirection != null) {
             leftStartPoint = true;
@@ -275,8 +281,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
                 
             } else {
-                this.complete();
+                preComplete();
             }
+        }
+        if(currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())){
+            complete();
         }
     }
 
@@ -287,21 +296,25 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             while(!isUnexplored(unexploredPoints.get(exploringUnexplored))){
                 exploringUnexplored++;
                 if(exploringUnexplored==unexploredPoints.size()){
-                    this.complete();
+                    preComplete();
                     return;
                 }
             }
             fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
         } else {
-            this.complete();
+            preComplete();
         }
     }
 
     @Override
     public void complete() {
+        getRobot().removeRobotActionListener(this);
+        super.complete();
+    }
+    
+    private void preComplete(){
         currentState = States.COMPLETED;
         fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint());
-        super.complete();
     }
 
     
