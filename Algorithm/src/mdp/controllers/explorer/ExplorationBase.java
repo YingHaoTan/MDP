@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import mdp.controllers.fp.MovementBase;
 
 import mdp.models.CellState;
 import mdp.models.MapState;
@@ -29,7 +28,7 @@ public abstract class ExplorationBase extends MovementBase{
      * @param robot
      * @param start
      */
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
         Dimension robotdim = robot.getDimension();
         setRobot(robot);
         MapState mstate = new MapState(mapdim, robot.getDimension());
@@ -37,6 +36,10 @@ public abstract class ExplorationBase extends MovementBase{
         mstate.setEndPoint(ecoordinate);
         mstate.setRobotPoint(rcoordinate);
         mstate.setStartPoint(rcoordinate);
+        
+        if(waypoint != null)
+        	mstate.setMapCellState(waypoint, CellState.WAYPOINT);
+        
         setMapState(mstate);
 
         for (int x = 0; x < robotdim.width; x++) {

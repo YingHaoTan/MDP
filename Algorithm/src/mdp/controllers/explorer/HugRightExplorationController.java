@@ -51,8 +51,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate);
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
+        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint);
         robot.addRobotActionListener(this);
         sensorsScan();
 

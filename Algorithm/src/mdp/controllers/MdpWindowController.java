@@ -350,11 +350,14 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		 for (Point p : exploredpoints)
 			 mstate.setMapCellState(p, CellState.NORMAL);
+		 
+		 if(mstate.getWayPoint() != null)
+		 	mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
 
 		 map.repaint();
 
 		 if (explorer != null)
-			 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint());
+			 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint());
 	 }
 	 
 	 private void fastestpath() {
