@@ -3,8 +3,10 @@ package mdp.robots;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,6 +25,7 @@ import mdp.models.SensorConfiguration;
 public class SimulatorRobot extends RobotBase {
 	private Timer timer;
 	private MapState mstate;
+	private Queue<NotifyTask> taskqueue;
 	private long delay;
 	
 	/**
@@ -32,6 +35,7 @@ public class SimulatorRobot extends RobotBase {
 	 */
 	public SimulatorRobot(Dimension dimension, Direction orientation) {
 		super(dimension, orientation);
+		taskqueue = new LinkedList<>();
 		delay = 10;
 	}
 	
@@ -84,7 +88,10 @@ public class SimulatorRobot extends RobotBase {
                 else if(mapdirection == Direction.RIGHT)
 			mstate.setRobotPoint(new Point(location.x + 1, location.y));
 		
-		timer.schedule(new NotifyTask(mapdirection, actions), delay);
+		NotifyTask task = new NotifyTask(mapdirection, actions);
+		taskqueue.offer(task);
+		if(taskqueue.size() == 1)
+			timer.schedule(task, delay);
 	}
 	
 	/**
@@ -136,8 +143,7 @@ public class SimulatorRobot extends RobotBase {
 	 * @return
 	 */
 	public Point getSensorCoordinate(SensorConfiguration sensor) {
-                       
-                List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
+        List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
 		Point location = points.get(points.size() / 2);
                 
 		Dimension rdim = mstate.getRobotDimension();
@@ -209,6 +215,10 @@ public class SimulatorRobot extends RobotBase {
 		@Override
 		public void run() {
 			SimulatorRobot.this.notify(mapdirection, actions);
+			SimulatorRobot.this.taskqueue.poll();
+			
+			if(SimulatorRobot.this.taskqueue.size() > 0)
+				timer.schedule(SimulatorRobot.this.taskqueue.peek(), delay);
 		}
 		
 	}

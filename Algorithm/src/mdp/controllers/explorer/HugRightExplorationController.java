@@ -295,6 +295,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 preComplete();
             }
         }
+        
         if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
             complete();
         }
@@ -323,10 +324,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         return;
                     }
                 }
+                
                 fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
 
             }
-        } else {
+        } else if(currentState != States.COMPLETED) {
             preComplete();
         }
 
