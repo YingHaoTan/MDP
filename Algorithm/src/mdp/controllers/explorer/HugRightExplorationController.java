@@ -34,8 +34,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
     List<Point> unexploredPoints;
+    List<List<Point>> neighbourPoints;
 
     int exploringUnexplored;
+    int neighbourCounter;
     int aboutTurn;
     boolean justTurned;
     boolean leftStartPoint;
@@ -56,11 +58,14 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         currentState = States.BOUNDARY;
         unexploredPoints = new ArrayList<Point>();
+        neighbourPoints = new ArrayList();
+
         exploringUnexplored = 0;
+        neighbourCounter = 0;
         aboutTurn = 0;
         justTurned = false;
         leftStartPoint = false;
-                
+
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -193,17 +198,23 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return hasUnexplored;
     }
-    
-    private List<Point> nearbyRobotPoints(Point rPoint){
+
+    // Can also be optimized
+    private List<Point> nearbyRobotPoints(Point rPoint) {
         List<Point> nearbyRobotPoints = new ArrayList<Point>();
-        for(int x = -1; x<2; x++){
-            for(int y = -1; y<2; y++){
-                //if()
+        for (int x = -1; x < 2; x++) {
+            if (rPoint.x + x > 0 && (rPoint.x + x) < getMapState().getMapSystemDimension().width && x != 0) {
+                nearbyRobotPoints.add(new Point(rPoint.x + x, rPoint.y));
+            }
+        }
+        for (int y = -1; y < 2; y++) {
+            if (rPoint.y + y > 0 && (rPoint.y + y) < getMapState().getMapSystemDimension().height && y != 0) {
+                nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y + y));
             }
         }
         return nearbyRobotPoints;
     }
-    
+
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
         // Update internal map state
@@ -270,40 +281,55 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
-                        //fastestPath.move(getMapState(), getRobot(), tempPoint);
+                        neighbourPoints.add(nearbyRobotPoints(tempPoint));
                     }
                 }
             }
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                
-                fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
-                
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
+                //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+
             } else {
                 preComplete();
             }
         }
-        if(currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())){
+        if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
             complete();
         }
     }
 
     @Override
     public void onFastestPathCompleted() {
-        exploringUnexplored++;
         if (exploringUnexplored < unexploredPoints.size()) {
-            while(!isUnexplored(unexploredPoints.get(exploringUnexplored))){
-                exploringUnexplored++;
-                if(exploringUnexplored==unexploredPoints.size()){
-                    preComplete();
-                    return;
+            if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                neighbourCounter++;
+                //if( neighbourCounter > neighbourPoints.get(exploringUnexplored).size()){
+
+                //}
+                if (neighbourCounter == neighbourPoints.get(exploringUnexplored).size()) {
+                    fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+                } else {
+                    fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
                 }
+            } else {
+                exploringUnexplored++;
+                neighbourCounter = 0;
+                while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                    exploringUnexplored++;
+                    if (exploringUnexplored == unexploredPoints.size()) {
+                        preComplete();
+                        return;
+                    }
+                }
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
+
             }
-            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
         } else {
             preComplete();
         }
+
     }
 
     @Override
@@ -311,12 +337,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         getRobot().removeRobotActionListener(this);
         super.complete();
     }
-    
-    private void preComplete(){
+
+    private void preComplete() {
         currentState = States.COMPLETED;
         fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint());
     }
-
-    
 
 }
