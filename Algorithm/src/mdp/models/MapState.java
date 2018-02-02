@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -234,14 +233,10 @@ public class MapState {
     }
 
     /**
-     * Clears the map and sets all CellState(s) to CellState.NORMAL
+     * Resets the robot to the starting point
      */
     public void reset() {
     	this.robotpoint = this.startpoint;
-    	
-        for (CellState[] rowStates : this.cellstates) {
-            Arrays.fill(rowStates, CellState.NORMAL);
-        }
     }
 
     

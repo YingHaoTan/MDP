@@ -370,7 +370,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 private void reset() {
 		 this.inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
 		 
-		 map.getMapState().reset();
+		 MapState mstate = map.getMapState();
+		 mstate.reset();
+		 mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+		 
 		 map.repaint();
 	 }
 
