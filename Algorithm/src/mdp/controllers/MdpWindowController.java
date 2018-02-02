@@ -364,7 +364,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		 MapState mstate = map.getMapState();
 		 
-		 planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint());
+		 planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint(), true);
 	 }
 	 
 	 private void reset() {

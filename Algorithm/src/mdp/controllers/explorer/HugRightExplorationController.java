@@ -288,7 +288,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
                 //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
 
             } else {
@@ -309,9 +309,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
                 //}
                 if (neighbourCounter == neighbourPoints.get(exploringUnexplored).size()) {
-                    fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+                    fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false);
                 } else {
-                    fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
+                    fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
                 }
             } else {
                 exploringUnexplored++;
@@ -323,7 +323,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         return;
                     }
                 }
-                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter));
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
 
             }
         } else {
@@ -340,7 +340,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     private void preComplete() {
         currentState = States.COMPLETED;
-        fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint());
+        fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint(), false);
     }
 
 }
