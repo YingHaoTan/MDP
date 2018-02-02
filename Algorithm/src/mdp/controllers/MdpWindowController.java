@@ -37,334 +37,338 @@ import mdp.robots.SimulatorRobot;
  */
 public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener, ExplorationCompletedListener, FastestPathCompletedListener {
 
-    /**
-     * ExecutionState contains the enumeration of all possible mutually
-     * exclusive execution states
-     *
-     * @author Ying Hao
-     */
-    private enum ExecutionState {
-        EXPLORE, FASTEST_PATH;
+	/**
+	 * ExecutionState contains the enumeration of all possible mutually
+	 * exclusive execution states
+	 *
+	 * @author Ying Hao
+	 */
+	private enum ExecutionState {
+		EXPLORE, FASTEST_PATH;
 
-        @Override
-        public String toString() {
-            if (this == EXPLORE) {
-                return "Explore";
-            } else {
-                return "Fastest Path";
-            }
-        }
-    }
-
-    private MdpMap map;
-    private MainInputPane inputpane;
-    private MapLoader maploader;
-    private MapSaver mapsaver;
-    private SimulatorRobot srobot;
-    private RobotBase probot;
-    private ExplorationBase explorer;
-    private FastestPathBase planner;
-
-    public MdpWindowController(MdpWindow window) {
-        this.map = window.getMap();
-        this.inputpane = window.getMainInputPane();
-
-        map.addMouseListener(this);
-        inputpane.getStartCoordinateInput().addCoordinateInputListener(this);
-        inputpane.getEndCoordinateInput().addCoordinateInputListener(this);
-        inputpane.getLoadMapButton().addActionListener(this);
-        inputpane.getSaveMapButton().addActionListener(this);
-        inputpane.getExecutionButton().addActionListener(this);
-        inputpane.getCancelButton().addActionListener(this);
-        inputpane.getResetButton().addActionListener(this);
-    }
-
-    /**
-     * Gets the map loader
-     * @return
-     */
-    public MapLoader getMapLoader() {
-        return this.maploader;
-    }
-
-    /**
-     * Sets the map loader
-     * @param loader
-     */
-    public void setMapLoader(MapLoader loader) {
-        this.maploader = loader;
-    }
-
-    /**
-     * Gets the map saver
-     * @return
-     */
-    public MapSaver getMapSaver() {
-        return this.mapsaver;
-    }
-
-    /**
-     * Sets the map saver
-     * @param saver
-     */
-    public void setMapSaver(MapSaver saver) {
-        this.mapsaver = saver;
-    }
-
-    /**
-     * Gets the simulator robot
-     * @return
-     */
-    public SimulatorRobot getSimulatorRobot() {
-        return srobot;
-    }
-
-    /**
-     * Sets the simulator robot
-     * @param srobot
-     */
-    public void setSimulatorRobot(SimulatorRobot srobot) {
-        if (this.srobot != null) {
-            this.srobot.removeRobotActionListener(this);
-        }
-
-        this.srobot = srobot;
-        this.srobot.addRobotActionListener(this);
-    }
-
-    /**
-     * Gets the physical robot
-     * @return
-     */
-    public RobotBase getPhysicalRobot() {
-        return probot;
-    }
-
-    /**
-     * Sets the physical robot
-     * @param probot
-     */
-    public void setPhysicalRobot(RobotBase probot) {
-        if (this.probot != null) {
-            this.probot.removeRobotActionListener(this);
-        }
-
-        this.probot = probot;
-        this.probot.addRobotActionListener(this);
-    }
-
-    /**
-     * Sets the explorer
-     * @return
-     */
-    public ExplorationBase getExplorer() {
-        return explorer;
-    }
-
-    /**
-     * Gets the explorer
-     * @param explorer
-     */
-    public void setExplorer(ExplorationBase explorer) {
-        if (this.explorer != null) {
-            this.explorer.removeCellStateUpdateListener(this);
-            this.explorer.removeExplorationCompletedListener(this);
-        }
-
-        this.explorer = explorer;
-        this.explorer.addCellStateUpdateListener(this);
-        this.explorer.addExplorationCompletedListener(this);
-    }
-    
-    /**
-     * Gets the fastest path planner
-     * @return
-     */
-    public FastestPathBase getFastestPathPlanner() {
-    	return planner;
-    }
-    
-    /**
-     * Sets the fastest path planner
-     * @param planner
-     */
-    public void setFastestPathPlanner(FastestPathBase planner) {
-    	if(this.planner != null)
-    		this.planner.removeFastestPathCompletedListener(this);
-    	
-    	this.planner = planner;
-    	this.planner.addFastestPathCompletedListener(this);
-    }
-
-    @Override
-    public void onCoordinateInput(CoordinateInputPane source, Point point) {
-        CoordinateInputPane sinput = inputpane.getStartCoordinateInput();
-        CoordinateInputPane einput = inputpane.getEndCoordinateInput();
-        MapState mstate = map.getMapState();
-
-        if (mstate.getRobotCellState(point) == CellState.NORMAL) {
-            if (source == sinput) {
-                mstate.setRobotPoint(point);
-            } else {
-                mstate.setEndPoint(point);
-            }
-
-            map.repaint();
-        } else if (source == sinput) {
-            if(!point.equals(mstate.getRobotPoint()))
-                sinput.setCoordinate(mstate.getRobotPoint());
-        } else {
-            if(!point.equals(mstate.getEndPoint()))
-                einput.setCoordinate(mstate.getEndPoint());
-        }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        Point p = map.convertScreenPointToMapPoint(e.getPoint());
-        MapInteractionMode mode = inputpane.getMapInteractionModeInput().getSelectedValue();
-        MapState mstate = map.getMapState();
-
-        Set<Point> rpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
-        rpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
-
-        CellState pstate = mstate.getMapCellState(p);
-        // Only add obstacle/set waypoint when CellState is normal and
-        // is not intersecting current robot or endpoint
-        if (pstate == CellState.NORMAL && !rpoints.contains(p)) {
-            if (mode == MapInteractionMode.ADD_OBSTACLE) {
-                mstate.setMapCellState(p, CellState.OBSTACLE);
-            } else if (mode == MapInteractionMode.SET_WAYPOINT) {
-                mstate.setMapCellState(p, CellState.WAYPOINT);
-            }
-        } else if (mode == MapInteractionMode.ADD_OBSTACLE && pstate == CellState.OBSTACLE) {
-            mstate.setMapCellState(p, CellState.NORMAL);
-        }
-
-        // Updates MDF 2 label
-        if (mode == MapInteractionMode.ADD_OBSTACLE) {
-            inputpane.sync(mstate);
-        }
-
-        map.repaint();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == inputpane.getLoadMapButton()) {
-            loadmap();
-        } else if (e.getSource() == inputpane.getSaveMapButton()) {
-            savemap();
-        } else if (e.getSource() == inputpane.getExecutionButton()) {
-            execute();
-        } else if (e.getSource() == inputpane.getCancelButton()) {
-            cancel();
-        } else if (e.getSource() == inputpane.getResetButton()) {
-            cancel();
-            map.getMapState().reset();
-            map.repaint();
-        }
-
-        inputpane.sync(map.getMapState());
-    }
-
-    @Override
-    public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-        MapState mstate = map.getMapState();
-        Point rlocation = mstate.getRobotPoint();
-
-        if(mapdirection != null){
-            switch (mapdirection) {
-                case UP:
-                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
-                    break;
-                case DOWN:
-                    mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
-                    break;
-                case LEFT:
-                    mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
-                    break;
-                case RIGHT:
-                    mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
-                    break;
-            }
-        }
-
-        map.repaint();
-    }
-
-    @Override
-    public void onCellStateUpdate(Point location, CellState state, String label) {
-    	MapState mstate = map.getMapState();
-    	
-    	mstate.setMapCellState(location, state);
-        map.setCellLabel(location, label);
-        
-        inputpane.sync(mstate);
-        map.repaint();
-    }
-    
-    @Override
-	public void onExplorationComplete() {
-    	JButton executionbtn = inputpane.getExecutionButton();
-    	
-    	executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
-    	inputpane.enable();
-	}
-    
-    @Override
-	public void onFastestPathCompleted() {
-    	JButton executionbtn = inputpane.getExecutionButton();
-    	
-    	executionbtn.setText(ExecutionState.EXPLORE.toString());
-    	inputpane.enable();
+		@Override
+		public String toString() {
+			if (this == EXPLORE) {
+				return "Explore";
+			} else {
+				return "Fastest Path";
+			}
+		}
 	}
 
-    private void loadmap() {
-        if (this.maploader != null) {
-            this.maploader.load(map);
-        }
-    }
+	private MdpMap map;
+	private MainInputPane inputpane;
+	private MapLoader maploader;
+	private MapSaver mapsaver;
+	private SimulatorRobot srobot;
+	private RobotBase probot;
+	private ExplorationBase explorer;
+	private FastestPathBase planner;
 
-    private void savemap() {
-        if (this.mapsaver != null) {
-            this.mapsaver.save(map);
-        }
-    }
+	public MdpWindowController(MdpWindow window) {
+		this.map = window.getMap();
+		this.inputpane = window.getMainInputPane();
 
-    private void execute() {
-        JButton executionbtn = inputpane.getExecutionButton();
-        ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
-        MapState mstate = map.getMapState();
-        boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
+		map.addMouseListener(this);
+		inputpane.getStartCoordinateInput().addCoordinateInputListener(this);
+		inputpane.getEndCoordinateInput().addCoordinateInputListener(this);
+		inputpane.getLoadMapButton().addActionListener(this);
+		inputpane.getSaveMapButton().addActionListener(this);
+		inputpane.getExecutionButton().addActionListener(this);
+		inputpane.getResetButton().addActionListener(this);
+	}
 
-        if (explore) {
-            if (mode == ExecutionMode.SIMULATION)
-                srobot.init(mstate);
+	/**
+	 * Gets the map loader
+	 * @return
+	 */
+	 public MapLoader getMapLoader() {
+		 return this.maploader;
+	 }
 
-            mstate.setMapCellState(CellState.UNEXPLORED);
+	 /**
+	  * Sets the map loader
+	  * @param loader
+	  */
+	 public void setMapLoader(MapLoader loader) {
+		 this.maploader = loader;
+	 }
 
-            Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
-            exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
+	 /**
+	  * Gets the map saver
+	  * @return
+	  */
+	 public MapSaver getMapSaver() {
+		 return this.mapsaver;
+	 }
 
-            for (Point p : exploredpoints)
-                mstate.setMapCellState(p, CellState.NORMAL);
+	 /**
+	  * Sets the map saver
+	  * @param saver
+	  */
+	 public void setMapSaver(MapSaver saver) {
+		 this.mapsaver = saver;
+	 }
 
-            map.repaint();
+	 /**
+	  * Gets the simulator robot
+	  * @return
+	  */
+	 public SimulatorRobot getSimulatorRobot() {
+		 return srobot;
+	 }
 
-            if (explorer != null)
-                explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint());
-            
-        } else {
-        	planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint());
-        }
-        
-        inputpane.disable();
-    }
+	 /**
+	  * Sets the simulator robot
+	  * @param srobot
+	  */
+	 public void setSimulatorRobot(SimulatorRobot srobot) {
+		 if (this.srobot != null) {
+			 this.srobot.removeRobotActionListener(this);
+		 }
 
-    private void cancel() {
-        this.map.getMapState().setMapCellState(CellState.NORMAL);
-        inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
-    }
-    
+		 this.srobot = srobot;
+		 this.srobot.addRobotActionListener(this);
+	 }
+
+	 /**
+	  * Gets the physical robot
+	  * @return
+	  */
+	 public RobotBase getPhysicalRobot() {
+		 return probot;
+	 }
+
+	 /**
+	  * Sets the physical robot
+	  * @param probot
+	  */
+	 public void setPhysicalRobot(RobotBase probot) {
+		 if (this.probot != null) {
+			 this.probot.removeRobotActionListener(this);
+		 }
+
+		 this.probot = probot;
+		 this.probot.addRobotActionListener(this);
+	 }
+
+	 /**
+	  * Sets the explorer
+	  * @return
+	  */
+	 public ExplorationBase getExplorer() {
+		 return explorer;
+	 }
+
+	 /**
+	  * Gets the explorer
+	  * @param explorer
+	  */
+	 public void setExplorer(ExplorationBase explorer) {
+		 if (this.explorer != null) {
+			 this.explorer.removeCellStateUpdateListener(this);
+			 this.explorer.removeExplorationCompletedListener(this);
+		 }
+
+		 this.explorer = explorer;
+		 this.explorer.addCellStateUpdateListener(this);
+		 this.explorer.addExplorationCompletedListener(this);
+	 }
+
+	 /**
+	  * Gets the fastest path planner
+	  * @return
+	  */
+	 public FastestPathBase getFastestPathPlanner() {
+		 return planner;
+	 }
+
+	 /**
+	  * Sets the fastest path planner
+	  * @param planner
+	  */
+	 public void setFastestPathPlanner(FastestPathBase planner) {
+		 if(this.planner != null)
+			 this.planner.removeFastestPathCompletedListener(this);
+
+		 this.planner = planner;
+		 this.planner.addFastestPathCompletedListener(this);
+	 }
+
+	 @Override
+	 public void onCoordinateInput(CoordinateInputPane source, Point point) {
+		 CoordinateInputPane sinput = inputpane.getStartCoordinateInput();
+		 MapState mstate = map.getMapState();
+
+		 if (mstate.getRobotCellState(point) == CellState.NORMAL) {
+			 
+			 if (source == sinput) {
+				 mstate.setStartPoint(point);
+				 mstate.setRobotPoint(point);
+			 } else {
+				 mstate.setEndPoint(point);
+			 }
+
+			 map.repaint();
+		 }
+	 }
+
+	 @Override
+	 public void mouseClicked(MouseEvent e) {
+		 Point p = map.convertScreenPointToMapPoint(e.getPoint());
+		 MapInteractionMode mode = inputpane.getMapInteractionModeInput().getSelectedValue();
+		 MapState mstate = map.getMapState();
+
+		 Set<Point> rpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
+		 rpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
+
+		 CellState pstate = mstate.getMapCellState(p);
+		 // Only add obstacle/set waypoint when CellState is normal and
+		 // is not intersecting current robot or endpoint
+		 if (pstate == CellState.NORMAL && !rpoints.contains(p)) {
+			 if (mode == MapInteractionMode.ADD_OBSTACLE) {
+				 mstate.setMapCellState(p, CellState.OBSTACLE);
+			 } else if (mode == MapInteractionMode.SET_WAYPOINT) {
+				 mstate.setMapCellState(p, CellState.WAYPOINT);
+			 }
+		 } else if (mode == MapInteractionMode.ADD_OBSTACLE && pstate == CellState.OBSTACLE) {
+			 mstate.setMapCellState(p, CellState.NORMAL);
+		 }
+
+		 // Updates MDF 2 label
+		 if (mode == MapInteractionMode.ADD_OBSTACLE) {
+			 inputpane.sync(mstate);
+		 }
+
+		 map.repaint();
+	 }
+
+	 @Override
+	 public void actionPerformed(ActionEvent e) {
+		 if (e.getSource() == inputpane.getLoadMapButton()) {
+			 loadmap();
+		 } else if (e.getSource() == inputpane.getSaveMapButton()) {
+			 savemap();
+		 } else { 
+			 if (e.getSource() == inputpane.getExecutionButton()) {
+				 execute();
+			 } else if (e.getSource() == inputpane.getResetButton()) {
+				 reset();
+			 }
+			 
+			 inputpane.sync(map.getMapState());
+		 }
+	 }
+
+	 @Override
+	 public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+		 MapState mstate = map.getMapState();
+		 Point rlocation = mstate.getRobotPoint();
+
+		 if(mapdirection != null){
+			 switch (mapdirection) {
+			 case UP:
+				 mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));
+				 break;
+			 case DOWN:
+				 mstate.setRobotPoint(new Point(rlocation.x, rlocation.y - 1));
+				 break;
+			 case LEFT:
+				 mstate.setRobotPoint(new Point(rlocation.x - 1, rlocation.y));
+				 break;
+			 case RIGHT:
+				 mstate.setRobotPoint(new Point(rlocation.x + 1, rlocation.y));
+				 break;
+			 }
+		 }
+
+		 map.repaint();
+	 }
+
+	 @Override
+	 public void onCellStateUpdate(Point location, CellState state, String label) {
+		 MapState mstate = map.getMapState();
+
+		 mstate.setMapCellState(location, state);
+		 map.setCellLabel(location, label);
+
+		 inputpane.sync(mstate);
+		 map.repaint();
+	 }
+
+	 @Override
+	 public void onExplorationComplete() {
+		 JButton executionbtn = inputpane.getExecutionButton();
+
+		 executionbtn.setText(ExecutionState.FASTEST_PATH.toString());
+		 inputpane.enable();
+	 }
+
+	 @Override
+	 public void onFastestPathCompleted() {
+		 JButton executionbtn = inputpane.getExecutionButton();
+
+		 executionbtn.setText(ExecutionState.EXPLORE.toString());
+		 inputpane.enable();
+	 }
+
+	 private void loadmap() {
+		 if (this.maploader != null) {
+			 this.maploader.load(map);
+		 }
+	 }
+
+	 private void savemap() {
+		 if (this.mapsaver != null) {
+			 this.mapsaver.save(map);
+		 }
+	 }
+
+	 private void execute() {
+		 JButton executionbtn = inputpane.getExecutionButton();
+		 boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
+
+		 if (explore)
+			 explore();
+		 else
+			 fastestpath();
+
+		 inputpane.disable();
+	 }
+	 
+	 private void explore() {
+		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
+		 MapState mstate = map.getMapState();
+		 
+		 if (mode == ExecutionMode.SIMULATION)
+			 srobot.init(mstate);
+
+		 mstate.setMapCellState(CellState.UNEXPLORED);
+
+		 Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
+		 exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
+
+		 for (Point p : exploredpoints)
+			 mstate.setMapCellState(p, CellState.NORMAL);
+
+		 map.repaint();
+
+		 if (explorer != null)
+			 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint());
+	 }
+	 
+	 private void fastestpath() {
+		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
+		 MapState mstate = map.getMapState();
+		 
+		 planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint());
+	 }
+	 
+	 private void reset() {
+		 this.inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
+		 
+		 map.getMapState().reset();
+		 map.repaint();
+	 }
+
 }

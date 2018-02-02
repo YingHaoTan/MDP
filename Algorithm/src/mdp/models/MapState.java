@@ -59,6 +59,7 @@ public class MapState {
         this.mapdim = mapdim;
         this.robotdim = robotdim;
         this.robotpoint = new Point(0, 0);
+        this.startpoint = new Point(0, 0);
 
         Dimension rsystemdim = getRobotSystemDimension();
         this.endpoint = new Point(rsystemdim.width - 1, rsystemdim.height - 1);
@@ -236,6 +237,8 @@ public class MapState {
      * Clears the map and sets all CellState(s) to CellState.NORMAL
      */
     public void reset() {
+    	this.robotpoint = this.startpoint;
+    	
         for (CellState[] rowStates : this.cellstates) {
             Arrays.fill(rowStates, CellState.NORMAL);
         }
