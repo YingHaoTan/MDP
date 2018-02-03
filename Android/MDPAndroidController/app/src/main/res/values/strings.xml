@@ -12,6 +12,11 @@
     <string name="no_device_address">NIL</string>
 
     <!-- added by Ernest-->
-    <string name="modeText">Auto</string>
+    <string name="updatingModeText">Auto</string>
+    <string name="executionModeText">Execution Mode:</string>
+    <string name="modeHeaderText">Updating Mode:</string>
     <string name="updateButtonText">Update</string>
+    <string name="exploreButtonText">Explore</string>
+    <string name="fastestButtonText">Fastest</string>
+    <string name="commandButtonText">Command</string>
 </resources>
