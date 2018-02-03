@@ -34,8 +34,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
     List<Point> unexploredPoints;
+    List<List<Point>> neighbourPoints;
 
     int exploringUnexplored;
+    int neighbourCounter;
     int aboutTurn;
     boolean justTurned;
     boolean leftStartPoint;
@@ -49,18 +51,21 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate);
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
+        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint);
         robot.addRobotActionListener(this);
         sensorsScan();
 
         currentState = States.BOUNDARY;
         unexploredPoints = new ArrayList<Point>();
+        neighbourPoints = new ArrayList();
+
         exploringUnexplored = 0;
+        neighbourCounter = 0;
         aboutTurn = 0;
         justTurned = false;
         leftStartPoint = false;
-                
+
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -194,8 +199,25 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         return hasUnexplored;
     }
 
+    // Can also be optimized
+    private List<Point> nearbyRobotPoints(Point rPoint) {
+        List<Point> nearbyRobotPoints = new ArrayList<Point>();
+        for (int x = -1; x < 2; x++) {
+            if (rPoint.x + x > 0 && (rPoint.x + x) < getMapState().getMapSystemDimension().width && x != 0) {
+                nearbyRobotPoints.add(new Point(rPoint.x + x, rPoint.y));
+            }
+        }
+        for (int y = -1; y < 2; y++) {
+            if (rPoint.y + y > 0 && (rPoint.y + y) < getMapState().getMapSystemDimension().height && y != 0) {
+                nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y + y));
+            }
+        }
+        return nearbyRobotPoints;
+    }
+
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        // Update internal map state
         Point robotPoint = getMapState().getRobotPoint();
         if (mapdirection != null) {
             leftStartPoint = true;
@@ -259,129 +281,68 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
-                        //System.out.println(tempPoint);
-                        //fastestPath.move(getMapState(), getRobot(), tempPoint);
+                        neighbourPoints.add(nearbyRobotPoints(tempPoint));
                     }
                 }
             }
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
-                
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
+                //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+
             } else {
-                this.complete();
+                preComplete();
             }
         }
-        if(currentState == States.EXPLORING){
-            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
+        
+        if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
+            complete();
         }
     }
 
     @Override
     public void onFastestPathCompleted() {
-        exploringUnexplored++;
-        if (exploringUnexplored < unexploredPoints.size()) {
-            while(!isUnexplored(unexploredPoints.get(exploringUnexplored))){
-                exploringUnexplored++;
-                if(exploringUnexplored==unexploredPoints.size()){
-                    this.complete();
-                    return;
+        if (exploringUnexplored < unexploredPoints.size() && currentState != States.COMPLETED) {
+            if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                neighbourCounter++;
+                //if( neighbourCounter > neighbourPoints.get(exploringUnexplored).size()){
+
+                //}
+                if (neighbourCounter == neighbourPoints.get(exploringUnexplored).size()) {
+                    fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false);
+                } else {
+                    fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
                 }
+            } else {
+                exploringUnexplored++;
+                neighbourCounter = 0;
+                while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                    exploringUnexplored++;
+                    if (exploringUnexplored == unexploredPoints.size()) {
+                        preComplete();
+                        return;
+                    }
+                }
+                
+                fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
+
             }
-            fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
-        } else {
-            this.complete();
+        } else if(currentState != States.COMPLETED) {
+            preComplete();
         }
+
     }
 
     @Override
     public void complete() {
-        currentState = States.COMPLETED;
-
+        getRobot().removeRobotActionListener(this);
         super.complete();
     }
 
-    /**
-     * Scan area using sensors and updates cell states
-     */
-    private void sensorsScan() {
-        Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
-        List<SensorConfiguration> sensors = getRobot().getSensors();
-
-        for (SensorConfiguration sensor : sensors) {
-
-            //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
-            int reading = readings.get(sensor);
-            int test = reading;
-            // Limits sensor range
-            if (reading > sensor.getMaxDistance()) {
-                reading = 0;
-            }
-
-            // If detects an obstacle
-            if (reading > 0) {
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
-
-                // Should also check for out-of-bounds (more applicable in physical robot)
-                switch (sDirection) {
-                    case UP:
-                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y + reading), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case DOWN:
-                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y - reading), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case LEFT:
-                        this.setCellState(new Point(sCoordinate.x - reading, sCoordinate.y), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                    case RIGHT:
-                        this.setCellState(new Point(sCoordinate.x + reading, sCoordinate.y), CellState.OBSTACLE, null);
-                        for (int range = 1; range < reading; range++) {
-                            this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                }
-            } else {
-                int maxRange = sensor.getMaxDistance();
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
-                switch (sDirection) {
-                    case UP:
-                        for (int range = 1; range <= maxRange; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case DOWN:
-                        for (int range = 1; range <= maxRange; range++) {
-                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
-                        }
-                        break;
-                    case LEFT:
-                        for (int range = 1; range <= maxRange; range++) {
-
-                            this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                    case RIGHT:
-                        for (int range = 1; range <= maxRange; range++) {
-
-                            this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
-                        }
-                        break;
-                }
-            }
-        }
-
+    private void preComplete() {
+        currentState = States.COMPLETED;
+        fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint(), false);
     }
 
 }

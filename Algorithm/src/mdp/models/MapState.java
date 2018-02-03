@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,6 +58,7 @@ public class MapState {
         this.mapdim = mapdim;
         this.robotdim = robotdim;
         this.robotpoint = new Point(0, 0);
+        this.startpoint = new Point(0, 0);
 
         Dimension rsystemdim = getRobotSystemDimension();
         this.endpoint = new Point(rsystemdim.width - 1, rsystemdim.height - 1);
@@ -170,8 +170,8 @@ public class MapState {
         for (Point p : points) {
             CellState pstate = getMapCellState(p);
 
-            if (pstate == CellState.UNEXPLORED
-                    || (pstate == CellState.OBSTACLE && state != CellState.UNEXPLORED)
+            if (pstate == CellState.OBSTACLE
+                    || (pstate == CellState.UNEXPLORED && state != CellState.OBSTACLE)
                     || (pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE)) {
                 state = pstate;
             }
@@ -233,12 +233,10 @@ public class MapState {
     }
 
     /**
-     * Clears the map and sets all CellState(s) to CellState.NORMAL
+     * Resets the robot to the starting point
      */
     public void reset() {
-        for (CellState[] rowStates : this.cellstates) {
-            Arrays.fill(rowStates, CellState.NORMAL);
-        }
+    	this.robotpoint = this.startpoint;
     }
 
     

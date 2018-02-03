@@ -180,7 +180,7 @@ public abstract class RobotBase {
                         break;
                 }
             }
-            
+
             setCurrentOrientation(newDirection);
 
         } else {
@@ -196,7 +196,7 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void notify(Direction mapdirection, RobotAction[] actions) {
-        for (RobotActionListener listener : listeners) {
+        for (RobotActionListener listener : new ArrayList<>(listeners)) {
             listener.onRobotActionCompleted(mapdirection, actions);
         }
     }

@@ -1,10 +1,9 @@
 package mdp.controllers.fp;
 
 import java.awt.Point;
-import mdp.models.Direction;
 
+import mdp.models.Direction;
 import mdp.models.MapState;
-import mdp.robots.RobotBase;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,39 +16,27 @@ import mdp.robots.RobotBase;
  */
 public class FastestPathController extends FastestPathBase {
 
-    @Override
-    public void move(MapState mstate, RobotBase robot, Point destination) {
-        // Cannot just for loop move, need a call back
-        Point rpoint = mstate.getRobotPoint();
-
-        int dx = destination.x - rpoint.x;
-        int dy = destination.y - rpoint.y;
-
-        if (dx > 0) {
-            //for (int i = 0; i < dx; i++) {
-                robot.move(Direction.RIGHT);
-                return;
-            //}
-        } else if (dx < 0) {
-            //for (int i = dx; i < 0; i++) {
-                robot.move(Direction.LEFT);
-                return;
-            //}
-        }
-
-        if (dy > 0) {
-            //for (int i = 0; i < dy; i++) {
-                robot.move(Direction.UP);
-                return;
-            //}
-        } else if (dy < 0) {
-            //for (int i = dy; i < 0; i++) {
-                robot.move(Direction.DOWN);
-                return;
-            //}
-        }
-
-        notifyMovementComplete();
-    }
+	@Override
+	protected Direction next() {
+		Direction nextd;
+		
+		MapState mstate = getMapState();
+		Point rpoint = mstate.getRobotPoint();
+		Point dpoint = this.getDestination();
+		
+		if(rpoint.x != dpoint.x) {
+			nextd = dpoint.x - rpoint.x > 0? Direction.RIGHT: Direction.LEFT;
+			mstate.setRobotPoint(new Point(rpoint.x + (nextd == Direction.RIGHT? 1: -1), rpoint.y));
+		}
+		else if(rpoint.y != dpoint.y) {
+			nextd = dpoint.y - rpoint.x > 0? Direction.UP: Direction.DOWN;
+			mstate.setRobotPoint(new Point(rpoint.x, rpoint.y + (nextd == Direction.UP? 1: -1)));
+		}
+		else {
+			nextd = null;
+		}
+		
+		return nextd;
+	}
 
 }

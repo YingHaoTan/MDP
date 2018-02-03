@@ -94,7 +94,7 @@ public class CoordinateInputPane extends JPanel {
 	}
 	
 	private void notifyCoordinateInput() {
-		for(CoordinateInputListener listener: this.listeners)
+		for(CoordinateInputListener listener: new ArrayList<>(this.listeners))
 			listener.onCoordinateInput(this, new Point((Integer) xcombobox.getSelectedItem(), (Integer) ycombobox.getSelectedItem())); 
 	}
 

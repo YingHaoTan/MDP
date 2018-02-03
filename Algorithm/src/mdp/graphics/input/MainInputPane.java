@@ -36,7 +36,6 @@ public class MainInputPane extends JPanel {
 	private JButton loadmapbtn;
 	private JButton savemapbtn;
 	private JButton executionbtn;
-	private JButton cancelbtn;
 	private JButton resetbtn;
 	
 	public MainInputPane(MdpMap map) {
@@ -45,7 +44,7 @@ public class MainInputPane extends JPanel {
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
 		MapState mstate = map.getMapState();
-		this.startinput = new CoordinateInputPane("Robot Coordinate(X, Y):", mstate.getRobotSystemDimension());
+		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", mstate.getRobotSystemDimension());
 		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", mstate.getRobotSystemDimension());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
@@ -78,10 +77,8 @@ public class MainInputPane extends JPanel {
 		JPanel executionpane = new JPanel();
 		executionpane.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.executionbtn = new JButton("Explore");
-		this.cancelbtn = new JButton("Cancel");
 		this.resetbtn = new JButton("Reset");
 		executionpane.add(executionbtn);
-		executionpane.add(cancelbtn);
 		executionpane.add(resetbtn);
 		
 		this.add(loadsavepane);
@@ -169,14 +166,6 @@ public class MainInputPane extends JPanel {
 	}
 	
 	/**
-	 * Gets the cancel button
-	 * @return
-	 */
-	public JButton getCancelButton() {
-		return this.cancelbtn;
-	}
-	
-	/**
 	 * Gets the reset button
 	 * @return
 	 */
@@ -189,7 +178,7 @@ public class MainInputPane extends JPanel {
 	 * @param map
 	 */
 	public void sync(MapState mstate) {
-		this.startinput.setCoordinate(mstate.getRobotPoint());
+		this.startinput.setCoordinate(mstate.getStartPoint());
 		this.endinput.setCoordinate(mstate.getEndPoint());
 		this.mdf1.setText(mstate.toString(MapDescriptorFormat.MDF1));
 		this.mdf2.setText(mstate.toString(MapDescriptorFormat.MDF2));
@@ -200,7 +189,6 @@ public class MainInputPane extends JPanel {
 	 */
 	public void enable() {
 		executionbtn.setEnabled(true);
-		cancelbtn.setEnabled(true);
 		resetbtn.setEnabled(true);
 	}
 	
@@ -209,7 +197,6 @@ public class MainInputPane extends JPanel {
 	 */
 	public void disable() {
 		executionbtn.setEnabled(false);
-		cancelbtn.setEnabled(false);
 		resetbtn.setEnabled(false);
 	}
 

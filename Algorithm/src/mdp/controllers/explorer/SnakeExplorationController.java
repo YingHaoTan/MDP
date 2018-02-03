@@ -36,8 +36,8 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
     Direction[] directionalPriority = {Direction.LEFT, Direction.UP, Direction.RIGHT, Direction.DOWN};
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate);
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
+        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint);
 
         robot.addRobotActionListener(this);
         MapState internalMapState = getMapState();
@@ -172,7 +172,7 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
     /**
      * Scan area using sensors and updates cell states
      */
-    private void sensorsScan() {
+    /*private void sensorsScan() {
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = getRobot().getSensors();
 
@@ -249,7 +249,7 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
             }
         }
 
-    }
+    }*/
 
     /**
      * Returns the new location in robot coordinates if you move 1 step in the
