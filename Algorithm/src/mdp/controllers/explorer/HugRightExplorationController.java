@@ -303,7 +303,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onFastestPathCompleted() {
-        if (exploringUnexplored < unexploredPoints.size()) {
+        if (exploringUnexplored < unexploredPoints.size() && currentState != States.COMPLETED) {
             if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
                 neighbourCounter++;
                 //if( neighbourCounter > neighbourPoints.get(exploringUnexplored).size()){
