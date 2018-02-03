@@ -2,14 +2,13 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
 
 /**
  * CommConstants stores constants for messages between devices
- * 
- * 
+ *
  * @author ernest
  *
  */
 public class CommConstants {
 
-	public static final String MESSAGE_TYPE_COMMAND	= "CO";
+	public static final String MESSAGE_TYPE_COMMAND	= "CM";
 	
 		public static final String COMMAND_TYPE_EXPLORE		= "EX";
 		public static final String COMMAND_TYPE_FASTESTPATH = "FP";
@@ -24,7 +23,10 @@ public class CommConstants {
 	public static final String MESSAGE_TYPE_STATUS	= "ST";
 	
 		public static final String STATUS_TYPE_ROBOT	= "RO";
-		
+
+			public static final String ROBOT_MOVING				= "MO";
+			public static final String ROBOT_TURNING			= "TU";
+			public static final String ROBOT_STOPPED			= "ST";
 			public static final String ROBOT_DIRECTION_UP		= "UP";
 			public static final String ROBOT_DIRECTION_DOWN		= "DN";
 			public static final String ROBOT_DIRECTION_LEFT		= "LE";
@@ -34,8 +36,9 @@ public class CommConstants {
 			
 			public static final String MAP_TYPE_CLEAR	= "CL";
 			public static final String MAP_TYPE_BLOCK	= "BL";
-	
-	
+
+	public static final String MESSAGE_TYPE_CONFIG	= "CF";
+	//to add more configuration patterns in the future
 
 	
 	

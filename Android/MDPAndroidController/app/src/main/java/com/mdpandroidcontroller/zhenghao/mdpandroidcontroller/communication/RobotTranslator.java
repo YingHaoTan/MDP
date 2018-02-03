@@ -9,9 +9,39 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
  */
 public class RobotTranslator {
 	//variables and constructors TBC
-	
+
 	/**
-	 * Generate message to update controller about status of robot
+	 * Generate message to update controller that robot is moving
+	 *
+	 * @return
+	 */
+	public String robotMoving(){
+		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_MOVING;
+		return message;
+	}
+
+	/**
+	 * Generate message to update controller that robot is turning
+	 *
+	 * @return
+	 */
+	public String robotTurning(){
+		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_TURNING;
+		return message;
+	}
+
+	/**
+	 * Generate message to update controller that robot has stopped
+	 *
+	 * @return
+	 */
+	public String robotStopped(){
+		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_STOPPED;
+		return message;
+	}
+
+	/**
+	 * Generate message to update controller about the location and orientation of the robot
 	 * 
 	 * @param x
 	 * @param y
@@ -105,6 +135,8 @@ public class RobotTranslator {
 				//set waypoint
 				return;
 			}
+		}else if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_CONFIG)){
+			//process config
 		}
 		
 		//error

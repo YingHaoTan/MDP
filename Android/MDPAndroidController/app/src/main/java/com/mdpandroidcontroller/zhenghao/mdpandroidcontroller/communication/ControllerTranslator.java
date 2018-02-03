@@ -88,6 +88,19 @@ public class ControllerTranslator {
 		
 		return message;
 	}
+
+	/**
+	 * generate string with configuration information to robot
+	 *
+	 * To be written in the future after collaboration with algo
+	 *
+	 * @return
+	 */
+	public String generateConfiString(){
+		String message = CommConstants.MESSAGE_TYPE_CONFIG;
+
+		return message;
+	}
 	
 	/**
 	 * Decodes the message sent from the robot
@@ -100,19 +113,35 @@ public class ControllerTranslator {
 		boolean isBlocked;
 		if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_STATUS)) {
 			if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_ROBOT)) {
-				x = Integer.parseInt(message.substring(4, 6));
-				y = Integer.parseInt(message.substring(6, 8));
-				//find direction of robot from message.substring(8,10)
-				//update update map
-				return;
+				if(message.substring(4,6).equals(CommConstants.ROBOT_MOVING)){
+					//do moving actions
+				}else if(message.substring(4,6).equals(CommConstants.ROBOT_TURNING)){
+					//do turning actions
+				}else if(message.substring(4,6).equals(CommConstants.ROBOT_STOPPED)){
+					//do stopping actions
+				}else{
+					try{
+						x = Integer.parseInt(message.substring(4, 6));
+						y = Integer.parseInt(message.substring(6, 8));
+						//find direction of robot from message.substring(8,10)
+						//update update map
+						return;
+					}catch (NumberFormatException exception){
+						//handle error
+					}
+				}
 			}else if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_MAP)) {
-				x = Integer.parseInt(message.substring(4, 6));
-				y = Integer.parseInt(message.substring(6, 8));
-				isBlocked = (message.substring(8, 10) == CommConstants.MAP_TYPE_BLOCK);
-				//update map
-				return;
+				try{
+					x = Integer.parseInt(message.substring(4, 6));
+					y = Integer.parseInt(message.substring(6, 8));
+					isBlocked = (message.substring(8, 10) == CommConstants.MAP_TYPE_BLOCK);
+					//update map
+					return;
+				}catch(NumberFormatException exception){
+					//handle error
+				}
 			}
 		}
-		// print error if required
+		// print error here if required
 	}
 }
