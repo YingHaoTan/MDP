@@ -10,14 +10,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 
 import java.util.ArrayList;
 import java.util.Set;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
 
 
@@ -34,6 +39,24 @@ public class MainActivity extends AppCompatActivity {
     private Button btnConnect = null;
     private TextView connectionString = null;
 
+    //variables for controller portion
+    private ToggleButton explorationButton = null;
+    private ToggleButton fastestPathButton = null;
+    private ToggleButton manualControlButton = null;
+
+    private TextView updateModeTextView = null;
+    private Switch updateModeSwitch = null;
+    private Button updateButton = null;
+
+    private TableLayout goTable = null;
+    private TableLayout controlTable = null;
+
+    private Button goButton = null;
+    private Button upButton = null;
+    private Button downButton = null;
+    private Button leftButton = null;
+    private Button rightButton = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: starts");
@@ -45,15 +68,46 @@ public class MainActivity extends AppCompatActivity {
 
         connectionString = (TextView) findViewById(R.id.connectionStr);
 
+        controllerInit(); //initialization for components within the controller portion
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-            finish();
+            //finish();
             return;
         }
 
+    }
+
+    private void controllerInit(){
+        explorationButton = (ToggleButton) findViewById(R.id.explorationButton);
+        explorationButton.setOnClickListener(explorationButtonListener);
+        fastestPathButton = (ToggleButton) findViewById(R.id.fastestPathButton);
+        fastestPathButton.setOnClickListener(fastestPathButtonListener);
+        manualControlButton = (ToggleButton) findViewById(R.id.manualControlButton);
+        manualControlButton.setOnClickListener(manualControlButtonListener);
+
+        updateModeTextView = (TextView) findViewById(R.id.updateModeTextView);
+        updateModeSwitch = (Switch) findViewById(R.id.updateModeSwitch);
+        updateModeSwitch.setOnClickListener(updateModeSwitchListener);
+        updateButton = (Button) findViewById(R.id.updateButton);
+        updateButton.setOnClickListener(updateButtonListener);
+
+        goTable = (TableLayout) findViewById(R.id.goTable);
+        controlTable = (TableLayout)findViewById(R.id.controlTable);
+
+        goButton = (Button) findViewById(R.id.goButton);
+        goButton.setOnClickListener(goButtonListener);
+        upButton = (Button) findViewById(R.id.upButton);
+        upButton.setOnClickListener(upButtonListener);
+        downButton = (Button) findViewById(R.id.downButton);
+        downButton.setOnClickListener(downButtonListener);
+        leftButton = (Button) findViewById(R.id.leftButton);
+        leftButton.setOnClickListener(leftButtonListener);
+        rightButton = (Button) findViewById(R.id.rightButton);
+        rightButton.setOnClickListener(rightButtonListener);
     }
 
     Button.OnClickListener connectButtonListener = new Button.OnClickListener() {
@@ -203,4 +257,106 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    ToggleButton.OnClickListener explorationButtonListener = new ToggleButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            goTable.setVisibility(VISIBLE);
+            controlTable.setVisibility(GONE);
+            fastestPathButton.setChecked(false);
+            manualControlButton.setChecked(false);
+        }
+    };
+
+    ToggleButton.OnClickListener fastestPathButtonListener = new ToggleButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            goTable.setVisibility(VISIBLE);
+            controlTable.setVisibility(GONE);
+            explorationButton.setChecked(false);
+            manualControlButton.setChecked(false);
+        }
+    };
+
+    ToggleButton.OnClickListener manualControlButtonListener = new ToggleButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            goTable.setVisibility(GONE);
+            controlTable.setVisibility(VISIBLE);
+            explorationButton.setChecked(false);
+            fastestPathButton.setChecked(false);
+        }
+    };
+
+    Button.OnClickListener updateModeSwitchListener = new Switch.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(updateModeSwitch.isChecked()){
+                updateModeTextView.setText(R.string.autoModeText);
+                updateButton.setVisibility(GONE);
+            }else{
+                updateModeTextView.setText(R.string.manualModeText);
+                updateButton.setVisibility(VISIBLE);
+            }
+        }
+    };
+
+    Button.OnClickListener updateButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //send message to robot via bluetooth
+
+        }
+    };
+
+    Button.OnClickListener goButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(explorationButton.isChecked()){
+                //send message to robot via bluetooth
+            }else if(fastestPathButton.isChecked()){
+                //send message to robot via bluetooth
+            }else{
+                //handle error here
+            }
+        }
+    };
+
+    Button.OnClickListener upButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //send message to robot via bluetooth
+
+        }
+    };
+
+    Button.OnClickListener downButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //send message to robot via bluetooth
+
+        }
+    };
+
+    Button.OnClickListener leftButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //send message to robot via bluetooth
+
+        }
+    };
+
+    Button.OnClickListener rightButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //send message to robot via bluetooth
+
+        }
+    };
+
 }
