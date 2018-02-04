@@ -44,15 +44,15 @@
 //    > 1080 is the int for the GP2Y0A21Y and 
 //    > 20150 is the int for GP2Y0A02YK and 
 //    The numbers reflect the distance range they are designed for (in cm)
-SharpIR::SharpIR(int irPin, long sensorModel, double gradient) {
+SharpIR::SharpIR(int irPin, long sensorModel, double gradient, double intercept) {
   
     _irPin=irPin;
     _model=sensorModel;
 	
 
 	//Additional
-    _grad = gradient
-
+    _grad = gradient;
+	_intercept = intercept;
     // Define pin as Input
     pinMode (_irPin, INPUT);
 
@@ -98,17 +98,22 @@ int SharpIR::distance() {
         // Different expressions required as the Photon has 12 bit ADCs vs 10 bit for Arduinos
         #ifdef ARDUINO
           //distanceCM = 27.728 * pow(map(ir_val[NB_SAMPLE / 2], 0, 1023, 0, 5000)/1000.0, -1.2045);
-		  //distanceCM = (1000/map(ir_val[NB_SAMPLE / 2], 0, 1023, 0, 5000)) - 0.1015 ) / grad;
+		  distanceCM = (1023.0 / (ir_val[NB_SAMPLE/2] * 5.0) - _intercept) / _grad ;
         #endif
 
     } else if (_model==20150){
+
+        // Previous formula used by  Dr. Marcal Casas-Cartagena
+        // puntualDistance=61.573*pow(voltFromRaw/1000, -1.1068);
+        
         // Different expressions required as the Photon has 12 bit ADCs vs 10 bit for Arduinos
         #ifdef ARDUINO
           //distanceCM = 60.374 * pow(map(ir_val[NB_SAMPLE / 2], 0, 1023, 0, 5000)/1000.0, -1.16);
-		  //distanceCM = (pow(map(ir_val[NB_SAMPLE / 2], 0, 1023, 0, 5000)/1000.0, -1) - 0.0163 ) / grad;
+		  distanceCM = (1023.0 / (ir_val[NB_SAMPLE/2] * 5.0) - _intercept) / _grad ;
         #endif
 
     } 
+
     return distanceCM;
 }
 
