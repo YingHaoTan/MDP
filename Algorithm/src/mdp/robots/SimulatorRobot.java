@@ -3,14 +3,16 @@ package mdp.robots;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import mdp.graphics.map.MdpMap;
 import mdp.models.CellState;
 import mdp.models.Direction;
+import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 
@@ -21,38 +23,29 @@ import mdp.models.SensorConfiguration;
  * @author Ying Hao
  */
 public class SimulatorRobot extends RobotBase {
-	private boolean[][] obstacles;
-	private long delay;
 	private Timer timer;
-	private Point location;
-	private Dimension rdim;
+	private MapState mstate;
+	private Queue<NotifyTask> taskqueue;
+	private long delay;
 	
 	/**
 	 * Creates an instance of SimulatorRobot with a default delay timer of 1 second
 	 * @param map
 	 * @param orientation
 	 */
-	public SimulatorRobot(Direction orientation) {
-		super(orientation);
+	public SimulatorRobot(Dimension dimension, Direction orientation) {
+		super(dimension, orientation);
+		taskqueue = new LinkedList<>();
+		delay = 10;
 	}
 	
 	/**
 	 * Initializes this SimulatorRobot instance with simulation map data
 	 * @param map
 	 */
-	public void init(MdpMap map) {
-		Dimension mapdim = map.getMapCoordinateDimension();
-		obstacles = new boolean[mapdim.width][mapdim.height];
-		delay = 1000;
-		timer = new Timer(true);
-		location = map.getRobotMapPoint();
-		rdim = map.getRobotDimension();
-		
-		for(int x = 0; x < obstacles.length; x++) {
-			for(int y = 0; y < obstacles[x].length; y++) {
-				obstacles[x][y] = map.getCellState(new Point(x, y)) == CellState.OBSTACLE;
-			}
-		}
+	public void init(MapState mstate) {
+		this.timer = new Timer(true);
+		this.mstate = mstate.clone();
 	}
 	
 	/**
@@ -84,16 +77,21 @@ public class SimulatorRobot extends RobotBase {
 
 	@Override
 	protected void move(Direction mapdirection, RobotAction... actions) {
-		if(mapdirection == Direction.UP)
-			this.location = new Point(location.x, location.y + 1);
-		else if(mapdirection == Direction.DOWN)
-			this.location = new Point(location.x, location.y - 1);
-		else if(mapdirection == Direction.LEFT)
-			this.location = new Point(location.x - 1, location.y);
-		else
-			this.location = new Point(location.x + 1, location.x);
+		Point location = mstate.getRobotPoint();
 		
-		timer.schedule(new NotifyTask(mapdirection, actions), delay);
+		if(mapdirection == Direction.UP)
+			mstate.setRobotPoint(new Point(location.x, location.y + 1));
+		else if(mapdirection == Direction.DOWN)
+			mstate.setRobotPoint(new Point(location.x, location.y - 1));
+		else if(mapdirection == Direction.LEFT)
+			mstate.setRobotPoint(new Point(location.x - 1, location.y));
+                else if(mapdirection == Direction.RIGHT)
+			mstate.setRobotPoint(new Point(location.x + 1, location.y));
+		
+		NotifyTask task = new NotifyTask(mapdirection, actions);
+		taskqueue.offer(task);
+		if(taskqueue.size() == 1)
+			timer.schedule(task, delay);
 	}
 	
 	/**
@@ -101,7 +99,7 @@ public class SimulatorRobot extends RobotBase {
 	 * @param sensor
 	 * @return
 	 */
-	private Direction getSensorDirection(SensorConfiguration sensor) {
+	public Direction getSensorDirection(SensorConfiguration sensor) {
 		Direction orientation = this.getCurrentOrientation();
 		Direction sdirection = sensor.getDirection();
 		
@@ -144,7 +142,11 @@ public class SimulatorRobot extends RobotBase {
 	 * @param sensor
 	 * @return
 	 */
-	private Point getSensorCoordinate(SensorConfiguration sensor) {
+	public Point getSensorCoordinate(SensorConfiguration sensor) {
+        List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
+		Point location = points.get(points.size() / 2);
+                
+		Dimension rdim = mstate.getRobotDimension();
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate;
 		
@@ -168,26 +170,27 @@ public class SimulatorRobot extends RobotBase {
 	private int getObstacleDistance(SensorConfiguration sensor) {
 		Direction sdirection = this.getSensorDirection(sensor);
 		Point scoordinate = this.getSensorCoordinate(sensor);
+		Dimension mdim = mstate.getMapSystemDimension();
 		int distance = 0;
 		
 		if(sdirection == Direction.UP) {
-			for(int y = scoordinate.y + 1; y < this.obstacles[scoordinate.x].length && distance == 0; y++)
-				if(this.obstacles[scoordinate.x][y])
+			for(int y = scoordinate.y + 1; y < mdim.height && distance == 0; y++)
+				if(mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE)
 					distance = y - scoordinate.y;
 		}
 		else if(sdirection == Direction.DOWN) {
 			for(int y = scoordinate.y - 1; y >= 0 && distance == 0; y--)
-				if(this.obstacles[scoordinate.x][y])
+				if(mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE)
 					distance = scoordinate.y - y;
 		}
 		else if(sdirection == Direction.LEFT) {
 			for(int x = scoordinate.x - 1; x >= 0 && distance == 0; x--)
-				if(this.obstacles[x][scoordinate.y])
+				if(mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE)
 					distance = scoordinate.x - x;
 		}
 		else {
-			for(int x = scoordinate.x + 1; x < this.obstacles.length; x++)
-				if(this.obstacles[x][scoordinate.y])
+			for(int x = scoordinate.x + 1; x < mdim.width  && distance == 0; x++)
+				if(mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE)
 					distance = x - scoordinate.x;
 		}
 		
@@ -212,6 +215,10 @@ public class SimulatorRobot extends RobotBase {
 		@Override
 		public void run() {
 			SimulatorRobot.this.notify(mapdirection, actions);
+			SimulatorRobot.this.taskqueue.poll();
+			
+			if(SimulatorRobot.this.taskqueue.size() > 0)
+				timer.schedule(SimulatorRobot.this.taskqueue.peek(), delay);
 		}
 		
 	}

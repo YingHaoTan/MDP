@@ -14,6 +14,7 @@ import mdp.graphics.ExecutionMode;
 import mdp.graphics.MapInteractionMode;
 import mdp.graphics.map.MdpMap;
 import mdp.models.MapDescriptorFormat;
+import mdp.models.MapState;
 
 /**
  * CoordinateInputPane encapsulates input controls necessary for all user inputs
@@ -35,7 +36,6 @@ public class MainInputPane extends JPanel {
 	private JButton loadmapbtn;
 	private JButton savemapbtn;
 	private JButton executionbtn;
-	private JButton cancelbtn;
 	private JButton resetbtn;
 	
 	public MainInputPane(MdpMap map) {
@@ -43,8 +43,9 @@ public class MainInputPane extends JPanel {
 		this.setLayout(layout);
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
-		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", map.getRobotCoordinateDimension());
-		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", map.getRobotCoordinateDimension());
+		MapState mstate = map.getMapState();
+		this.startinput = new CoordinateInputPane("Start Coordinate(X, Y):", mstate.getRobotSystemDimension());
+		this.endinput = new CoordinateInputPane("End Coordinate(X, Y):", mstate.getRobotSystemDimension());
 		this.minteractionmode = new ComboBoxInputPane<>("Map Interaction Mode:", MapInteractionMode.values());
 		this.executionmode = new ComboBoxInputPane<>("Execution Mode:", ExecutionMode.values());
 		
@@ -76,10 +77,8 @@ public class MainInputPane extends JPanel {
 		JPanel executionpane = new JPanel();
 		executionpane.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.executionbtn = new JButton("Explore");
-		this.cancelbtn = new JButton("Cancel");
 		this.resetbtn = new JButton("Reset");
 		executionpane.add(executionbtn);
-		executionpane.add(cancelbtn);
 		executionpane.add(resetbtn);
 		
 		this.add(loadsavepane);
@@ -91,7 +90,7 @@ public class MainInputPane extends JPanel {
 		this.add(mdf2panel);
 		this.add(executionpane);
 		
-		this.sync(map);
+		this.sync(mstate);
 	}
 	
 	/**
@@ -167,14 +166,6 @@ public class MainInputPane extends JPanel {
 	}
 	
 	/**
-	 * Gets the cancel button
-	 * @return
-	 */
-	public JButton getCancelButton() {
-		return this.cancelbtn;
-	}
-	
-	/**
 	 * Gets the reset button
 	 * @return
 	 */
@@ -183,14 +174,30 @@ public class MainInputPane extends JPanel {
 	}
 	
 	/**
-	 * Syncrhonizes the current MainInputPane displays with the provided map instance
+	 * Syncrhonizes the current MainInputPane displays with the provided map state instance
 	 * @param map
 	 */
-	public void sync(MdpMap map) {
-		this.startinput.setCoordinate(map.getRobotLocation());
-		this.endinput.setCoordinate(map.getEndLocation());
-		this.mdf1.setText(map.toString(MapDescriptorFormat.MDF1));
-		this.mdf2.setText(map.toString(MapDescriptorFormat.MDF2));
+	public void sync(MapState mstate) {
+		this.startinput.setCoordinate(mstate.getStartPoint());
+		this.endinput.setCoordinate(mstate.getEndPoint());
+		this.mdf1.setText(mstate.toString(MapDescriptorFormat.MDF1));
+		this.mdf2.setText(mstate.toString(MapDescriptorFormat.MDF2));
+	}
+	
+	/**
+	 * Enables input pane
+	 */
+	public void enable() {
+		executionbtn.setEnabled(true);
+		resetbtn.setEnabled(true);
+	}
+	
+	/**
+	 * Disables input pane
+	 */
+	public void disable() {
+		executionbtn.setEnabled(false);
+		resetbtn.setEnabled(false);
 	}
 
 	@Override
