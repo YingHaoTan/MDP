@@ -146,7 +146,7 @@ public abstract class RobotBase {
     public void move(RobotAction action) {
         if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
             move(null, action);
-            Direction newDirection = null;
+            Direction newDirection = getCurrentOrientation();
 
             if (action == RobotAction.TURN_RIGHT) {
                 switch (getCurrentOrientation()) {
