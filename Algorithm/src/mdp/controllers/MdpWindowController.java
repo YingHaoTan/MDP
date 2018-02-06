@@ -372,8 +372,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		 
 		 MapState mstate = map.getMapState();
 		 mstate.reset();
-		 mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-		 
+                 if(mstate.getWayPoint() != null){
+                    mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+                 }
 		 map.repaint();
 	 }
 
