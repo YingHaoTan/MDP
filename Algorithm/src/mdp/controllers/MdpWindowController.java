@@ -340,8 +340,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		 MapState mstate = map.getMapState();
 		 
-		 if (mode == ExecutionMode.SIMULATION)
-			 srobot.init(mstate);
+		 if (mode == ExecutionMode.SIMULATION){
+                        srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
+			srobot.init(mstate);
+                 }
 
 		 mstate.setMapCellState(CellState.UNEXPLORED);
 

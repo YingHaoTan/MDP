@@ -33,6 +33,7 @@ public class MainInputPane extends JPanel {
 	private ComboBoxInputPane<ExecutionMode> executionmode;
 	private JTextArea mdf1;
 	private JTextArea mdf2;
+        private JTextArea stepspeed;
 	private JButton loadmapbtn;
 	private JButton savemapbtn;
 	private JButton executionbtn;
@@ -67,6 +68,8 @@ public class MainInputPane extends JPanel {
 		mdf2panel.add(new JLabel("MDF 2:"));
 		mdf2panel.add(mdf2);
 		
+                
+                
 		JPanel loadsavepane = new JPanel();
 		loadsavepane.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.loadmapbtn = new JButton("Load Map");
@@ -81,6 +84,14 @@ public class MainInputPane extends JPanel {
 		executionpane.add(executionbtn);
 		executionpane.add(resetbtn);
 		
+                JPanel speedpane = new JPanel();
+                speedpane.setLayout(new FlowLayout(FlowLayout.LEADING));
+		speedpane.add(new JLabel("1 action = "));
+		this.stepspeed = new JTextArea();
+                this.stepspeed.setPreferredSize(new Dimension(50,30));
+                speedpane.add(stepspeed);
+                speedpane.add(new JLabel(" seconds"));
+                
 		this.add(loadsavepane);
 		this.add(startinput);
 		this.add(endinput);
@@ -88,6 +99,7 @@ public class MainInputPane extends JPanel {
 		this.add(executionmode);
 		this.add(mdf1panel);
 		this.add(mdf2panel);
+                this.add(speedpane);
 		this.add(executionpane);
 		
 		this.sync(mstate);
@@ -124,6 +136,15 @@ public class MainInputPane extends JPanel {
 	public ComboBoxInputPane<ExecutionMode> getExecutionModeInput() {
 		return this.executionmode;
 	}
+        
+        public double getDelaySeconds(){
+            if(this.stepspeed.getText().matches("[0-9]+(\\.[0-9]+)*")){
+                return Double.parseDouble(this.stepspeed.getText());
+            }
+            else{
+                return 0;
+            }
+        }
 	
 	/**
 	 * Gets the MDF 1 label
@@ -190,6 +211,7 @@ public class MainInputPane extends JPanel {
 	public void enable() {
 		executionbtn.setEnabled(true);
 		resetbtn.setEnabled(true);
+                stepspeed.setEnabled(true);
 	}
 	
 	/**
@@ -198,6 +220,7 @@ public class MainInputPane extends JPanel {
 	public void disable() {
 		executionbtn.setEnabled(false);
 		resetbtn.setEnabled(false);
+                stepspeed.setEnabled(false);
 	}
 
 	@Override
