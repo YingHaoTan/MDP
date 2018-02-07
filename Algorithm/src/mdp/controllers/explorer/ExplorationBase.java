@@ -17,7 +17,9 @@ import mdp.robots.RobotBase;
 public abstract class ExplorationBase extends MovementBase{
 
     private List<ExplorationCompletedListener> eclisteners;
-
+    private int coveragepercentage;
+    
+    
     public ExplorationBase() {
         this.eclisteners = new ArrayList<>();
     }
@@ -28,7 +30,8 @@ public abstract class ExplorationBase extends MovementBase{
      * @param robot
      * @param start
      */
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint, int percentage) {
+        this.coveragepercentage = percentage;
         Dimension robotdim = robot.getDimension();
         setRobot(robot);
         MapState mstate = new MapState(mapdim, robot.getDimension());
@@ -49,6 +52,27 @@ public abstract class ExplorationBase extends MovementBase{
         }
     }
 
+    protected int getCoveragePercentage(){
+        return this.coveragepercentage;
+    }
+    
+    protected boolean reachedCoveragePercentage(){
+        int targetPercentage = getCoveragePercentage();
+        int explored = 0;
+        for(int y = 0; y < getMapState().getMapSystemDimension().height; y++){
+            for(int x = 0; x < getMapState().getMapSystemDimension().width; x++){
+                if(getMapState().getMapCellState(new Point(x,y)) == CellState.NORMAL){
+                    explored++;
+                }
+            }
+        }
+        if(getMapState().getMapSystemDimension().height * getMapState().getMapSystemDimension().width * targetPercentage / 100 <= explored){
+            return true;
+        }
+        return false;
+    }
+    
+    
     
     
     /**

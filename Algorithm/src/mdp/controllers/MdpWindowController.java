@@ -339,6 +339,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 private void explore() {
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		 MapState mstate = map.getMapState();
+                 
 		 
 		 if (mode == ExecutionMode.SIMULATION){
                         srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
@@ -358,9 +359,11 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		 map.repaint();
 
-		 if (explorer != null)
-			 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint());
-	 }
+		 if (explorer != null){
+                     int coveragepercentage = inputpane.getCoveragePercentage();
+                     explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coveragepercentage);
+                 }
+         }
 	 
 	 private void fastestpath() {
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
