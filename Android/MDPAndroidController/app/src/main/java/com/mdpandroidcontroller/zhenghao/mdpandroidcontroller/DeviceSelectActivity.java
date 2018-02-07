@@ -28,6 +28,7 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
 
     private ArrayList<BluetoothDevice> knownDeviceNameList = null;
     private ArrayList<BluetoothDevice> nearbyDeviceNameList = null;
+    private ArrayList<BluetoothDevice> tempDeviceList = null;
 
     private bluetoothDevicesAdapter knownDevicesAdapter = null;
     private bluetoothDevicesAdapter nearbyDevicesAdapter = null;
@@ -49,10 +50,8 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
 
         // Register for broadcasts when a device is discovered.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        this.registerReceiver(mReceiver, filter);
-
-        // Register for broadcasts when a device is discovered
-        filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
 
         scanButton = (Button) findViewById(R.id.scanButton);
@@ -61,18 +60,19 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
 
         knownDeviceNameList = getKnownDeviceNameList();
         nearbyDeviceNameList = getNearbyDeviceNameList();
+        tempDeviceList = new ArrayList<>();
 
         RecyclerView knownDevicesRecyclerView = (RecyclerView) findViewById(R.id.knownDevicesRecyclerView);
         RecyclerView nearbyDevicesRecyclerView = (RecyclerView) findViewById(R.id.nearbyDevicesRecyclerView);
-
-        knownDevicesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        nearbyDevicesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         knownDevicesAdapter = new bluetoothDevicesAdapter(getApplicationContext(), this, knownDeviceNameList);
         nearbyDevicesAdapter = new bluetoothDevicesAdapter(getApplicationContext(), this, nearbyDeviceNameList);
 
         knownDevicesRecyclerView.setAdapter(knownDevicesAdapter);
         nearbyDevicesRecyclerView.setAdapter(nearbyDevicesAdapter);
+
+        knownDevicesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        nearbyDevicesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private ArrayList<BluetoothDevice> getKnownDeviceNameList() {
@@ -96,15 +96,26 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.d(TAG, "BroadcastReceiver::onReceive: name - " + device.getName());
                 Log.d(TAG, "BroadcastReceiver::onReceive: address - " + device.getAddress());
+                Log.d(TAG, "BroadcastReceiver::onReceive: isPaired - " + device.getBondState());
+                Log.d(TAG, "BroadcastReceiver::onReceive: type - " + device.getType());
 
                 // if the device is not already paired
                 if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                    nearbyDeviceNameList.add(device);
+                    Log.d(TAG, "BroadcastReceiver::onReceive: new device found");
+//                    tempDeviceList.add(device);
+//                    nearbyDeviceNameList.clear();
+//                    nearbyDeviceNameList.addAll(tempDeviceList);
+                    nearbyDevicesAdapter.addDevice(device);
 
                     if (nearbyDevicesAdapter == null) {
                         throw new NullPointerException("nearbyDevicesAdapter is null!");
                     }
                     else {
+                        Log.d(TAG, "BroadcastReceiver::onReceive: notifyDataSetChanged");
+                        Log.d(TAG, "BroadcastReceiver::onReceive: device list");
+                        for (int i = 0; i < nearbyDeviceNameList.size(); i++) {
+                            Log.d(TAG, nearbyDeviceNameList.get(i).getName());
+                        }
                         nearbyDevicesAdapter.notifyDataSetChanged();
                     }
                 }

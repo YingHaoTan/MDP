@@ -15,6 +15,7 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTED;
@@ -41,7 +42,9 @@ public class BluetoothService {
 
     // Unique UUID for this application
     // If new UUID is needed, obtain one from online UUID generation tool
-    private static final UUID MY_UUID = UUID.fromString("124b4e1a-9b5f-4191-a129-90e7947acacd");
+    //private static final UUID MY_UUID = UUID.fromString("124b4e1a-9b5f-4191-a129-90e7947acacd");
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
 
     // Member fields
     private final BluetoothAdapter mAdapter;
@@ -267,9 +270,18 @@ public class BluetoothService {
 
             // Create a new listening server socket
             try {
-                tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+                tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID);
+//                try {
+//                    tmp = (BluetoothServerSocket) mAdapter.getClass().getMethod("listenUsingRfcommOn", new Class[] {int.class}).invoke(mAdapter, 1);
+//                }
+//                catch (Exception e) {
+//                    throw new IOException(e);
+//                }
             } catch (IOException e) {
                 Log.e(TAG, "AcceptThread::listenUsingRfcommWithServiceRecord failed", e);
+            }
+            if (tmp == null) {
+                Log.e(TAG, "AcceptThread::NPE!!");
             }
             mmServerSocket = tmp;
         }
@@ -285,9 +297,22 @@ public class BluetoothService {
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
+//                    Method m = mAdapter.getClass().getMethod("listenUsingRfcommOn", new Class[] { int.class });
+//                    int port = mmServerSocket.;
+//                    tmp = (BluetoothServerSocket) m.invoke(mAdapter, port);
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(TAG, "accept() failed", e);
+                    try {
+                        Log.e(TAG, "accept() failed", e);
+                        mmServerSocket.close();
+                        break;
+                    } catch (IOException e2) {
+                        Log.e(TAG, "accept() failed: failed to close socket", e2);
+                        break;
+                    }
+
+                } catch (Exception e2) {
+                    Log.e(TAG, "accept() failed: other exception", e2);
                     break;
                 }
 
@@ -298,12 +323,20 @@ public class BluetoothService {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
                                 // Situation normal. Start the connected thread.
+                                // First discard server socket as we only expect one connection at a time
+                                try {
+                                    mmServerSocket.close();
+                                } catch (IOException e) {
+                                    Log.e(TAG, "Could not close server socket", e);
+                                }
+                                // Second start connected thread
                                 connected(socket, socket.getRemoteDevice());
                                 break;
                             case STATE_NONE:
                             case STATE_CONNECTED:
                                 // Either not ready or already connected. Terminate new socket.
                                 try {
+                                    mmServerSocket.close();
                                     socket.close();
                                 } catch (IOException e) {
                                     Log.e(TAG, "Could not close unwanted socket", e);
@@ -332,8 +365,8 @@ public class BluetoothService {
      * succeeds or fails.
      */
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
+        private BluetoothSocket mmSocket;
+        private BluetoothDevice mmDevice;
         private String mSocketType;
 
         public ConnectThread(BluetoothDevice device) {
@@ -343,7 +376,8 @@ public class BluetoothService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                //tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
                 Log.e(TAG, "ConnectTread::create() failed", e);
             }
@@ -361,6 +395,7 @@ public class BluetoothService {
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
+                //mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,2);
                 mmSocket.connect();
             } catch (IOException e) {
                 // Close the socket
@@ -369,9 +404,14 @@ public class BluetoothService {
                     e.printStackTrace();
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() during connection failure", e2);
+                    Log.e(TAG, "unable to close socket", e2);
                     e2.printStackTrace();
                 }
+                connectionFailed();
+                return;
+            } catch (Exception e3) {
+                Log.e(TAG, "other exception", e3);
+                e3.printStackTrace();
                 connectionFailed();
                 return;
             }

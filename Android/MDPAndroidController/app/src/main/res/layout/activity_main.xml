@@ -59,6 +59,11 @@
                     android:text="arena here"
                     android:textSize="50sp" />
 
+                <!--<com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.PixelGridView-->
+                    <!--android:id="@+id/arenaView"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
+
             </LinearLayout>
 
             <LinearLayout

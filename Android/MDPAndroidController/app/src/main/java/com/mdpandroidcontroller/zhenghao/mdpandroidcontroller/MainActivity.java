@@ -13,7 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothClass;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.PixelGridView;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -31,9 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
+    private BluetoothClass mBluetoothClass = null;
 
     private Button btnConnect = null;
     private TextView connectionString = null;
+//    private PixelGridView arenaView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
         btnConnect.setOnClickListener(connectButtonListener);
 
         connectionString = (TextView) findViewById(R.id.connectionStr);
+
+//        arenaView = (PixelGridView) findViewById(R.id.arenaView);
+//        arenaView.setNumColumns(4);
+//        arenaView.setNumRows(6);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -65,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "Bluetooth service is not started properly, trying to start it now");
                 mBluetoothService = new BluetoothService(getApplicationContext(), mHandler);
             }
+//            if (mBluetoothClass == null) {
+//                mBluetoothClass = BluetoothClass.getInstance();
+//            }
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             ArrayList<BluetoothDevice> pairedDevicesList = new ArrayList<>();
@@ -102,6 +113,10 @@ public class MainActivity extends AppCompatActivity {
             if (mBluetoothService == null) {
                 mBluetoothService = new BluetoothService(getApplicationContext(), mHandler);
             }
+//            if (mBluetoothClass == null) {
+//                mBluetoothClass = BluetoothClass.getInstance();
+//                mBluetoothClass.setmHandler(mHandler);
+//            }
         }
     }
 
@@ -120,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
         else if (mBluetoothService.getState() == STATE_NONE) {
             mBluetoothService.start();
         }
+
+//        if (mBluetoothClass == null) {
+//            mBluetoothClass = BluetoothClass.getInstance();
+//        }
     }
 
     @Override
@@ -144,6 +163,18 @@ public class MainActivity extends AppCompatActivity {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         Log.d(TAG, "connectDevice: connecting device " + device.getName());
         mBluetoothService.connect(device);
+    }
+
+    private void connectDeviceNew(String address) {
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        Log.d(TAG, "connectDevice: connecting device " + device.getName());
+        try {
+            mBluetoothClass.ConnectToDevice(device);
+        } catch (InterruptedException e) {
+            Log.d(TAG, "connectDeviceNew: connecting device interrupted ex");
+            e.printStackTrace();
+        }
+
     }
 
     private void updateConnectionUI(String deviceName, String deviceAddress) {
@@ -171,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     updateConnectionUI(mBluetoothService.getDevice().getName(),
                             mBluetoothService.getDevice().getAddress());
+//                    updateConnectionUI(mBluetoothClass.getMmDevice().getName(),
+//                            mBluetoothClass.getMmDevice().getAddress());
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;

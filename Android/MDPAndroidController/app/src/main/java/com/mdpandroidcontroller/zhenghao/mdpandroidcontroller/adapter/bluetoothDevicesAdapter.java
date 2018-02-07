@@ -61,6 +61,14 @@ public class bluetoothDevicesAdapter extends RecyclerView.Adapter<bluetoothDevic
         return deviceList.size();
     }
 
+    public void addDevice(BluetoothDevice device) {
+        if (device == null) {
+            throw new NullPointerException("bluetoothDeviceAdapter:: addDevice - NPE");
+        }
+        deviceList.add(device);
+        notifyDataSetChanged();
+    }
+
     public class DeviceViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView deviceName;
