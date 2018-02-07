@@ -66,19 +66,160 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/cell_shape"
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/executionModeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="control here"
-                    android:textSize="50sp" />
+                    android:text="@string/executionModeText" />
 
-            </LinearLayout>
+                <ToggleButton
+                    android:id="@+id/explorationButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:textOn="@string/explorationButtonText"
+                    android:textOff="@string/explorationButtonText"/>
+
+                <ToggleButton
+                    android:id="@+id/fastestPathButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:layout_toRightOf="@+id/explorationButton"
+                    android:checked="false"
+                    android:textOn="@string/fastestButtonText"
+                    android:textOff="@string/fastestButtonText"/>
+
+                <ToggleButton
+                    android:id="@+id/manualControlButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:layout_toRightOf="@+id/fastestPathButton"
+                    android:checked="false"
+                    android:textOn="@string/manualControlButtonText"
+                    android:textOff="@string/manualControlButtonText"/>
+
+                <TextView
+                    android:id="@+id/modeHeaderTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/explorationButton"
+                    android:text="@string/modeHeaderText" />
+
+                <TextView
+                    android:id="@+id/updateModeTextView"
+                    android:layout_width="70sp"
+                    android:layout_height="40sp"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:gravity="center"
+                    android:text="@string/autoModeText" />
+
+                <Switch
+                    android:id="@+id/updateModeSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:layout_toRightOf="@+id/updateModeTextView"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/updateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_weight="1"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:layout_toRightOf="@+id/updateModeSwitch"
+                    android:text="@string/updateButtonText"/>
+
+                <TableLayout
+                    android:id="@+id/goTable"
+                    android:layout_width="140sp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/cell_shape"
+                    android:layout_alignParentEnd="true">
+
+                    <Button
+                        android:id="@+id/goButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="140sp"
+                        android:text="@string/goButtonText"
+                        android:layout_alignParentEnd="true"/>
+
+                </TableLayout>
+
+                <TableLayout
+                    android:id="@+id/controlTable"
+                    android:layout_width="140sp"
+                    android:layout_height="140sp"
+                    android:visibility="gone"
+                    android:background="@drawable/cell_shape"
+                    android:layout_alignParentEnd="true">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="30sp"
+                        android:paddingRight="30sp">
+
+                        <Button
+                            android:id="@+id/upButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="UP" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="5sp"
+                        android:paddingRight="5sp">
+
+                        <Button
+                            android:id="@+id/leftButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="LEFT" />
+
+                        <Button
+                            android:id="@+id/rightButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="RIGHT" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="30sp"
+                        android:paddingRight="30sp">
+
+                        <Button
+                            android:id="@+id/downButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="DOWN" />
+
+                    </TableRow>
+                </TableLayout>
+            </RelativeLayout>
         </LinearLayout>
 
 
