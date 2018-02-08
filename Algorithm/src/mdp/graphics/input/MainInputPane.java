@@ -36,6 +36,7 @@ public class MainInputPane extends JPanel {
     private JTextArea mdf2;
     private JTextArea stepspeed;
     private JTextArea coveragepercentage;
+    private JTextArea coveragetime;
     private JButton loadmapbtn;
     private JButton savemapbtn;
     private JButton executionbtn;
@@ -92,14 +93,24 @@ public class MainInputPane extends JPanel {
         speedpane.add(stepspeed);
         speedpane.add(new JLabel(" seconds"));
 
-        JPanel limitedexplorationpane = new JPanel();
-        limitedexplorationpane.setLayout(new FlowLayout(FlowLayout.LEADING));
-        limitedexplorationpane.add(new JLabel("Terminate exploration after "));
+        JPanel coverageexplorationpane = new JPanel();
+        coverageexplorationpane.setLayout(new FlowLayout(FlowLayout.LEADING));
+        coverageexplorationpane.add(new JLabel("Terminate exploration after "));
         this.coveragepercentage = new JTextArea();
         this.coveragepercentage.setPreferredSize(new Dimension(50, 30));
         this.coveragepercentage.setText("100");
-        limitedexplorationpane.add(coveragepercentage);
-        limitedexplorationpane.add(new JLabel("% coverage"));
+        coverageexplorationpane.add(coveragepercentage);
+        coverageexplorationpane.add(new JLabel("% coverage"));
+        
+        // Not really sure if it's good to just keep adding new JPanels
+        JPanel timeexplorationpane = new JPanel();
+        timeexplorationpane.setLayout(new FlowLayout(FlowLayout.LEADING));
+        timeexplorationpane.add(new JLabel("Terminate exploration after "));
+        this.coveragetime = new JTextArea();
+        this.coveragetime.setPreferredSize(new Dimension(50, 30));
+        this.coveragetime.setText("-1");
+        timeexplorationpane.add(coveragetime);
+        timeexplorationpane.add(new JLabel("seconds (-1 if there's no time limit)"));
 
         this.add(loadsavepane);
         this.add(startinput);
@@ -109,8 +120,10 @@ public class MainInputPane extends JPanel {
         this.add(mdf1panel);
         this.add(mdf2panel);
         this.add(speedpane);
-        this.add(limitedexplorationpane);
+        this.add(coverageexplorationpane);
+        this.add(timeexplorationpane);
         this.add(executionpane);
+        
 
         this.sync(mstate);
     }
@@ -165,6 +178,13 @@ public class MainInputPane extends JPanel {
         } else {
             return 100;
         }
+    }
+    
+    public double getTimeLimit(){
+        if (this.coveragetime.getText().matches("(-1)|([0-9]+(\\.[0-9]+)*)")) {
+            return Double.parseDouble(this.coveragetime.getText());
+        }
+        return -1;
     }
 
     /**
@@ -222,7 +242,7 @@ public class MainInputPane extends JPanel {
     }
 
     /**
-     * Syncrhonizes the current MainInputPane displays with the provided map
+     * Synchronizes the current MainInputPane displays with the provided map
      * state instance
      *
      * @param map

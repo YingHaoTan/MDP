@@ -361,7 +361,8 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		 if (explorer != null){
                      int coveragepercentage = inputpane.getCoveragePercentage();
-                     explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coveragepercentage);
+                     double timelimit = inputpane.getTimeLimit();
+                     explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coveragepercentage, timelimit);
                  }
          }
 	 
@@ -380,6 +381,9 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
                  if(mstate.getWayPoint() != null){
                     mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
                  }
+                 
+                 //Need to find way to reset robot orientation too
+                 
 		 map.repaint();
 	 }
 
