@@ -87,7 +87,7 @@ public class MainInputPane extends JPanel {
         JPanel speedpane = new JPanel();
         speedpane.setLayout(new FlowLayout(FlowLayout.LEADING));
         speedpane.add(new JLabel("1 action = "));
-        this.stepspeed = new JTextArea();
+        this.stepspeed = new JTextArea("0.1");
         this.stepspeed.setPreferredSize(new Dimension(50, 30));
         speedpane.add(stepspeed);
         speedpane.add(new JLabel(" seconds"));
