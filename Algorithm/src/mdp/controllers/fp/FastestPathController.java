@@ -25,11 +25,11 @@ public class FastestPathController extends FastestPathBase {
 		Point dpoint = this.getDestination();
 		
 		if(rpoint.x != dpoint.x) {
-			nextd = dpoint.x - rpoint.x > 0? Direction.RIGHT: Direction.LEFT;
+			nextd = dpoint.x - rpoint.x > 0 ? Direction.RIGHT: Direction.LEFT;
 			mstate.setRobotPoint(new Point(rpoint.x + (nextd == Direction.RIGHT? 1: -1), rpoint.y));
 		}
 		else if(rpoint.y != dpoint.y) {
-			nextd = dpoint.y - rpoint.x > 0? Direction.UP: Direction.DOWN;
+			nextd = dpoint.y - rpoint.y > 0? Direction.UP: Direction.DOWN;
 			mstate.setRobotPoint(new Point(rpoint.x, rpoint.y + (nextd == Direction.UP? 1: -1)));
 		}
 		else {
