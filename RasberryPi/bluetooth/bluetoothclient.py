@@ -12,3 +12,4 @@ while(True):
     android_socket.send("data...")
     
 android_socket.close()
+ 
