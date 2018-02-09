@@ -51,8 +51,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint);
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint, int percentage, double timelimit) {
+        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint, percentage, timelimit);
         robot.addRobotActionListener(this);
         sensorsScan();
 
@@ -238,6 +238,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         sensorsScan();
+        
+        // check explorated nodes;
+        if((reachedTimeLimit() || reachedCoveragePercentage()) && currentState != States.COMPLETED){
+            preComplete();
+            return;
+        }
+        
 
         if (currentState == States.BOUNDARY) {
             if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
@@ -319,12 +326,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 neighbourCounter = 0;
                 while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
                     exploringUnexplored++;
+                    
+                    //System.out.println(unexploredPoints.get(exploringUnexplored) + " is " + isUnexplored(unexploredPoints.get(exploringUnexplored)));
                     if (exploringUnexplored == unexploredPoints.size()) {
                         preComplete();
                         return;
                     }
                 }
-                
                 fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
 
             }

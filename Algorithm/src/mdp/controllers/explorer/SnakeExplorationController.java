@@ -36,8 +36,8 @@ public class SnakeExplorationController extends ExplorationBase implements Robot
     Direction[] directionalPriority = {Direction.LEFT, Direction.UP, Direction.RIGHT, Direction.DOWN};
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint);
+    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint, int percentage, double timelimit) {
+        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint, percentage, timelimit);
 
         robot.addRobotActionListener(this);
         MapState internalMapState = getMapState();
