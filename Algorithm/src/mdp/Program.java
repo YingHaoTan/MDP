@@ -37,10 +37,9 @@ public class Program {
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, -1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 3, 0.5));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 3, 0.5));
+        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 3, 0.5));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
 
         controller.setMapLoader(filehandler);
         controller.setMapSaver(filehandler);
