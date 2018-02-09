@@ -339,9 +339,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 private void explore() {
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		 MapState mstate = map.getMapState();
+                 
 		 
-		 if (mode == ExecutionMode.SIMULATION)
-			 srobot.init(mstate);
+		 if (mode == ExecutionMode.SIMULATION){
+                        srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
+			srobot.init(mstate);
+                 }
 
 		 mstate.setMapCellState(CellState.UNEXPLORED);
 
@@ -356,9 +359,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		 map.repaint();
 
-		 if (explorer != null)
-			 explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint());
-	 }
+		 if (explorer != null){
+                     int coveragepercentage = inputpane.getCoveragePercentage();
+                     double timelimit = inputpane.getTimeLimit();
+                     explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coveragepercentage, timelimit);
+                 }
+         }
 	 
 	 private void fastestpath() {
 		 ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
@@ -372,8 +378,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		 
 		 MapState mstate = map.getMapState();
 		 mstate.reset();
-		 mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-		 
+                 if(mstate.getWayPoint() != null){
+                    mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+                 }
+                 
+                 //Need to find way to reset robot orientation too
+                 
 		 map.repaint();
 	 }
 
