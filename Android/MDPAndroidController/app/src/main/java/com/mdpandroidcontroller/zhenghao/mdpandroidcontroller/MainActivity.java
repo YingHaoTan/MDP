@@ -357,7 +357,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             //send message to robot via bluetooth
-
+//            Log.d(TAG, "up button onClick");
+//            mBluetoothService.write("test123".getBytes());
         }
     };
 
