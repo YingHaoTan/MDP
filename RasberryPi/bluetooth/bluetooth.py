@@ -57,6 +57,9 @@ while(True):
     data = rpi_socket.recv(1024)#recv max of 1024 char
     print ("received %s" % data)
     android_socket.send(data)
+    # have to check to see if this if statement break in between when robot is idle
+    if not data: 
+    	break
 
 
 android_socket.close()
