@@ -16,6 +16,7 @@ import mdp.graphics.MdpWindow;
 import mdp.models.Direction;
 import mdp.models.SensorConfiguration;
 import mdp.robots.SimulatorRobot;
+import mdp.tcp.MDPTCPConnector;
 
 public class Program {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
@@ -53,6 +54,10 @@ public class Program {
         explorer.setFastestPath(fp2);
         */
         controller.setExplorer(explorer);
+        
+        
+        /*MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 8080);
+        mdpTCPConnector.start();*/
     }
 
 }
