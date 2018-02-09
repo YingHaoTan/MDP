@@ -1,4 +1,5 @@
 #to implement without the library look up http://blog.kevindoran.co/bluetooth-programming-with-python-3/
+#WARNING!!! CODE IS NOT TESTED YET
 import bluetooth
 
 target_name = "Nexus 7"
