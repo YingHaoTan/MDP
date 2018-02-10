@@ -141,6 +141,7 @@ public abstract class RobotBase {
         actionsequence.add(RobotAction.FORWARD);
 
         setCurrentOrientation(mapdirection);
+        
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
     }
@@ -166,7 +167,8 @@ public abstract class RobotBase {
                         break;
 
                 }
-            } else {
+            } 
+            else {
                 switch (getCurrentOrientation()) {
                     case UP:
                         newDirection = Direction.LEFT;

@@ -370,8 +370,11 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private void fastestpath() {
 		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
 		MapState mstate = map.getMapState();
-
-		planner.move(mstate, mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getEndPoint(), true);
+		RobotBase robot = mode == ExecutionMode.PHYSICAL ? probot : srobot;
+		
+		robot.reset();
+		
+		planner.move(mstate, robot, mstate.getEndPoint(), false);
 	}
 
 	private void reset() {
@@ -379,8 +382,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		MapState mstate = map.getMapState();
 		mstate.reset();
-		srobot.reset();
-		probot.reset();
+		if(srobot != null)
+			srobot.reset();
+		if(probot != null)
+			probot.reset();
 		
 		if(mstate.getWayPoint() != null)
 			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
