@@ -18,7 +18,8 @@ import mdp.models.MapState;
  */
 public class MdpFastestPath extends FastestPathBase {
 	private static final double DISCOUNT_VALUE = 0.99;
-	private static final double EPSILON = 1e-3;
+	private static final double EPSILON = 0.9;
+	private static final double EPSILON_DECAY = 0.1;
 	
 	private State currentstate;
 	private Map<State, Direction> policy;
@@ -136,6 +137,9 @@ public class MdpFastestPath extends FastestPathBase {
 	private Map<State, Direction> optimizePolicyMap(Map<State, Direction> policymap) {
 		boolean policychanges = true;
 		
+		System.out.println(String.format("Optimizing policies for %d states", policymap.size()));
+		
+		int iteration = 0;
 		while(policychanges) {
 			policychanges = false;
 			
@@ -143,7 +147,7 @@ public class MdpFastestPath extends FastestPathBase {
 			
 			// Calculate utility values based on current policy until it converges
 			double delta = 1.0;
-			while(delta > EPSILON) { 
+			while(delta > EPSILON * Math.pow(EPSILON_DECAY, iteration)) { 
 				delta = 0.0;
 				
 				// Create new policy evaluator instance with switched utility maps
@@ -151,7 +155,7 @@ public class MdpFastestPath extends FastestPathBase {
 				
 				delta = policymap.keySet()
 						.parallelStream()
-						.mapToDouble(evaluator::evaluate)
+						.mapToDouble(evaluator::evaluate)	
 						.sum();
 			}
 			
@@ -159,7 +163,11 @@ public class MdpFastestPath extends FastestPathBase {
 			PolicyImprover improver = new PolicyImprover(policymap, evaluator.cutility);
 			policychanges = policymap.keySet()
 					.parallelStream().mapToInt(improver::improve).sum() > 0;
+					
+			iteration++;
 		}
+		
+		System.out.println(String.format("%d iterations till policy convergence", iteration));
 		
 		return policymap;
 	}
