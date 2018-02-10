@@ -17,9 +17,8 @@ import mdp.models.MapState;
  * @author Ying Hao
  */
 public class MdpFastestPath extends FastestPathBase {
-	private static final double DISCOUNT_VALUE = 0.99;
-	private static final double EPSILON = 0.9;
-	private static final double EPSILON_DECAY = 0.1;
+	private static final double DISCOUNT_VALUE = 0.9;
+	private static final double EPSILON = 1e-5;
 	
 	private State currentstate;
 	private Map<State, Direction> policy;
@@ -119,14 +118,13 @@ public class MdpFastestPath extends FastestPathBase {
 	 * Initialize the policy map with the specified initial state
 	 * @param initialstate
 	 */
-	private void initializePolicyMap(State initialstate, Map<State, Direction> policymap) {
-		if(!isTerminalState(initialstate) && !policymap.containsKey(initialstate)) {
-			List<Direction> actions = this.getAvailableActions(initialstate);
-			policymap.put(initialstate, actions.get(0));
+	private void initializePolicyMap(PolicyImprover improver, State initialstate) {
+		if(!isTerminalState(initialstate) && !improver.policymap.containsKey(initialstate)) {
+			improver.improve(initialstate);
 			
-			for(Direction action: actions) {
+			for(Direction action: this.getAvailableActions(initialstate)) {
 				State nstate = getNextState(initialstate, action);
-				initializePolicyMap(nstate, policymap);
+				initializePolicyMap(improver, nstate);
 			}
 		}
 	}
@@ -137,17 +135,13 @@ public class MdpFastestPath extends FastestPathBase {
 	private Map<State, Direction> optimizePolicyMap(Map<State, Direction> policymap) {
 		boolean policychanges = true;
 		
-		System.out.println(String.format("Optimizing policies for %d states", policymap.size()));
-		
-		int iteration = 0;
+		PolicyEvaluator evaluator = new PolicyEvaluator(policymap, new ConcurrentHashMap<State, Double>(policymap.size()), new ConcurrentHashMap<State, Double>(policymap.size()));
 		while(policychanges) {
 			policychanges = false;
 			
-			PolicyEvaluator evaluator = new PolicyEvaluator(policymap, new ConcurrentHashMap<State, Double>(policymap.size()), new ConcurrentHashMap<State, Double>(policymap.size()));
-			
 			// Calculate utility values based on current policy until it converges
 			double delta = 1.0;
-			while(delta > EPSILON * Math.pow(EPSILON_DECAY, iteration)) { 
+			while(delta > EPSILON) { 
 				delta = 0.0;
 				
 				// Create new policy evaluator instance with switched utility maps
@@ -163,11 +157,7 @@ public class MdpFastestPath extends FastestPathBase {
 			PolicyImprover improver = new PolicyImprover(policymap, evaluator.cutility);
 			policychanges = policymap.keySet()
 					.parallelStream().mapToInt(improver::improve).sum() > 0;
-					
-			iteration++;
 		}
-		
-		System.out.println(String.format("%d iterations till policy convergence", iteration));
 		
 		return policymap;
 	}
@@ -176,9 +166,9 @@ public class MdpFastestPath extends FastestPathBase {
 	protected void preprocess() {
 		State initialstate = getInitialState();
 		
-		Map<State, Direction> policymap = new ConcurrentHashMap<State, Direction>();
-		this.initializePolicyMap(initialstate, policymap);
-		this.policy = optimizePolicyMap(policymap);
+		PolicyImprover improver = new PolicyImprover(new ConcurrentHashMap<State, Direction>(), new ConcurrentHashMap<State, Double>());
+		this.initializePolicyMap(improver, initialstate);
+		this.policy = optimizePolicyMap(improver.policymap);
 		this.currentstate = initialstate;
 	}
 
@@ -258,13 +248,13 @@ public class MdpFastestPath extends FastestPathBase {
 			
 			for(Direction action: getAvailableActions(state)) {
 				State nstate = getNextState(state, action);
-				Double utility = utilitymap.get(nstate);
+				double utility;
 				
-				if(utility != null) {
-					utility = getImmediateReward(state, action) + DISCOUNT_VALUE * utility;
+				if(!isTerminalState(nstate)) {
+					utility = getImmediateReward(state, action) + DISCOUNT_VALUE * utilitymap.getOrDefault(nstate, 0.0);
 					if(maxval == null || utility > maxval) {
 						evaluated = action;
-						maxval = utility;	
+						maxval = utility;
 					}
 				}
 				else {

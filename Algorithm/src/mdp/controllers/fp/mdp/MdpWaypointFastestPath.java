@@ -47,7 +47,7 @@ public class MdpWaypointFastestPath extends MdpFastestPath {
 		Point wpoint = this.getMapState().getWayPoint();
 		
 		if(wpoint != null && !wstate.isWaypointVisited() && this.getMapState().getRobotCellState(new Point(wnstate.getX(), wnstate.getY())) == CellState.WAYPOINT)
-			reward = 1.0;
+			reward = 0.75;
 		
 		return reward;
 	}

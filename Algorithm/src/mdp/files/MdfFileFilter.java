@@ -16,7 +16,7 @@ public class MdfFileFilter extends FileFilter {
 	@Override
 	public boolean accept(File f) {
 		String extension = FilenameUtils.getExtension(f.getAbsolutePath());
-		return extension.equalsIgnoreCase("mdf1") || extension.equalsIgnoreCase("mdf2");
+		return f.isDirectory() || extension.equalsIgnoreCase("mdf1") || extension.equalsIgnoreCase("mdf2");
 	}
 
 	@Override

@@ -374,7 +374,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		
 		robot.reset();
 		
-		planner.move(mstate, robot, mstate.getEndPoint(), true);
+		planner.move(mstate, robot, mstate.getEndPoint(), false);
 	}
 
 	private void reset() {
