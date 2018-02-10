@@ -10,15 +10,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.MazeGridAdapter;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothClass;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
-import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.PixelGridView;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -43,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView connectionString = null;
 //    private PixelGridView arenaView = null;
 
+    //variables for Arena Portion
+    private Maze maze;
+    private Button settingsButton = null;
+    private GridView mazeGridView = null;
+    private MazeGridAdapter mazeGridAdapter = null;
+    private TextView robotStatusTextView = null;
+
     //variables for controller portion
     private ToggleButton explorationButton = null;
     private ToggleButton fastestPathButton = null;
@@ -61,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private Button leftButton = null;
     private Button rightButton = null;
 
+    private ControllerTranslator translator = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: starts");
@@ -72,7 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
         connectionString = (TextView) findViewById(R.id.connectionStr);
 
+        arenaInit(); //initialization for components within the arena portion
         controllerInit(); //initialization for components within the controller portion
+        translator = ControllerTranslator.getInstance();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -83,6 +99,24 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+    }
+
+    private void arenaInit(){
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(settingsButtonListener);
+
+        mazeGridView = (GridView) findViewById(R.id.mazeGridView);
+        maze = new Maze();
+        mazeGridAdapter = new MazeGridAdapter(this, maze);
+        mazeGridView.setAdapter(mazeGridAdapter);
+
+        //this para is for testing purposes
+        maze.updateGrid(2,2, CellState.OBSTACLE);
+        maze.updateRobot(5,5, Direction.DOWN);
+        mazeGridAdapter.updateMaze(maze);
+        mazeGridAdapter.notifyDataSetChanged();
+
+        robotStatusTextView = (TextView) findViewById(R.id.robotStatusTextView);
     }
 
     private void controllerInit(){
@@ -287,6 +321,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    Button.OnClickListener settingsButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //open up fragment for more settings.
+        }
+    };
+
     ToggleButton.OnClickListener explorationButtonListener = new ToggleButton.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -344,8 +385,9 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             if(explorationButton.isChecked()){
                 //send message to robot via bluetooth
+                mBluetoothService.write(translator.commandExplore().getBytes());
             }else if(fastestPathButton.isChecked()){
-                //send message to robot via bluetooth
+                mBluetoothService.write(translator.commandFastestPath().getBytes());
             }else{
                 //handle error here
             }
@@ -357,8 +399,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             //send message to robot via bluetooth
-//            Log.d(TAG, "up button onClick");
-//            mBluetoothService.write("test123".getBytes());
+            //Log.d(TAG, "up button onClick");
+            mBluetoothService.write(translator.commandMoveForward().getBytes());
         }
     };
 
@@ -367,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             //send message to robot via bluetooth
+            mBluetoothService.write(translator.commandMoveBack().getBytes());
 
         }
     };
@@ -376,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             //send message to robot via bluetooth
-
+            mBluetoothService.write(translator.commandTurnLeft().getBytes());
         }
     };
 
@@ -385,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             //send message to robot via bluetooth
+            mBluetoothService.write(translator.commandTurnRight().getBytes());
 
         }
     };

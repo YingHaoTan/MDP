@@ -1,13 +1,26 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
 /**
  * ControllerTranslator translates instructions between robot and controller for the controller
+ * this is a singleton class
  * 
  * @author ernes
  *
  */
 public class ControllerTranslator {
-	//variables and constructors TBC
-	
+	//variables and constructors
+	private static ControllerTranslator instance = null;
+
+	protected ControllerTranslator(){
+		//to prevent instantiation elsewhere. edit accordingly if required.
+	}
+
+	public static ControllerTranslator getInstance(){
+		if(instance == null) {
+			instance = new ControllerTranslator();
+		}
+		return instance;
+	}
+
 	/**
 	 * Generate message to command robot to explore the maze
 	 * 
