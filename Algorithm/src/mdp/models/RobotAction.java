@@ -5,6 +5,18 @@ package mdp.models;
  * 
  * @author Ying Hao
  */
+
+
 public enum RobotAction {
-	TURN_LEFT, TURN_RIGHT, FORWARD, REVERSE;
+        // byte values are for communication
+        START((byte)(0x01)),  SCAN((byte)(0x02)), TURN_LEFT((byte)0x03), TURN_RIGHT((byte)0x04), FORWARD((byte)0x05), REVERSE((byte)0x06);
+        private byte value;
+        
+        RobotAction(byte value){
+            this.value = value;
+        }
+        
+        public byte getByte(){
+            return this.value;
+        }
 }
