@@ -17,8 +17,9 @@ import mdp.models.MapState;
  * @author Ying Hao
  */
 public class MdpFastestPath extends FastestPathBase {
-	private static final double DISCOUNT_VALUE = 0.9;
+	private static final double DISCOUNT_VALUE = 0.99;
 	private static final double EPSILON = 1e-5;
+	private static final int MAX_CONVERGENCE_ITERATION = 200;
 	
 	private State currentstate;
 	private Map<State, Direction> policy;
@@ -73,9 +74,9 @@ public class MdpFastestPath extends FastestPathBase {
 		if(isTerminalState(nextstate))
 			reward = 1.0;
 		else if(state.getOrientation() == action)
-			reward = -0.05;
+			reward = -0.25;
 		else
-			reward = -0.15;
+			reward = -1.0;
 		
 		return reward;
 	}
@@ -136,12 +137,14 @@ public class MdpFastestPath extends FastestPathBase {
 		boolean policychanges = true;
 		
 		PolicyEvaluator evaluator = new PolicyEvaluator(policymap, new ConcurrentHashMap<State, Double>(policymap.size()), new ConcurrentHashMap<State, Double>(policymap.size()));
+		
 		while(policychanges) {
 			policychanges = false;
 			
 			// Calculate utility values based on current policy until it converges
+			int iteration = 0;
 			double delta = 1.0;
-			while(delta > EPSILON) { 
+			while(iteration < MAX_CONVERGENCE_ITERATION && delta > EPSILON) { 
 				delta = 0.0;
 				
 				// Create new policy evaluator instance with switched utility maps
@@ -151,6 +154,8 @@ public class MdpFastestPath extends FastestPathBase {
 						.parallelStream()
 						.mapToDouble(evaluator::evaluate)	
 						.sum();
+				
+				iteration++;
 			}
 			
 			// Assign best policy for all states based on evaluated utilities
