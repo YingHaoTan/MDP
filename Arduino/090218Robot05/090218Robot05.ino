@@ -37,7 +37,7 @@ volatile uint8_t mRev[2] = {0, 0};
 volatile long tickTime[2] = {0, 0};
 volatile long unsigned prevTickTime[2] = {0, 0};
 volatile uint8_t flag[2] = {0, 0};
-
+volatile int tick[2] = {0,0};
 //Instantiate IR and Motor objects from library
 SharpIR ir1(lfwdIr, shrtmodel, 0.0353, 0.0934);
 SharpIR ir2(mfwdIr, shrtmodel, 0.0358, 0.0878);
@@ -79,6 +79,7 @@ void setup() {
   //motorRevTest(int sampleSize, int speedVal, int timeVal)
   //Serial.println("Sample Size: 10 Speed: 400 Time: 3000");
   //motorRevTest(10, 400, 3000, 1);
+  moveStraight(15);
 }
 
 void DEBUG(int sel){
@@ -115,6 +116,7 @@ void DEBUG(int sel){
             }
             break;
   }
+  
 }
 
 void loop() {
@@ -123,6 +125,8 @@ void loop() {
 //if(seeFront() > 0.5){
   //moveFwd();
 //}
+
+  
 }
 
 ////Begin 
@@ -143,36 +147,55 @@ void loop() {
 ////
 
 void moveStraight(int noBlock) {
-  double kprop = 1;
+  double kprop = 0.100;
   double error = 0;
-  int setSpd1 = 300;
+  int setSpd1 = 285;
   int setSpd2 = 300;
   //Rev have to change to one turn only 
   md.setSpeeds(setSpd1,setSpd2);
-  while (mRev[0] < noBlock || mRev[1] < noBlock){
+
+  while (mRev[0] < noBlock && mRev[1] < noBlock){
     //Set 0.2 seconds to observe readings first
-    delay(200);
+   
     if (mCounter[0] > mCounter[1]) {
       Serial.println("motor 1 faster than motor 2, reducing motor 1 speed");
-      error = (mCounter[0] - mCounter[1]) * kprop;
-      md.setSpeeds(setSpd1 - error, setSpd2 + error);
+      Serial.print("M1 speed: ");
+      Serial.println(mCounter[0]);
+      Serial.print("M2 speed: ");
+      Serial.println(mCounter[1]);
+      
+      error = abs(tick[0] - tick[1]) * kprop;
       setSpd1 -= error;
       setSpd2 += error;
+      md.setSpeeds(setSpd1,setSpd2);
     }
     else {
       Serial.println("motor 2 faster than motor 1, reducing motor 2 speed");
-      error = (mCounter[0] - mCounter[1]) * kprop; 
-      md.setSpeeds(setSpd1 + error, setSpd2 - error);
+      
+      Serial.print("M1 speed: ");
+      Serial.println(mCounter[0]);
+      Serial.print("M2 speed: ");
+      Serial.println(mCounter[1]);
+      
+      error = abs(tick[1] - tick[0]) * kprop; 
       setSpd1 += error;
       setSpd2 -= error;
+      md.setSpeeds(setSpd1,setSpd2);
     }
 //    SHORTCUT METHOD (Should do the same thing as the thing above)
+//    Serial.print("M1 speed: ");
+//    Serial.print(mCounter[0]);
+//    Serial.print("M2 speed: ");
+//    Serial.print(mCounter[1]);
 //    error = (mCounter[0] - mCounter[1]) * kprop;
 //    md.setSpeed(setSpd1 - error, setSpd2 + error);
 //    setSpd1 -= error;
 //    setSpd2 += error;
-  md.setBrakes(400, 400);
+    tick[0] = 0;
+    tick[1] = 0;
+     delay(50);
   }
+  md.setBrakes(400, 400);
 }
 
 
@@ -205,22 +228,18 @@ void moveFwd(){
 
 //Method calls for IR sensors
 double seeFront(){
-  //int dis1 = ir1.distance();
-  double dis2 = ((ir2.distance() - offset2) / 10) + 0.5;
-  //double dis2 = ir2.distance() - offset
-  double actualDist = ir2.distance();
-  //int dis3 = ir3.distance();
+  double dis1 = ir1.distance();
+  double dis2 = ir2.distance();
+  double dis3 = ir3.distance();
   
-  //Serial.print("Mean distance of left fwd sensor: ");  // returns it to the serial monitor
-  //Serial.println(dis1);
+  Serial.print("Mean distance of left fwd sensor: ");  // returns it to the serial monitor
+  Serial.println(dis1);
 
-  Serial.print("Mean voltage of mid fwd sensor: ");  // returns it to the serial monitor
-  Serial.print(actualDist);
-  Serial.print(" in blocks:");
+  Serial.print("Mean distance of mid fwd sensor: ");  // returns it to the serial monitor
   Serial.println(dis2);
 
-  //Serial.print("Mean distance of right fwd sensor: ");  // returns it to the serial monitor
-  //Serial.println(dis3);
+  Serial.print("Mean distance of right fwd sensor: ");  // returns it to the serial monitor
+  Serial.println(dis3);
 
   return dis2;
 }
@@ -289,6 +308,7 @@ void mEncoder(int motor, int setTick){
   if(encState[motor] != encLastState[motor]){          //Was there a change in state?
     if(digitalRead(encB[motor]) != encState[motor]){   //If EncA state is different from EncB
       mCounter[motor]++;                               //Then it's going forward so ++ ticks
+      tick[motor]++;
     }
     else{
       mCounter[motor]--;                               //Else it is going in reverse so -- ticks
