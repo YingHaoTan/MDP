@@ -164,17 +164,22 @@ public class MapState {
      * @return
      */
     public CellState getRobotCellState(Point point) {
-        CellState state = CellState.NORMAL;
+        CellState state = null;
+        Dimension rdim = getRobotSystemDimension();
 
-        List<Point> points = this.convertRobotPointToMapPoints(point);
-        for (Point p : points) {
-            CellState pstate = getMapCellState(p);
-
-            if (pstate == CellState.OBSTACLE
-                    || (pstate == CellState.UNEXPLORED && state != CellState.OBSTACLE)
-                    || (pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE)) {
-                state = pstate;
-            }
+        if(point.x >= 0 && point.y >= 0 && point.x < rdim.width && point.y < rdim.height) {
+        	state = CellState.NORMAL;
+        	
+	        List<Point> points = this.convertRobotPointToMapPoints(point);
+	        for (Point p : points) {
+	            CellState pstate = getMapCellState(p);
+	
+	            if (pstate == CellState.OBSTACLE
+	                    || (pstate == CellState.UNEXPLORED && state != CellState.OBSTACLE)
+	                    || (pstate == CellState.WAYPOINT && state != CellState.UNEXPLORED && state != CellState.OBSTACLE)) {
+	                state = pstate;
+	            }
+	        }
         }
 
         return state;
@@ -186,9 +191,9 @@ public class MapState {
      * @param point
      */
     public CellState getMapCellState(Point point) {
-        if (point.x >= 0 && point.y >= 0 && point.x < cellstates.length && point.y < cellstates[0].length) {
+        if (point.x >= 0 && point.y >= 0 && point.x < cellstates.length && point.y < cellstates[point.x].length)
             return this.cellstates[point.x][point.y];
-        }
+            
         return null;
     }
 
@@ -300,6 +305,7 @@ public class MapState {
         int mdf1counter = 0;
         int mdf2counter = 0;
         mdf1bin = mdf1bin.substring(2, mdf1bin.length() - 2);
+        
         for (int y = 0; y < this.mapdim.height; y++) {
             for (int x = 0; x < this.mapdim.width; x++) {
                 if (mdf1bin.substring(mdf1counter, mdf1counter + 1).equals("0")) {
@@ -307,6 +313,9 @@ public class MapState {
                 } else {
                     if (mdf2bin.substring(mdf2counter, mdf2counter + 1).equals("1")) {
                         this.cellstates[x][y] = CellState.OBSTACLE;
+                    }
+                    else {
+                    	this.cellstates[x][y] = CellState.NORMAL;
                     }
 
                     mdf2counter++;

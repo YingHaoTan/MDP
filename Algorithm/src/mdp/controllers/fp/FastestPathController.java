@@ -39,4 +39,9 @@ public class FastestPathController extends FastestPathBase {
 		return nextd;
 	}
 
+	@Override
+	protected void preprocess() {
+		// Perform nothing as the actions are generated on-the-fly
+	}
+
 }

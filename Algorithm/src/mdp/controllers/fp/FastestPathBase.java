@@ -53,6 +53,8 @@ public abstract class FastestPathBase implements RobotActionListener {
 		this.mstate = mstate.clone();
 		this.robot = robot;
 		this.destination = destination;
+		
+		preprocess();
 
 		robot.addRobotActionListener(this);
 		if(faststream) {
@@ -61,7 +63,11 @@ public abstract class FastestPathBase implements RobotActionListener {
 				robot.move(direction);
 		}
 		else {
-			robot.move(next());
+			Direction direction = next();
+			if(direction != null)
+				robot.move(direction);
+			else
+				complete();
 		}
 	}
 
@@ -70,11 +76,17 @@ public abstract class FastestPathBase implements RobotActionListener {
 		Direction mdirection = next();
 		if(mdirection != null)
 			robot.move(mdirection);
-		else {
-			robot.removeRobotActionListener(this);
-			for(FastestPathCompletedListener listener: listeners)
-				listener.onFastestPathCompleted();
-		}
+		else
+			complete();
+	}
+	
+	/**
+	 * Completes the fastest path by notifying listeners and removing robot action listener
+	 */
+	private void complete() {
+		robot.removeRobotActionListener(this);
+		for(FastestPathCompletedListener listener: listeners)
+			listener.onFastestPathCompleted();
 	}
 
 	/**
@@ -82,6 +94,11 @@ public abstract class FastestPathBase implements RobotActionListener {
 	 * @return
 	 */
 	protected abstract Direction next();
+	
+	/**
+	 * Performs preprocessing before starting to stream actions for robot
+	 */
+	protected abstract void preprocess();
 
 	/**
 	 * Gets the map state

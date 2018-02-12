@@ -9,8 +9,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import mdp.controllers.MdpWindowController;
 import mdp.controllers.explorer.ExplorationBase;
 import mdp.controllers.explorer.HugRightExplorationController;
-import mdp.controllers.fp.FastestPathBase;
-import mdp.controllers.fp.FastestPathController;
+import mdp.controllers.fp.astar.AStarFastestPath;
+import mdp.controllers.fp.astar.BasicPathSpecification;
+import mdp.controllers.fp.astar.WaypointPathSpecification;
 import mdp.files.MapFileHandler;
 import mdp.graphics.MdpWindow;
 import mdp.models.Direction;
@@ -32,21 +33,19 @@ public class Program {
         MdpWindowController controller = new MdpWindowController(window);
         MapFileHandler filehandler = new MapFileHandler();
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
-        FastestPathBase fastestpath = new FastestPathController();
-        ExplorationBase explorer = new HugRightExplorationController(fastestpath);
+        ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
         //ExplorationBase explorer = new SnakeExplorationController();
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, -1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 3, 0.5));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 3, 0.5));
+        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 3, 0.5));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
 
         controller.setMapLoader(filehandler);
         controller.setMapSaver(filehandler);
         controller.setSimulatorRobot(srobot);
-        controller.setFastestPathPlanner(new FastestPathController());
+        controller.setFastestPathPlanner(new AStarFastestPath(new WaypointPathSpecification()));
         /*
         FastestPath fp = new FastestPath();
         FastestPath fp2 = new FastestPath();

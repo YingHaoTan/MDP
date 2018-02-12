@@ -18,12 +18,14 @@ import mdp.models.SensorConfiguration;
 public abstract class RobotBase {
 
     private Dimension dimension;
+    private Direction initialorientation;
     private Direction orientation;
     private List<SensorConfiguration> sensors;
     private List<RobotActionListener> listeners;
 
     public RobotBase(Dimension dimension, Direction orientation) {
         this.dimension = dimension;
+        this.initialorientation = orientation;
         this.orientation = orientation;
         this.sensors = new ArrayList<>();
         this.listeners = new ArrayList<>();
@@ -139,6 +141,7 @@ public abstract class RobotBase {
         actionsequence.add(RobotAction.FORWARD);
 
         setCurrentOrientation(mapdirection);
+        
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
     }
@@ -164,7 +167,8 @@ public abstract class RobotBase {
                         break;
 
                 }
-            } else {
+            } 
+            else {
                 switch (getCurrentOrientation()) {
                     case UP:
                         newDirection = Direction.LEFT;
@@ -187,7 +191,14 @@ public abstract class RobotBase {
             move(orientation, action);
         }
     }
-
+    
+    /**
+     * Resets the robot orientation
+     */
+    public void reset() {
+    	orientation  = initialorientation;
+    }
+    
     /**
      * Notifies all RobotActionListener instances registered to this Robot
      * instance
