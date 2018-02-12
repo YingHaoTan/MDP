@@ -125,6 +125,71 @@ void loop() {
 //}
 }
 
+////Begin 
+//* We want to be able to achieve error correction on the fly and this can be done through a guess and check method. Here is the pseudocode
+//* User can specify how many blocks we want to travel (In the situation of a fastest path)
+//* 
+//* SET INITIAL SPD1 & SPD2
+//* SET KPROP TO BE 1
+//* WHILE mRev != noblock {
+//* DELAY()
+//* CHECK DIFFERENCE BETWEEN TICK 1 & TICK 2
+//* CALCULATE ERROR FROM PROP CONSTANT * DIFFERENCE
+//* INC SLOWER MOTOR, DEC FASTER MOTOR
+//* UPDATE SPD1 & SPD2 USING NEW SPEED
+//* }
+//* BRAKE
+//* 
+////
+
+void moveStraight(int noBlock) {
+  double kprop = 1;
+  double error = 0;
+  int setSpd1 = 300;
+  int setSpd2 = 300;
+  //Rev have to change to one turn only 
+  md.setSpeeds(setSpd1,setSpd2);
+  while (mRev[0] < noBlock || mRev[1] < noBlock){
+    //Set 0.2 seconds to observe readings first
+    delay(200);
+    if (mCounter[0] > mCounter[1]) {
+      Serial.println("motor 1 faster than motor 2, reducing motor 1 speed");
+      error = (mCounter[0] - mCounter[1]) * kprop;
+      md.setSpeeds(setSpd1 - error, setSpd2 + error);
+      setSpd1 -= error;
+      setSpd2 += error;
+    }
+    else {
+      Serial.println("motor 2 faster than motor 1, reducing motor 2 speed");
+      error = (mCounter[0] - mCounter[1]) * kprop; 
+      md.setSpeeds(setSpd1 + error, setSpd2 - error);
+      setSpd1 += error;
+      setSpd2 -= error;
+    }
+//    SHORTCUT METHOD (Should do the same thing as the thing above)
+//    error = (mCounter[0] - mCounter[1]) * kprop;
+//    md.setSpeed(setSpd1 - error, setSpd2 + error);
+//    setSpd1 -= error;
+//    setSpd2 += error;
+  md.setBrakes(400, 400);
+  }
+}
+
+
+void turnLeft() {
+  
+
+  
+}
+
+void turnRight(){
+
+
+  
+}
+
+
+//End
 void moveFwd(){
   while(mRev[0] < 1 || mRev[1] < 1){
      md.setSpeeds(300, 300);
@@ -132,7 +197,7 @@ void moveFwd(){
      //mRev[1] = 0;
   }
   //else{
-    md.setBrakes(400, 400);
+   md.setBrakes(400, 400);
    // mRev[0] = 0;
     //mRev[1] = 0;
   //}
