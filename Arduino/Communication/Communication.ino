@@ -3,8 +3,7 @@
 #define BUFFER_SIZE                               32
 
 // need to check if will overflow
-uint8_t last_sent = 0;
-uint8_t to_receive = 0;
+uint8_t last_sent = 1;
 uint8_t incomingBuffer[BUFFER_SIZE];
 int bufferIndex = 0;
 
@@ -27,15 +26,15 @@ void loop() {
     /*Serial.println(bufferIndex);
       Serial.println("TraversalIndex:");
       Serial.println(traversalIndex);*/
-    while (bufferIndex > traversalIndex + 4) {
-      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 4] == '!') {
+    while (bufferIndex > traversalIndex + 3) {
+      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 3] == '!') {
         InstructionMessage instructMsg;
-        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 3);
+        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 2);
         /*Serial.println("ID received:");
-          Serial.println(instructMsg.id);
-          Serial.println("ACK received:");
-          Serial.println(instructMsg.ack);*/
-        if (to_receive == instructMsg.id && last_sent == instructMsg.ack) {
+         Serial.println(instructMsg.id);*/
+        if (last_sent == instructMsg.id) {
+         
+          yetToReceiveAck = false;
           switch (instructMsg.action) {
             case TURN_LEFT:
               break;
@@ -43,13 +42,17 @@ void loop() {
               break;
             case FORWARD:
               break;
+            case SCAN:
+              sendStatusUpdate();
+              last_sent++;
+              break;
+            case START:
+              sendStatusUpdate();
+              last_sent++;
+              break;
+
           }
 
-          to_receive += 1;
-          last_sent += 1;
-          yetToReceiveAck = false;
-
-          sendStatusUpdate();
           bufferIndex = 0;
           break;
         }
@@ -57,7 +60,7 @@ void loop() {
           // Received wrong instruction
           //Serial.println("RECEIVED WRONG INSTRUCTION");
         }
-        traversalIndex += 5;
+        traversalIndex += 4;
       }
       else {
         traversalIndex++;
@@ -67,12 +70,13 @@ void loop() {
   /*
 
     if(completedMove()){
-    sendStatusUpdate();
+  	sendStatusUpdate();
+  	last_sent++;
 
     }
   */
   if (millis() > timer + timeout && yetToReceiveAck) {
-    sendStatusUpdate();
+    resendStatusUpdate();
   }
 
 
@@ -97,6 +101,12 @@ void putIncomingUSBMessageToBuffer() {
   }
 }
 
+void resendStatusUpdate() {
+  last_sent = last_sent - 1;
+  sendStatusUpdate();
+  last_sent = last_sent + 1;
+}
+
 
 void sendStatusUpdate() {
   // Put sensor readings here
@@ -109,12 +119,11 @@ void sendStatusUpdate() {
   statusPayload.right2 = 14;
   statusPayload.left1 = 12;
   statusPayload.reached = 1;
-  statusPayload.ack = to_receive;
 
 
   // Crafts message to send
   Message msg;
-  msg.type = ARDUINO_STATUS;
+  msg.type = ARDUINO_UPDATE;
   memcpy(&msg.payload, &statusPayload, sizeof(statusPayload));
 
   uint8_t tmpOutBuffer[64] = {0};
