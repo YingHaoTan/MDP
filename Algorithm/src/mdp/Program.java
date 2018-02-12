@@ -9,8 +9,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import mdp.controllers.MdpWindowController;
 import mdp.controllers.explorer.ExplorationBase;
 import mdp.controllers.explorer.HugRightExplorationController;
-import mdp.controllers.fp.mdp.MdpFastestPath;
-import mdp.controllers.fp.mdp.MdpWaypointFastestPath;
+import mdp.controllers.fp.astar.AStarFastestPath;
+import mdp.controllers.fp.astar.BasicPathSpecification;
+import mdp.controllers.fp.astar.WaypointPathSpecification;
 import mdp.files.MapFileHandler;
 import mdp.graphics.MdpWindow;
 import mdp.models.Direction;
@@ -31,7 +32,7 @@ public class Program {
         MdpWindowController controller = new MdpWindowController(window);
         MapFileHandler filehandler = new MapFileHandler();
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
-        ExplorationBase explorer = new HugRightExplorationController(new MdpFastestPath());
+        ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
         //ExplorationBase explorer = new SnakeExplorationController();
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
@@ -43,7 +44,7 @@ public class Program {
         controller.setMapLoader(filehandler);
         controller.setMapSaver(filehandler);
         controller.setSimulatorRobot(srobot);
-        controller.setFastestPathPlanner(new MdpWaypointFastestPath());
+        controller.setFastestPathPlanner(new AStarFastestPath(new WaypointPathSpecification()));
         /*
         FastestPath fp = new FastestPath();
         FastestPath fp2 = new FastestPath();
