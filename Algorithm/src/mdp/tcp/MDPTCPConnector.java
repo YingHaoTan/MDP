@@ -39,14 +39,21 @@ public class MDPTCPConnector extends Thread {
             /*byte[] test = {0x01,0x01};
             System.out.println(StatusMessage.checkMessageType(test));
             */
-            byte last_sent = 0;
+            byte lastSent = 0;
             boolean yetToReceiveAck = false;
+            ArduinoInstruction lastSentArduinoMessage = null;
+            long timer = System.currentTimeMillis();
+            
+            // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
+            long timeout = 1000;
             
             Socket clientSocket = new Socket(ipAddr, port);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             
-            ArduinoInstruction instruction = new ArduinoInstruction(last_sent, RobotAction.START);
+            
+            ArduinoInstruction instruction = new ArduinoInstruction(lastSent, RobotAction.START);
+            lastSentArduinoMessage = instruction;
             // Raspberry Pi need to check byte [0], then sends byte [1] to [2] with ~ and ! to Arduino
             outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
             yetToReceiveAck = true;
@@ -68,14 +75,14 @@ public class MDPTCPConnector extends Thread {
                     */
                     case ARDUINO_UPDATE:
                         ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
-                        if(arduinoUpdate.getId() == last_sent){
+                        if(arduinoUpdate.getId() == lastSent){
                             System.out.println(arduinoUpdate.getFront1());                          
                             yetToReceiveAck = false;
-                            last_sent++;
-                            instruction = new ArduinoInstruction(last_sent, RobotAction.SCAN);
+                            lastSent++;
+                            instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN);
                             outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
                             yetToReceiveAck = true;
-                            
+                            timer = System.currentTimeMillis();
                             //send_updates_to_android();
                             
                             
@@ -83,9 +90,12 @@ public class MDPTCPConnector extends Thread {
                         break;
                     }   
                 }       
-                
-                // if past timer, resends arduino instruction
-                
+                if(yetToReceiveAck && System.currentTimeMillis() > timer + timeout){
+                    System.out.println("Resending");
+                    
+                    outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
+                    timer = System.currentTimeMillis();
+                }                
             }
         } catch (SocketException ex) {
             Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
