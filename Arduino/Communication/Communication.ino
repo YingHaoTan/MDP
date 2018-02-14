@@ -9,6 +9,7 @@ int bufferIndex = 0;
 
 // timer
 bool yetToReceiveAck = false;
+bool alreadyReceived = false;
 unsigned long timer = millis();
 unsigned long timeout = 250; // 250 milliseconds
 
@@ -32,23 +33,27 @@ void loop() {
         memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 2);
         /*Serial.println("ID received:");
          Serial.println(instructMsg.id);*/
-        if (last_sent == instructMsg.id) {
-         
+        if (last_sent == instructMsg.id && alreadyReceived == false) {
+          alreadyReceived = true
           yetToReceiveAck = false;
           switch (instructMsg.action) {
             case TURN_LEFT:
+              //turnLeft();
               break;
             case TURN_RIGHT:
+              //turnRight();
               break;
             case FORWARD:
               break;
             case SCAN:
               sendStatusUpdate();
               last_sent++;
+              alreadyReceived = false;
               break;
             case START:
               sendStatusUpdate();
               last_sent++;
+              alreadyReceived = false;
               break;
 
           }
@@ -72,6 +77,7 @@ void loop() {
     if(completedMove()){
   	sendStatusUpdate();
   	last_sent++;
+    alreadyReceived = false;
 
     }
   */

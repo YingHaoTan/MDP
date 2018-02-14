@@ -295,6 +295,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
+
                 fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
                 //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
 
