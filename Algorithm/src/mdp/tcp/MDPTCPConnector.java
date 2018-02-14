@@ -55,6 +55,7 @@ public class MDPTCPConnector extends Thread {
             ArduinoInstruction instruction = new ArduinoInstruction(lastSent, RobotAction.START);
             lastSentArduinoMessage = instruction;
             // Raspberry Pi need to check byte [0], then sends byte [1] to [2] with ~ and ! to Arduino
+            byte[] test = instruction.toBytes();
             outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
             yetToReceiveAck = true;
             
@@ -84,8 +85,6 @@ public class MDPTCPConnector extends Thread {
                             yetToReceiveAck = true;
                             timer = System.currentTimeMillis();
                             //send_updates_to_android();
-                            
-                            
                         }
                         break;
                     }   

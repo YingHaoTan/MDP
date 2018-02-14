@@ -3,7 +3,7 @@
 #define BUFFER_SIZE                               32
 
 // need to check if will overflow
-uint8_t last_sent = 1;
+uint8_t last_sent = 0;
 uint8_t incomingBuffer[BUFFER_SIZE];
 int bufferIndex = 0;
 

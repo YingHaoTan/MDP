@@ -6,7 +6,8 @@ class ArduinoInterface(object):
 
     def __init__(self):
         #self.port = '/dev/ttyACM0'
-        self.port='/dev/tty.usbmodem1421'
+        self.port='COM13'
+		#self.port='/dev/tty.usbmodem1421'
         self.baudrate = 115200
         self.ser = None
         # self.parity= serial.PARITY_ODD
