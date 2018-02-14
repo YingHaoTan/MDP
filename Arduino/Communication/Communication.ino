@@ -11,16 +11,16 @@ int bufferIndex = 0;
 bool yetToReceiveAck = false;
 bool alreadyReceived = false;
 unsigned long timer = millis();
-unsigned long timeout = 250; // 250 milliseconds
+unsigned long timeout = 2000; // 250 milliseconds
 
 
 void setup() {
   //The default is 8 data bits, no parity, one stop bit.
   Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
-
   if (Serial.available() > 0) {
     putIncomingUSBMessageToBuffer();
     int traversalIndex = 0;
@@ -29,12 +29,13 @@ void loop() {
       Serial.println(traversalIndex);*/
     while (bufferIndex > traversalIndex + 3) {
       if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 3] == '!') {
+        
         InstructionMessage instructMsg;
         memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 2);
         /*Serial.println("ID received:");
          Serial.println(instructMsg.id);*/
         if (last_sent == instructMsg.id && alreadyReceived == false) {
-          alreadyReceived = true
+          alreadyReceived = true;
           yetToReceiveAck = false;
           switch (instructMsg.action) {
             case TURN_LEFT:
@@ -55,7 +56,6 @@ void loop() {
               last_sent++;
               alreadyReceived = false;
               break;
-
           }
 
           bufferIndex = 0;
@@ -139,6 +139,7 @@ void sendStatusUpdate() {
 
   // Need to test
   Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
+  Serial.flush();
 
   //start_timer()
   timer = millis();

@@ -45,7 +45,7 @@ public class MDPTCPConnector extends Thread {
             long timer = System.currentTimeMillis();
             
             // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
-            long timeout = 1000;
+            long timeout = 2000;
             
             Socket clientSocket = new Socket(ipAddr, port);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -56,14 +56,26 @@ public class MDPTCPConnector extends Thread {
             lastSentArduinoMessage = instruction;
             // Raspberry Pi need to check byte [0], then sends byte [1] to [2] with ~ and ! to Arduino
             byte[] test = instruction.toBytes();
-            outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
+            outToServer.writeBytes(new String(instruction.toBytes()) + "~");
             yetToReceiveAck = true;
             
             
             while (true) {
                 // If I receive something from Raspberry Pi
                 if(inFromServer.ready()){
-                    byte[] incoming = inFromServer.readLine().getBytes();
+                    // Need to read until '~'
+                    String incomingStr = "";
+                    while(inFromServer.ready()){
+                        int read = inFromServer.read();
+                        if(read != 126){
+                            incomingStr += (char)read;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    byte[] incoming = incomingStr.getBytes();
+                    //byte[] incoming = inFromServer.readLine().getBytes();
                     StatusMessageType messageType = StatusMessage.checkMessageType(incoming);
                     //System.out.println("Sending Raspberry Pi stuffs");
                     //outToServer.writeBytes("YO WHATUP FROM ALGORITHM CLIENT\n");
@@ -76,6 +88,7 @@ public class MDPTCPConnector extends Thread {
                     */
                     case ARDUINO_UPDATE:
                         ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
+                        System.out.println("Receiving:" + arduinoUpdate.getId());
                         if(arduinoUpdate.getId() == lastSent){
                             System.out.println(arduinoUpdate.getFront1());                          
                             yetToReceiveAck = false;
@@ -90,9 +103,9 @@ public class MDPTCPConnector extends Thread {
                     }   
                 }       
                 if(yetToReceiveAck && System.currentTimeMillis() > timer + timeout){
-                    System.out.println("Resending");
+                    System.out.println("Resending:" + instruction.getID());
                     
-                    outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
+                    outToServer.writeBytes(new String(instruction.toBytes()) + "~");
                     timer = System.currentTimeMillis();
                 }                
             }

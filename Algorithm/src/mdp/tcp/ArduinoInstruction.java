@@ -31,4 +31,8 @@ public class ArduinoInstruction extends StatusMessage{
         toSend[2] = actionToTake.getByte();
         return toSend;
     }
+    
+    public int getID(){
+        return this.id;
+    }
 }

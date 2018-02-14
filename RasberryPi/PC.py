@@ -1,6 +1,6 @@
 import socket
 import ArduinoInterface
-
+from functools import reduce
 
 from queue import Queue
 from threading import Thread
@@ -18,29 +18,39 @@ def PC_recv(to_arduino_queue, from_arduino_queue):
 	print ("Listening")
 	clientsock, clientaddr = serversock.accept()
 	print ("Connection from: " + str(clientaddr))
-	received = ""
+	received = []
 	message_end = False
 	while True:
 		while not message_end:
 			data = clientsock.recv(1024)                 
 			for i in range(len(data)):
 				# if new line
-				print(data[i])
-				if(data[i] == 10):
+				if(data[i] == 126):
 					message_end = True
 					break
-				received += str(data[i])
+				received.append(data[i].to_bytes(1, byteorder='big'))
+				
 			
 		
 		# send to Arduino
-		to_arduino_queue.put(received)
-		received = ""
-		message_end = False
+		
+		# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ANDROID_UPDATE((byte)0x05);
+		#to_send_arduino = "";
+		if(received[0] == (2).to_bytes(1, byteorder='big')):
+			#to_send_arduino += chr(int(received[1]))
+			#to_send_arduino += chr(int(received[2]))
+			to_arduino_queue.put(received[1:3])#to_send_arduino)
 			
+		received = []
+		message_end = False
+
 		# receives from Arduino
-		if(not from_arduino_queue.empty):
-			from_arduino_queue.get(block=False)
-		# sends to Algo
+		if(not from_arduino_queue.empty()):
+			string_to_send_tcp = from_arduino_queue.get()
+			# Ends with a ~
+			string_to_send_tcp += "~"
+			print("sending to PC")
+			clientsock.send(string_to_send_tcp.encode("ascii"))
 		
 		
 
@@ -61,17 +71,30 @@ def Arduino_Thread(to_arduino_queue, from_arduino_queue):
 	arduino = ArduinoInterface.ArduinoInterface()
 	arduino.start_arduino_connection()
 	while True:
-		to_send = to_arduino_queue.get()
-		package = "~" + to_send
-		package += "!"
-		bytes_to_send = bytes(package, "ascii")
-		arduino.write_to_arduino(bytes_to_send)
-		arduino.read_from_arduino()
+		to_send_bytes = to_arduino_queue.get()
+		to_send_bytes.insert(0, bytes("~", "ascii"))
+		#package = "~" + to_send
+		#package += "!"
+		to_send_bytes.append(bytes("!", "ascii"))
+		
+		#bytes_to_send_arduino = bytes(package, "ascii")
+		arduino.write_to_arduino(b''.join(to_send_bytes))
+		
+		
+		temp = arduino.read_from_arduino()
+		string_to_send_tcp = ""
+		for i in range(len(temp)):
+			string_to_send_tcp += temp[i].decode("ascii")			
+		
+		from_arduino_queue.put(string_to_send_tcp)
+		
+		
+		
+	
 	
 if __name__ == "__main__":
 	to_arduino_queue = Queue()
 	from_arduino_queue = Queue()
-	#android_queue = Queue()
 	t1 = Thread(target=PC_recv, args=(to_arduino_queue,from_arduino_queue))
 	t2 = Thread(target=Arduino_Thread, args=(to_arduino_queue,from_arduino_queue))
 	t1.start()
