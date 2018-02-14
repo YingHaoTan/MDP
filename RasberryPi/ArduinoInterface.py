@@ -37,18 +37,6 @@ class ArduinoInterface(object):
 							return toReturn
 						else:
 							toReturn.append(nextByte)
-		'''a=0
-		while a < 10:
-			try:
-				inByte = self.ser.inWaiting()
-				read_msg = self.ser.read(inByte).decode()
-				if read_msg:
-					print("Message read from arduino: " + read_msg)
-					a +=1
-			except serial.SerialException:
-				pass
-		
-		return read_msg'''
 		
 	# Write message to Arduino
 	def write_to_arduino(self, msg):
