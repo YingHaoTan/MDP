@@ -56,8 +56,8 @@ public class Program {
         controller.setExplorer(explorer);
         
         
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000);
-        mdpTCPConnector.start();
+        /*MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000);
+        mdpTCPConnector.start();*/
     }
 
 }
