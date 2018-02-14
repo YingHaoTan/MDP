@@ -49,26 +49,30 @@ public abstract class FastestPathBase implements RobotActionListener {
 	 * @param destination
 	 * @param faststream - False indicates that the FastestPathBase should wait for robot acknowledgement before issuing another command
 	 */
-	public void move(MapState mstate, RobotBase robot, Point destination, boolean faststream) {
+	public boolean move(MapState mstate, RobotBase robot, Point destination, boolean faststream) {
 		this.mstate = mstate.clone();
 		this.robot = robot;
 		this.destination = destination;
 		
-		preprocess();
+		boolean success = preprocess();
 
-		robot.addRobotActionListener(this);
-		if(faststream) {
-			Direction direction;
-			while((direction = next()) != null)
-				robot.move(direction);
+		if(success) {
+			robot.addRobotActionListener(this);
+			if(faststream) {
+				Direction direction;
+				while((direction = next()) != null)
+					robot.move(direction);
+			}
+			else {
+				Direction direction = next();
+				if(direction != null)
+					robot.move(direction);
+				else
+					complete();
+			}
 		}
-		else {
-			Direction direction = next();
-			if(direction != null)
-				robot.move(direction);
-			else
-				complete();
-		}
+		
+		return success;
 	}
 
 	@Override
@@ -98,7 +102,7 @@ public abstract class FastestPathBase implements RobotActionListener {
 	/**
 	 * Performs preprocessing before starting to stream actions for robot
 	 */
-	protected abstract void preprocess();
+	protected abstract boolean preprocess();
 
 	/**
 	 * Gets the map state
