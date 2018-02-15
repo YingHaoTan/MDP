@@ -3,7 +3,6 @@ package mdp.controllers.explorer;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
-import java.util.Map;
 
 import mdp.models.CellState;
 
@@ -11,7 +10,6 @@ import mdp.models.Direction;
 import mdp.models.ExplorationNode;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
-import mdp.models.SensorConfiguration;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 

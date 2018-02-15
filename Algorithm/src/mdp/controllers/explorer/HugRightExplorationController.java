@@ -9,14 +9,12 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import mdp.controllers.fp.FastestPathBase;
 import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.RobotAction;
-import mdp.models.SensorConfiguration;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 
@@ -47,7 +45,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         super();
         fastestPath.addFastestPathCompletedListener(this);
         this.fastestPath = fastestPath;
-        this.unexploredPoints = new ArrayList();
+        this.unexploredPoints = new ArrayList<>();
     }
 
     @Override
@@ -58,7 +56,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         currentState = States.BOUNDARY;
         unexploredPoints = new ArrayList<Point>();
-        neighbourPoints = new ArrayList();
+        neighbourPoints = new ArrayList<>();
 
         exploringUnexplored = 0;
         neighbourCounter = 0;
