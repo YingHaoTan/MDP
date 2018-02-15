@@ -11,7 +11,7 @@ int bufferIndex = 0;
 bool yetToReceiveAck = false;
 bool alreadyReceived = false;
 unsigned long timer = millis();
-unsigned long timeout = 2000; // 250 milliseconds
+unsigned long timeout = 500; // 250 milliseconds
 
 
 void setup() {
@@ -48,12 +48,14 @@ void loop() {
               break;
             case SCAN:
               sendStatusUpdate();
-              last_sent++;
+              incrementID();
+              //last_sent++;
               alreadyReceived = false;
               break;
             case START:
               sendStatusUpdate();
-              last_sent++;
+              incrementID();
+              //last_sent++;
               alreadyReceived = false;
               break;
           }
@@ -108,9 +110,9 @@ void putIncomingUSBMessageToBuffer() {
 }
 
 void resendStatusUpdate() {
-  last_sent = last_sent - 1;
+  decrementID();
   sendStatusUpdate();
-  last_sent = last_sent + 1;
+  incrementID();
 }
 
 
@@ -144,5 +146,18 @@ void sendStatusUpdate() {
   //start_timer()
   timer = millis();
   yetToReceiveAck = true;
+}
+
+void incrementID(){
+  last_sent = (last_sent+1)%126;  
+}
+
+void decrementID(){
+  if(last_sent == 0){
+    last_sent = 125;  
+  }  
+  else{
+    last_sent = last_sent - 1;  
+  }
 }
 

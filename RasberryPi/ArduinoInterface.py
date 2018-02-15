@@ -4,11 +4,11 @@ import time
 
 class ArduinoInterface(object):
 
-	def __init__(self):
+	def __init__(self, port, baud_rate):
 		#self.port = '/dev/ttyACM0'
-		self.port='COM13'
+		self.port=port
 		#self.port='/dev/tty.usbmodem1421'
-		self.baudrate = 115200
+		self.baudrate = baud_rate
 		self.ser = None
 		# self.parity= serial.PARITY_ODD
 		# self.bytesize=serial.SEVENBITS
@@ -25,15 +25,18 @@ class ArduinoInterface(object):
 
 	# Read message from Arduino
 	def read_from_arduino(self):
-		time.sleep(.5)
+		time.sleep(.1)
 		while True:
 			if(self.ser.inWaiting()):
 				inByte = self.ser.read()
 				if(inByte == bytes('~', 'ascii')):
 					toReturn = []
+					counter = 0
 					while True:
 						nextByte = self.ser.read()
-						if(nextByte == bytes('!', 'ascii')):
+						counter+=1
+						
+						if(nextByte == bytes('!', 'ascii') and counter == 10):
 							return toReturn
 						else:
 							toReturn.append(nextByte)
@@ -42,7 +45,7 @@ class ArduinoInterface(object):
 	def write_to_arduino(self, msg):
 		#print("Message to write to arduino: " + msg.decode() )
 		try:
-			time.sleep(.5)
+			time.sleep(.1)
 			self.ser.write(msg)
 			self.ser.flush()
 			print("Message written successfully")

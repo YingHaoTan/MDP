@@ -45,7 +45,7 @@ public class MDPTCPConnector extends Thread {
             long timer = System.currentTimeMillis();
             
             // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
-            long timeout = 2000;
+            long timeout = 500;
             
             Socket clientSocket = new Socket(ipAddr, port);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -92,7 +92,7 @@ public class MDPTCPConnector extends Thread {
                         if(arduinoUpdate.getId() == lastSent){
                             System.out.println(arduinoUpdate.getFront1());                          
                             yetToReceiveAck = false;
-                            lastSent++;
+                            lastSent = incrementID(lastSent);
                             instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN);
                             outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
                             yetToReceiveAck = true;
@@ -114,5 +114,10 @@ public class MDPTCPConnector extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private byte incrementID(byte lastSent){
+        byte value =  (byte)((byte)(lastSent+1)%126);
+        return value;
     }
 }
