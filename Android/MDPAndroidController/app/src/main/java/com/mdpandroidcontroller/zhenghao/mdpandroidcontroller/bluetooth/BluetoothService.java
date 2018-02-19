@@ -72,7 +72,11 @@ public class BluetoothService {
         mState = STATE_NO_INIT;
     }
 
-    public void init(Handler handler) {
+    /**
+     * Initiate message handler if it is not initiated.
+     * @param handler
+     */
+    public void initHandler(Handler handler) {
         // Check if is already initiated
         if (mState == STATE_NO_INIT) {
             mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -98,6 +102,11 @@ public class BluetoothService {
         return device;
     }
 
+    /**
+     * Force this service to use a new message handler. Use this method if the service is going to
+     * be used for another propose. E.g.: use for chat activity.
+     * @param handler
+     */
     public synchronized void setmHandler (Handler handler) {
         this.mHandler = handler;
     }

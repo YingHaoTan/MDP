@@ -1,8 +1,6 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller;
 
-import android.bluetooth.BluetoothAdapter;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 
@@ -18,7 +15,6 @@ public class ChatActivity extends AppCompatActivity implements ChatMessageHandle
 
     private static final String TAG = "ChatActivity";
 
-    private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
     private Handler mHandler = new ChatMessageHandler(this);
 
@@ -54,6 +50,7 @@ public class ChatActivity extends AppCompatActivity implements ChatMessageHandle
         if (mBluetoothService.getState() == Constants.STATE_NO_INIT) {
             Log.e(TAG, "bluetooth service is not started properly.");
         }
+        // Set the message handler to chat message handler.
         mBluetoothService.setmHandler(mHandler);
     }
 
@@ -66,6 +63,7 @@ public class ChatActivity extends AppCompatActivity implements ChatMessageHandle
     @Override
     protected void onStop() {
         super.onStop();
+        // Reset the handler to control message handler.
         mBluetoothService.setmHandler(ControlMessageHandler.getInstance());
     }
 }

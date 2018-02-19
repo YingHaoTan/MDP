@@ -163,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             }
 
             if (mBluetoothService.getState() != STATE_CONNECTED) {
+                Log.d(TAG, "No device connected");
                 Toast.makeText(getApplicationContext(), "No device connected", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -185,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         else {
             if (mBluetoothService == null) {
                 mBluetoothService = BluetoothService.getInstance();
-                mBluetoothService.init(mHandler);
+                mBluetoothService.initHandler(mHandler);
             }
 //            if (mBluetoothClass == null) {
 //                mBluetoothClass = BluetoothClass.getInstance();
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         // onResume() is called and we can start the service.
         if (mBluetoothService == null) {
             mBluetoothService = BluetoothService.getInstance();
-            mBluetoothService.init(mHandler);
+            mBluetoothService.initHandler(mHandler);
         }
         else if (mBluetoothService.getState() == STATE_NONE) {
             mBluetoothService.start();

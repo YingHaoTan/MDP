@@ -28,8 +28,8 @@ public class ControlMessageHandler extends Handler {
     }
 
     public ControlMessageHandler withParentActivity (ControlMessageCallBack parentActivity) {
-        mInstance.mParentActivity = parentActivity;
-        return mInstance;
+        mParentActivity = parentActivity;
+        return this;
     }
 
     interface ControlMessageCallBack {
