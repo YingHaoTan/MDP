@@ -45,6 +45,13 @@
                     android:text="@string/connectionStringDefaultText"
                     android:textSize="24sp" />
 
+                <Button
+                    android:id="@+id/chatBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:text="@string/chatBtn" />
+
             </LinearLayout>
 
             <LinearLayout

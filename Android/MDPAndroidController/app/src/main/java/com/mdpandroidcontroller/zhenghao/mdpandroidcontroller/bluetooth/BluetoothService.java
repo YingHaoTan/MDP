@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,20 +14,19 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTED;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTING;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_LISTEN;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NO_INIT;
 
 /**
  * Implement Handler() interface and pass to BluetoothService upon creation.
  *
  * Created by Zhenghao on 28/1/18.
  */
-// TODO: refactor as a singleton
 
 public class BluetoothService {
 
@@ -36,6 +34,8 @@ public class BluetoothService {
 
     // Name for the SDP record when creating server socket
     private static final String NAME = "BluetoothService";
+
+    private static BluetoothService mInstance = null;
 
     // The connected bluetooth device
     private BluetoothDevice device = null;
@@ -47,23 +47,38 @@ public class BluetoothService {
 
 
     // Member fields
-    private final BluetoothAdapter mAdapter;
-    private final Handler mHandler;
+    private BluetoothAdapter mAdapter;
+    private Handler mHandler;
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
 
     /**
-     * Constructor. Prepares a new Bluetooth service.
-     *
-     * @param context The UI Activity context
-     * @param handler A Handler to send message back to the UI Activity
+     * Get the only instance of this object
+     * @return the only instance
      */
-    public BluetoothService(Context context, Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = STATE_NONE;
-        mHandler = handler;
+    public static BluetoothService getInstance() {
+        if (mInstance == null) {
+            mInstance = new BluetoothService();
+        }
+        return mInstance;
+    }
+
+    /**
+     * Private constructor for singleton. Prepares a new Bluetooth service.
+     */
+    private BluetoothService() {
+        mState = STATE_NO_INIT;
+    }
+
+    public void init(Handler handler) {
+        // Check if is already initiated
+        if (mState == STATE_NO_INIT) {
+            mAdapter = BluetoothAdapter.getDefaultAdapter();
+            mState = STATE_NONE;
+            mHandler = handler;
+        }
     }
 
     private synchronized void setState(int state) {
@@ -81,6 +96,10 @@ public class BluetoothService {
 
     public BluetoothDevice getDevice() {
         return device;
+    }
+
+    public synchronized void setmHandler (Handler handler) {
+        this.mHandler = handler;
     }
 
     /**
@@ -270,7 +289,8 @@ public class BluetoothService {
 
             // Create a new listening server socket
             try {
-                tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID);
+                //tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID);
+                tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
 //                try {
 //                    tmp = (BluetoothServerSocket) mAdapter.getClass().getMethod("listenUsingRfcommOn", new Class[] {int.class}).invoke(mAdapter, 1);
 //                }
@@ -376,8 +396,8 @@ public class BluetoothService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
-                //tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-                tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+                //tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
                 Log.e(TAG, "ConnectTread::create() failed", e);
             }
@@ -395,7 +415,7 @@ public class BluetoothService {
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
-                //mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,2);
+                //mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,4);
                 mmSocket.connect();
             } catch (IOException e) {
                 // Close the socket

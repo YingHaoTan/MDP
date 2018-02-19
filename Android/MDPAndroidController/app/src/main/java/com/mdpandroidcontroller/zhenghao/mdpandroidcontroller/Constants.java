@@ -19,6 +19,7 @@ public class Constants {
     public static final int MESSAGE_TOAST = 5;
 
     // Constants that indicate the current connection state
+    public static final int STATE_NO_INIT = -1;  // the service is not initialized
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection

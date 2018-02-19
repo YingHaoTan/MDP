@@ -61,8 +61,6 @@ public class BluetoothClass {
         return new BigInteger(s, 2).toString(16);
     }
 
-
-
     public static BluetoothClass getInstance() {
         if (mInstance == null) {
             mInstance = new BluetoothClass();
