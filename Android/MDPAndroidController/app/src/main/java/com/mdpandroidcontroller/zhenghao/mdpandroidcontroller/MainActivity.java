@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -173,7 +174,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void settingsPopupInit(){
         settingsDialog = new Dialog(this);
+        settingsDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // remove header on dialog
         settingsDialog.setContentView(R.layout.settings_popout);
+
 
         closeText = (TextView) settingsDialog.findViewById(R.id.settingsClose);
         closeText.setOnClickListener(new View.OnClickListener(){
@@ -454,6 +457,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(robotx < 0 || robotx > Maze.MAZE_COLS - 3 || roboty < 0 || roboty > Maze.MAZE_ROWS -3){
                 Toast.makeText(getApplicationContext(),"invalid coordinates", Toast.LENGTH_SHORT).show();
+                return;
             }
 
             Direction dir = null;
@@ -489,6 +493,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(waypointx < 0 || waypointx > Maze.MAZE_COLS - 1 || waypointy < 0 || waypointy > Maze.MAZE_ROWS -1){
                 Toast.makeText(getApplicationContext(),"invalid coordinates", Toast.LENGTH_SHORT).show();
+                return;
             }
             //send message to robot
             mBluetoothService.write(translator.commandWayPoint(waypointx , waypointy).getBytes());

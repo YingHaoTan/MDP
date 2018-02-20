@@ -3,6 +3,7 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.R;
@@ -10,6 +11,8 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 
 /**
+ * Adapter to convert maze into gridview
+ *
  * Created by ernes on 10/2/2018.
  */
 
@@ -41,7 +44,10 @@ public class MazeGridAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
 
         View temp = new View(context);
-        temp.setLayoutParams(new ViewGroup.LayoutParams((viewGroup.getWidth()/Maze.MAZE_COLS),(viewGroup.getWidth()/Maze.MAZE_COLS)));
+        // using AbsListView.LayoutParams instead of ViewGroup.LayoutParams for tablet version compatibility
+        AbsListView.LayoutParams lp = new AbsListView.LayoutParams((viewGroup.getWidth()/Maze.MAZE_COLS),(viewGroup.getWidth()/Maze.MAZE_COLS));
+        temp.setLayoutParams(lp);
+
         CellState state = maze.getState(i % Maze.MAZE_COLS, Maze.MAZE_ROWS-1-(i / Maze.MAZE_COLS) );
 
         if(state == CellState.NORMAL){

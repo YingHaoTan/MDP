@@ -4,6 +4,13 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 /**
+ *
+ * Class used to manage the arena.
+ * data is stored as a 1d array instead of 2d and managed mathematically
+ *
+ * More methods are to be completed for integration with other groups
+ *
+ *
  * Created by ernes on 10/2/2018.
  */
 
@@ -78,6 +85,13 @@ public class Maze {
 
     }
 
+    /**
+     * This method is for easy conversion to the actual arena GUI
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     public CellState getState(int x , int y){
         if(x >= robot_x && x <=(robot_x+2) && y >= robot_y && y <= (robot_y+2)){
             if(robot_d == Direction.UP && x == robot_x+1 && y == robot_y+2){

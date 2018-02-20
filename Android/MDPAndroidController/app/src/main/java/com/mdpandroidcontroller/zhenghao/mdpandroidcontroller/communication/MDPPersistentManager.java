@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 /**
+ * Purpose of this class is to serve as a easy management class for the 2 pre-set config strings.
+ * Initially designed as a singleton, to be changed if necessary.
+ *
  * Created by ernes on 19/2/2018.
  */
 
@@ -32,6 +35,14 @@ public class MDPPersistentManager extends Activity{
         return instance;
     }
 
+    /**
+     * This method retrieves persistent string from the application.
+     * You can use the constants for name or your own name if required.
+     * This method will set a default value if a particular name has never been used.
+     *
+     * @param name
+     * @return
+     */
     public String getPersistString(String name){
         String message = sp.getString(name, null);
 
@@ -43,6 +54,12 @@ public class MDPPersistentManager extends Activity{
         return message;
     }
 
+    /**
+     * This methods saves a value tagged to the name as a persistent data
+     *
+     * @param name
+     * @param value
+     */
     public void savePersistString(String name, String value){
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(name , value);
