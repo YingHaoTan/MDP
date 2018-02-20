@@ -52,9 +52,9 @@ public class MDPTCPConnector extends Thread {
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             
             
-            ArduinoInstruction instruction = new ArduinoInstruction(lastSent, RobotAction.START);
+            ArduinoInstruction instruction = new ArduinoInstruction(lastSent, RobotAction.START, false);
             lastSentArduinoMessage = instruction;
-            // Raspberry Pi need to check byte [0], then sends byte [1] to [2] with ~ and ! to Arduino
+            // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
             byte[] test = instruction.toBytes();
             outToServer.writeBytes(new String(instruction.toBytes()) + "~");
             yetToReceiveAck = true;
@@ -93,7 +93,7 @@ public class MDPTCPConnector extends Thread {
                             System.out.println(arduinoUpdate.getFront1());                          
                             yetToReceiveAck = false;
                             lastSent = incrementID(lastSent);
-                            instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN);
+                            instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
                             outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
                             yetToReceiveAck = true;
                             timer = System.currentTimeMillis();

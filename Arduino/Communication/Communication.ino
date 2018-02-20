@@ -27,11 +27,11 @@ void loop() {
     /*Serial.println(bufferIndex);
       Serial.println("TraversalIndex:");
       Serial.println(traversalIndex);*/
-    while (bufferIndex > traversalIndex + 3) {
-      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 3] == '!') {
+    while (bufferIndex > traversalIndex + 4) {
+      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 4] == '!') {
         
         InstructionMessage instructMsg;
-        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 2);
+        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 3);
         /*Serial.println("ID received:");
          Serial.println(instructMsg.id);*/
         if (last_sent == instructMsg.id && alreadyReceived == false) {
@@ -67,7 +67,7 @@ void loop() {
           // Received wrong instruction
           //Serial.println("RECEIVED WRONG INSTRUCTION");
         }
-        traversalIndex += 4;
+        traversalIndex += 5;
       }
       else {
         traversalIndex++;

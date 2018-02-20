@@ -31,5 +31,6 @@ struct InstructionMessage
 {
   uint8_t id;
   uint8_t action;
+  uint8_t obstacleInFront;
 };
 

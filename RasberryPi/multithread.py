@@ -54,7 +54,7 @@ class Main(object):
 			# sends to Arduino
 			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ANDROID_UPDATE((byte)0x05);
 			if(received[0] == (2).to_bytes(1, byteorder='big')):
-				to_arduino_queue.put(received[1:3])
+				to_arduino_queue.put(received[1:4])
 				
 			received = []
 			message_end = False
