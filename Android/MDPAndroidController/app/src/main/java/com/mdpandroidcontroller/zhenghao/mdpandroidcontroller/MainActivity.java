@@ -1,7 +1,9 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller;
 
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,8 +11,11 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -21,11 +26,13 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.MazeGridAd
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothClass;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static android.view.View.GONE;
@@ -39,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_DEVICE_SELECT = 2;
+
+    private Context context = null;
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
@@ -54,6 +63,19 @@ public class MainActivity extends AppCompatActivity {
     private GridView mazeGridView = null;
     private MazeGridAdapter mazeGridAdapter = null;
     private TextView robotStatusTextView = null;
+
+    //variables for settings popup
+    private Dialog settingsDialog = null;
+    private TextView closeText = null;
+    private EditText robotxSelection, robotySelection, waypointxSelection, waypointySelection = null;
+    private Spinner robotdSpinner = null;
+    private Button sendRobotButton = null;
+    private Button sendWaypointButton = null;
+
+    private ToggleButton persist1Button, persist2Button = null;
+    private EditText persistText = null;
+    private Button persistSaveButton, persistSendButton = null;
+
 
     //variables for controller portion
     private ToggleButton explorationButton = null;
@@ -86,10 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
         connectionString = (TextView) findViewById(R.id.connectionStr);
 
-        arenaInit(); //initialization for components within the arena portion
-        controllerInit(); //initialization for components within the controller portion
+        context = this.getBaseContext();
         translator = ControllerTranslator.getInstance();
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If the adapter is null, then Bluetooth is not supported
@@ -99,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        arenaInit(); //initialization for components within the arena portion
+        controllerInit(); //initialization for components within the controller portion
+        settingsPopupInit(); //initialization for the popup
     }
 
     private void arenaInit(){
@@ -112,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         //this para is for testing purposes
         maze.updateGrid(2,2, CellState.OBSTACLE);
-        maze.updateRobot(5,5, Direction.DOWN);
+        maze.updateRobot(7,4, Direction.DOWN);
         mazeGridAdapter.updateMaze(maze);
         mazeGridAdapter.notifyDataSetChanged();
 
@@ -146,6 +169,52 @@ public class MainActivity extends AppCompatActivity {
         leftButton.setOnClickListener(leftButtonListener);
         rightButton = (Button) findViewById(R.id.rightButton);
         rightButton.setOnClickListener(rightButtonListener);
+    }
+
+    private void settingsPopupInit(){
+        settingsDialog = new Dialog(this);
+        settingsDialog.setContentView(R.layout.settings_popout);
+
+        closeText = (TextView) settingsDialog.findViewById(R.id.settingsClose);
+        closeText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                settingsDialog.dismiss();
+            }
+        });
+
+        robotxSelection = (EditText) settingsDialog.findViewById(R.id.robotRowSelection);
+        robotySelection = (EditText) settingsDialog.findViewById(R.id.robotColSelection);
+        robotdSpinner = (Spinner) settingsDialog.findViewById(R.id.robotDirSpinner);
+        waypointxSelection = (EditText) settingsDialog.findViewById(R.id.waypointRowSelection);
+        waypointySelection = (EditText) settingsDialog.findViewById(R.id.waypointColSelection);
+
+        List<String> list = new ArrayList<String>();
+        list.add("Up");
+        list.add("Down");
+        list.add("Left");
+        list.add("Right");
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        robotdSpinner.setAdapter(dataAdapter);
+        robotdSpinner.setSelection(0); // set default value to up
+
+        sendRobotButton = (Button) settingsDialog.findViewById(R.id.robotButton);
+        sendRobotButton.setOnClickListener(sendRobotButtonListener);
+        sendWaypointButton = (Button) settingsDialog.findViewById(R.id.waypointButton);
+        sendWaypointButton.setOnClickListener(sendWaypointButtonListener);
+
+        persist1Button = (ToggleButton) settingsDialog.findViewById(R.id.persist1);
+        persist1Button.setOnClickListener(persist1ButtonListener);
+        persist2Button = (ToggleButton) settingsDialog.findViewById(R.id.persist2);
+        persist2Button.setOnClickListener(persist2ButtonListener);
+        persistSaveButton = (Button) settingsDialog.findViewById(R.id.persistSaveButton);
+        persistSaveButton.setOnClickListener(persistSaveButtonListener);
+        persistSendButton = (Button) settingsDialog.findViewById(R.id.persistSendButton);
+        persistSendButton.setOnClickListener(persistSendButtonListener);
+        persistText = (EditText) settingsDialog.findViewById(R.id.persistText);
+        MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
+        persistText.setText(pm.getPersistString(MDPPersistentManager.PERSIST_1));
     }
 
     Button.OnClickListener connectButtonListener = new Button.OnClickListener() {
@@ -321,10 +390,115 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    ToggleButton.OnClickListener persist1ButtonListener = new ToggleButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            persist2Button.setChecked(false);
+            //display text
+            MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
+            persistText.setText(pm.getPersistString(MDPPersistentManager.PERSIST_1));
+        }
+    };
+
+    ToggleButton.OnClickListener persist2ButtonListener = new ToggleButton.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            persist1Button.setChecked(false);
+            //display text
+            MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
+            persistText.setText(pm.getPersistString(MDPPersistentManager.PERSIST_2));
+        }
+    };
+
+    Button.OnClickListener persistSaveButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
+            if(persist1Button.isChecked()){
+                //save here
+                pm.savePersistString(MDPPersistentManager.PERSIST_1, persistText.getText().toString());
+            }else{
+                //save here
+                pm.savePersistString(MDPPersistentManager.PERSIST_2, persistText.getText().toString());
+            }
+        }
+    };
+
+    Button.OnClickListener persistSendButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String message;
+            MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
+            if(persist1Button.isChecked()){
+                message = persistText.getText().toString();
+                pm.savePersistString(MDPPersistentManager.PERSIST_1, message);
+                mBluetoothService.write(message.getBytes());
+            }else{
+                message = persistText.getText().toString();
+                pm.savePersistString(MDPPersistentManager.PERSIST_2, message);
+                mBluetoothService.write(message.getBytes());
+            }
+        }
+    };
+
+
+
+    Button.OnClickListener sendRobotButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //check that values are legal
+            int robotx = Integer.parseInt(robotxSelection.getText().toString());
+            int roboty = Integer.parseInt(robotySelection.getText().toString());
+
+            int robotd = robotdSpinner.getSelectedItemPosition();
+
+            if(robotx < 0 || robotx > Maze.MAZE_COLS - 3 || roboty < 0 || roboty > Maze.MAZE_ROWS -3){
+                Toast.makeText(getApplicationContext(),"invalid coordinates", Toast.LENGTH_SHORT).show();
+            }
+
+            Direction dir = null;
+            switch (robotd){
+                case 0:
+                    dir = Direction.UP;
+                    break;
+                case 1:
+                    dir = Direction.DOWN;
+                    break;
+                case 2:
+                    dir = Direction.LEFT;
+                    break;
+                case 3:
+                    dir = Direction.RIGHT;
+                    break;
+                default:
+                    Toast.makeText(getApplicationContext(),"invalid direction", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            //send message to robot
+            mBluetoothService.write(translator.commandRobotStartPos(robotx , roboty, dir).getBytes());
+
+        }
+    };
+
+    Button.OnClickListener sendWaypointButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //check that values are legal
+            int waypointx = Integer.parseInt(waypointxSelection.getText().toString());
+            int waypointy = Integer.parseInt(waypointySelection.getText().toString());
+
+            if(waypointx < 0 || waypointx > Maze.MAZE_COLS - 1 || waypointy < 0 || waypointy > Maze.MAZE_ROWS -1){
+                Toast.makeText(getApplicationContext(),"invalid coordinates", Toast.LENGTH_SHORT).show();
+            }
+            //send message to robot
+            mBluetoothService.write(translator.commandWayPoint(waypointx , waypointy).getBytes());
+        }
+    };
+
     Button.OnClickListener settingsButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //open up fragment for more settings.
+            settingsDialog.show();
         }
     };
 

@@ -1,4 +1,7 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
+
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
+
 /**
  * ControllerTranslator translates instructions between robot and controller for the controller
  * this is a singleton class
@@ -81,7 +84,43 @@ public class ControllerTranslator {
 		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_MOVE + CommConstants.COMMAND_MOVE_BACK;
 		return message;
 	}
-	
+
+	/**
+	 * Generate message to let robot know its starting position
+	 *
+	 * @param x
+	 * @param y
+	 * @param d
+	 * @return
+	 */
+	public String commandRobotStartPos(int x, int y, Direction d){
+		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_ROBOT_POS;
+
+		if(x < 10)
+			message += 0;
+		message += x;
+		if(y < 10)
+			message+=0;
+		message+= y;
+
+		switch(d){
+			case UP:
+				message += CommConstants.ROBOT_POS_UP;
+				break;
+			case DOWN:
+				message += CommConstants.ROBOT_POS_DOWN;
+				break;
+			case LEFT:
+				message += CommConstants.ROBOT_POS_LEFT;
+				break;
+			case RIGHT:
+				message += CommConstants.ROBOT_POS_RIGHT;
+				break;
+		}
+
+		return message;
+	}
+
 	/**
 	 * Generate message to command robot to set a waypoint at a specified location
 	 * 
@@ -123,6 +162,7 @@ public class ControllerTranslator {
 	public void decodeMessage(String message) {
 		int x;
 		int y;
+		Direction d;
 		boolean isBlocked;
 		if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_STATUS)) {
 			if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_ROBOT)) {
@@ -137,6 +177,19 @@ public class ControllerTranslator {
 						x = Integer.parseInt(message.substring(4, 6));
 						y = Integer.parseInt(message.substring(6, 8));
 						//find direction of robot from message.substring(8,10)
+						String temp = message.substring(8, 10);
+						if(temp.equals(CommConstants.ROBOT_DIRECTION_UP)){
+							d = Direction.UP;
+						}else if (temp.equals(CommConstants.ROBOT_DIRECTION_DOWN)){
+							d = Direction.DOWN;
+						}else if(temp.equals(CommConstants.ROBOT_DIRECTION_LEFT)){
+							d = Direction.LEFT;
+						}else if(temp.equals(CommConstants.ROBOT_DIRECTION_RIGHT)){
+							d = Direction.RIGHT;
+						}else{
+							//error
+							return;
+						}
 						//update update map
 						return;
 					}catch (NumberFormatException exception){

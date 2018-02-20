@@ -50,7 +50,7 @@
                 android:id="@+id/arena"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/controls_border"
+                android:background="@drawable/layout_border"
                 android:orientation="horizontal">
 
                 <Button
@@ -83,7 +83,7 @@
                 android:id="@+id/control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/controls_border"
+                android:background="@drawable/layout_border"
                 android:orientation="horizontal">
 
                 <TextView
@@ -163,7 +163,7 @@
                     android:layout_width="140sp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:background="@drawable/controls_border">
+                    android:background="@drawable/layout_border">
 
                     <Button
                         android:id="@+id/goButton"
@@ -179,7 +179,7 @@
                     android:layout_width="140sp"
                     android:layout_height="140sp"
                     android:layout_alignParentEnd="true"
-                    android:background="@drawable/controls_border"
+                    android:background="@drawable/layout_border"
                     android:visibility="gone">
 
                     <TableRow
