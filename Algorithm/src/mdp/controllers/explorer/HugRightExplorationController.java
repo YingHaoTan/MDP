@@ -255,7 +255,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         
 
         if (currentState == States.BOUNDARY) {
-            if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
+            if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 20) {
                 currentState = States.EXPLORATION;
             } else {
                 for (RobotAction action : actionPriority) {
