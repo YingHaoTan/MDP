@@ -1,6 +1,9 @@
 package mdp;
 
 import java.awt.Dimension;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -18,6 +21,7 @@ import mdp.models.Direction;
 import mdp.models.SensorConfiguration;
 import mdp.robots.SimulatorRobot;
 import mdp.tcp.MDPTCPConnector;
+import mdp.tcp.StatusMessage;
 
 public class Program {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
@@ -56,8 +60,12 @@ public class Program {
         */
         controller.setExplorer(explorer);
         
+        SynchronousQueue<StatusMessage> incomingQueue = new SynchronousQueue();
+        Queue<StatusMessage> outgoingArduinoQueue = new LinkedList();
+        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
         
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000);
+        
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         mdpTCPConnector.start();
     }
 

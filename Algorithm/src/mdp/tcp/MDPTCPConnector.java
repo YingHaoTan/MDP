@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mdp.models.RobotAction;
@@ -24,12 +26,18 @@ public class MDPTCPConnector extends Thread {
 
     String ipAddr;
     int port;
-    
+    SynchronousQueue<StatusMessage> incomingQueue;
+    Queue<StatusMessage> outgoingArduinoQueue;
+    Queue<StatusMessage> outgoingAndroidQueue;
     
 
-    public MDPTCPConnector(String ipAddr, int port) {
+    public MDPTCPConnector(String ipAddr, int port, SynchronousQueue incoming, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
         this.ipAddr = ipAddr;
         this.port = port;
+        this.incomingQueue = incoming;
+        this.outgoingArduinoQueue = outgoingArduinoQueue;
+        this.outgoingAndroidQueue = outgoingAndroidQueue;
+        
     }
 
     @Override
@@ -61,6 +69,7 @@ public class MDPTCPConnector extends Thread {
             
             
             while (true) {
+                
                 // If I receive something from Raspberry Pi
                 if(inFromServer.ready()){
                     // Need to read until '~'
@@ -75,33 +84,50 @@ public class MDPTCPConnector extends Thread {
                         }
                     }
                     byte[] incoming = incomingStr.getBytes();
-                    //byte[] incoming = inFromServer.readLine().getBytes();
                     StatusMessageType messageType = StatusMessage.checkMessageType(incoming);
                     //System.out.println("Sending Raspberry Pi stuffs");
                     //outToServer.writeBytes("YO WHATUP FROM ALGORITHM CLIENT\n");
                     
                     switch(messageType){
-                    /*case ANDROID_START:
-                        init_algo();
-                        tell_arduino_to_start_working();
-                        break;
-                    */
-                    case ARDUINO_UPDATE:
-                        ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
-                        System.out.println("Receiving:" + arduinoUpdate.getId());
-                        if(arduinoUpdate.getId() == lastSent){
-                            System.out.println(arduinoUpdate.getFront1());                          
-                            yetToReceiveAck = false;
-                            lastSent = incrementID(lastSent);
-                            instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
-                            outToServer.writeBytes(new String(instruction.toBytes()) + "\n");
-                            yetToReceiveAck = true;
-                            timer = System.currentTimeMillis();
-                            //send_updates_to_android();
-                        }
-                        break;
+                        /*case ANDROID_START:
+                            init_algo();
+                            tell_arduino_to_start_working();
+                            break;
+                        */
+                        case ANDROID_INSTRUCTION:
+                            // set interrupt variable to true, exploration and fastest path stops giving instruction to Arduino, 
+                            // only bluetooth gives instructions to Arduino
+                            break;
+                        case ARDUINO_UPDATE:
+                            ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
+                            System.out.println("Receiving: " + arduinoUpdate.getId());
+                            if(arduinoUpdate.getId() == lastSent){
+                                yetToReceiveAck = false;
+                                lastSent = incrementID(lastSent);
+                                System.out.println(arduinoUpdate.getFront1());   
+                                
+                                //incomingQueue.put(arduinoUpdate);    
+                                
+                                // Sends Android map updates, maybe put this in PhysicalRobot.move()
+                                // outgoingAndroidQueue.add();
+                                
+                                instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
+                                outgoingArduinoQueue.add(instruction);
+                                //outToServer.writeBytes(new String(instruction.toBytes()) + "~");
+                                
+                                
+                            }
+                            break;
                     }   
                 }       
+                if(!outgoingArduinoQueue.isEmpty()){
+                    outToServer.writeBytes(new String(outgoingArduinoQueue.remove().toBytes()) + "~");
+                    yetToReceiveAck = true;
+                    timer = System.currentTimeMillis();
+                }
+                if(!outgoingAndroidQueue.isEmpty()){
+                    // sends whatever format u like
+                }
                 if(yetToReceiveAck && System.currentTimeMillis() > timer + timeout){
                     System.out.println("Resending:" + instruction.getID());
                     
