@@ -129,6 +129,26 @@ public class RobotTranslator {
 						break;
 				}
 				return;
+			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_ROBOT_POS)){
+				int x = Integer.parseInt(message.substring(4, 6));
+				int y = Integer.parseInt(message.substring(6, 8));
+				Direction d;
+				String temp = message.substring(8, 10);
+				if(temp.equals(CommConstants.ROBOT_POS_UP)){
+					d = Direction.UP;
+				}else if (temp.equals(CommConstants.ROBOT_POS_DOWN)){
+					d = Direction.DOWN;
+				}else if(temp.equals(CommConstants.ROBOT_POS_LEFT)){
+					d = Direction.LEFT;
+				}else if(temp.equals(CommConstants.ROBOT_POS_RIGHT)){
+					d = Direction.RIGHT;
+				}else{
+					//error
+					return;
+				}
+
+				//set robot start pos
+				return;
 			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_WAYPOINT)) {
 				int x = Integer.parseInt(message.substring(4, 6));
 				int y = Integer.parseInt(message.substring(6, 8));

@@ -18,13 +18,24 @@
     <string name="chatSendBtn">Send</string>
 
     <!-- added by Ernest-->
-    <string name="autoModeText">Auto</string>
-    <string name="manualModeText">Manual</string>
     <string name="executionModeText">Execution Mode:</string>
     <string name="modeHeaderText">Updating Mode:</string>
+    <string name="autoModeText">Auto</string>
+    <string name="manualModeText">Manual</string>
     <string name="updateButtonText">Update</string>
     <string name="explorationButtonText">Explore</string>
     <string name="fastestButtonText">Fastest</string>
     <string name="manualControlButtonText">Command</string>
     <string name="goButtonText">GO!</string>
+    <string name="settingsButtonText">Settings</string>
+    <string name="robotStartText">Enter robot starting position: </string>
+    <string name="robotRowText">Enter row: </string>
+    <string name="robotColText">Enter column: </string>
+    <string name="robotDirText">Enter Direction: </string>
+    <string name="send">Send</string>
+    <string name="waypointText">Enter waypoint coordinates: </string>
+    <string name="waypointRowText">Enter row: </string>
+    <string name="waypointColText">Enter column: </string>
+    <string name="configStringText">Manage Persistance Config</string>
+
 </resources>

@@ -12,6 +12,13 @@ public class CommConstants {
 	
 		public static final String COMMAND_TYPE_EXPLORE		= "EX";
 		public static final String COMMAND_TYPE_FASTESTPATH = "FP";
+		public static final String COMMAND_TYPE_ROBOT_POS	= "RP";
+
+			public static final String ROBOT_POS_UP		= "UP";
+			public static final String ROBOT_POS_DOWN	= "DN";
+			public static final String ROBOT_POS_LEFT	= "LE";
+			public static final String ROBOT_POS_RIGHT	= "RI";
+
 		public static final String COMMAND_TYPE_WAYPOINT	= "WP";
 		public static final String COMMAND_TYPE_MOVE		= "MV";
 		

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.MainActivity">
 
     <FrameLayout
@@ -59,75 +58,91 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/arena"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/layout_border"
                 android:orientation="horizontal">
 
-                <TextView
+                <Button
+                    android:id="@+id/settingsButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="arena here"
-                    android:textSize="50sp" />
+                    android:layout_alignParentRight="true"
+                    android:text="@string/settingsButtonText" />
 
-                <!--<com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.PixelGridView-->
-                    <!--android:id="@+id/arenaView"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content" />-->
+                <GridView
+                    android:id="@+id/mazeGridView"
+                    android:layout_width="400dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:numColumns="15"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/settingsButton" />
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/robotStatusTextView"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_below="@+id/mazeGridView" />
+
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/cell_shape"
+                android:background="@drawable/layout_border"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/executionModeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
                     android:text="@string/executionModeText" />
 
                 <ToggleButton
                     android:id="@+id/explorationButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/executionModeTextView"
                     android:layout_weight="1"
                     android:checked="true"
-                    android:layout_below="@+id/executionModeTextView"
-                    android:textOn="@string/explorationButtonText"
-                    android:textOff="@string/explorationButtonText"/>
+                    android:textOff="@string/explorationButtonText"
+                    android:textOn="@string/explorationButtonText" />
 
                 <ToggleButton
                     android:id="@+id/fastestPathButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_below="@+id/executionModeTextView"
                     android:layout_toRightOf="@+id/explorationButton"
+                    android:layout_weight="1"
                     android:checked="false"
-                    android:textOn="@string/fastestButtonText"
-                    android:textOff="@string/fastestButtonText"/>
+                    android:textOff="@string/fastestButtonText"
+                    android:textOn="@string/fastestButtonText" />
 
                 <ToggleButton
                     android:id="@+id/manualControlButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_below="@+id/executionModeTextView"
                     android:layout_toRightOf="@+id/fastestPathButton"
+                    android:layout_weight="1"
                     android:checked="false"
-                    android:textOn="@string/manualControlButtonText"
-                    android:textOff="@string/manualControlButtonText"/>
+                    android:textOff="@string/manualControlButtonText"
+                    android:textOn="@string/manualControlButtonText" />
 
                 <TextView
                     android:id="@+id/modeHeaderTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/explorationButton"
+                    android:layout_marginLeft="2dp"
                     android:text="@string/modeHeaderText" />
 
                 <TextView
@@ -150,24 +165,24 @@
                     android:id="@+id/updateButton"
                     android:layout_width="wrap_content"
                     android:layout_height="40sp"
-                    android:layout_weight="1"
                     android:layout_below="@+id/modeHeaderTextView"
                     android:layout_toRightOf="@+id/updateModeSwitch"
-                    android:text="@string/updateButtonText"/>
+                    android:layout_weight="1"
+                    android:text="@string/updateButtonText" />
 
                 <TableLayout
                     android:id="@+id/goTable"
                     android:layout_width="140sp"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/cell_shape"
-                    android:layout_alignParentEnd="true">
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/layout_border">
 
                     <Button
                         android:id="@+id/goButton"
                         android:layout_width="wrap_content"
                         android:layout_height="140sp"
-                        android:text="@string/goButtonText"
-                        android:layout_alignParentEnd="true"/>
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/goButtonText" />
 
                 </TableLayout>
 
@@ -175,9 +190,9 @@
                     android:id="@+id/controlTable"
                     android:layout_width="140sp"
                     android:layout_height="140sp"
-                    android:visibility="gone"
-                    android:background="@drawable/cell_shape"
-                    android:layout_alignParentEnd="true">
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/layout_border"
+                    android:visibility="gone">
 
                     <TableRow
                         android:layout_width="match_parent"
@@ -236,7 +251,6 @@
 
 
     </FrameLayout>
-
 
 
 </LinearLayout>
