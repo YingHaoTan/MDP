@@ -34,7 +34,9 @@ public class PhysicalRobot extends RobotBase {
     public void init() {
         // Tells TCP to send START command
         
-        // Waits for TCP's reply
+        
+        // a = SynchronousQueue.take()
+        // Waits for TCP's reply^
     }
 
     @Override
@@ -49,10 +51,14 @@ public class PhysicalRobot extends RobotBase {
 
     @Override
     protected void move(Direction mapdirection, RobotAction... actions) {
-        // Tells TCP Connector to send move instruction
-
+        // for actions
+            // Tells TCP Connector to send move instruction
+            // outgoingArduinoQueue.add(instruction);
+            // a = SychronousQueue.take()
+            // update sensor readings 
+           
         // Waits for robot to reach, then notify
-        this.notify(mapdirection, actions);
+        // this.notify(mapdirection, actions);
 
     }
 
