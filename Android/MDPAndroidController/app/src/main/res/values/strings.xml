@@ -10,6 +10,12 @@
     <string name="scanning_devices">Scanning</string>
     <string name="no_device">No Devices</string>
     <string name="no_device_address">NIL</string>
+    <string name="chatBtn">Chat</string>
+    <string name="chatReceivedMsg">Received Message</string>
+    <string name="chatSendMsg">Send Message</string>
+    <string name="chatReceivedMsgDefaultText">No Message Received</string>
+    <string name="chatSendMsgDefaultText">Tap Here to Enter Text</string>
+    <string name="chatSendBtn">Send</string>
 
     <!-- added by Ernest-->
     <string name="executionModeText">Execution Mode:</string>

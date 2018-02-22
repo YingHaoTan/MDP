@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -38,10 +37,11 @@ import java.util.Set;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_CONNECTED;
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ControlMessageHandler.ControlMessageCallBack{
 
     private static final String TAG = "MainActivity";
 
@@ -53,8 +53,11 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
     private BluetoothClass mBluetoothClass = null;
+    private ControlMessageHandler mHandler =
+            ControlMessageHandler.getInstance().withParentActivity(this);
 
     private Button btnConnect = null;
+    private Button btnChat = null;
     private TextView connectionString = null;
 //    private PixelGridView arenaView = null;
 
@@ -106,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
         btnConnect = (Button) findViewById(R.id.connectionBtn);
         btnConnect.setOnClickListener(connectButtonListener);
+
+        btnChat = (Button) findViewById(R.id.chatBtn);
+        btnChat.setOnClickListener(chatButtonListener);
 
         connectionString = (TextView) findViewById(R.id.connectionStr);
 
@@ -225,8 +231,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             if (mBluetoothService == null) {
-                Log.w(TAG, "Bluetooth service is not started properly, trying to start it now");
-                mBluetoothService = new BluetoothService(getApplicationContext(), mHandler);
+                Log.w(TAG, "Bluetooth service is not started properly");
+                return;
             }
 //            if (mBluetoothClass == null) {
 //                mBluetoothClass = BluetoothClass.getInstance();
@@ -242,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    Button.OnClickListener disconnectButtonListener = new View.OnClickListener() {
+    Button.OnClickListener disconnectButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
             Log.d(TAG, "disconnectButtonListener::onClick start");
@@ -251,6 +257,25 @@ public class MainActivity extends AppCompatActivity {
             btnConnect.setOnClickListener(connectButtonListener);
             btnConnect.setText(R.string.connectionBtnDefaultText);
             connectionString.setText(R.string.connectionStringDefaultText);
+        }
+    };
+
+    Button.OnClickListener chatButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (mBluetoothService == null) {
+                Log.e(TAG, "Bluetooth service is not started properly");
+                return;
+            }
+
+            if (mBluetoothService.getState() != STATE_CONNECTED) {
+                Log.d(TAG, "No device connected");
+                Toast.makeText(getApplicationContext(), "No device connected", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+            startActivity(intent);
         }
     };
 
@@ -266,7 +291,8 @@ public class MainActivity extends AppCompatActivity {
         // else start the bluetooth service for establish connections
         else {
             if (mBluetoothService == null) {
-                mBluetoothService = new BluetoothService(getApplicationContext(), mHandler);
+                mBluetoothService = BluetoothService.getInstance();
+                mBluetoothService.initHandler(mHandler);
             }
 //            if (mBluetoothClass == null) {
 //                mBluetoothClass = BluetoothClass.getInstance();
@@ -285,7 +311,8 @@ public class MainActivity extends AppCompatActivity {
         // be promoted to enable it. This is done in a new activity. After the activity returns,
         // onResume() is called and we can start the service.
         if (mBluetoothService == null) {
-            mBluetoothService = new BluetoothService(getApplicationContext(), mHandler);
+            mBluetoothService = BluetoothService.getInstance();
+            mBluetoothService.initHandler(mHandler);
         }
         else if (mBluetoothService.getState() == STATE_NONE) {
             mBluetoothService.start();
@@ -344,54 +371,6 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothService.disconnect();
         Log.d(TAG, "disconnectDevice: disconnecting device");
     }
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case Constants.MESSAGE_DEVICE_NAME:
-                    Log.d(TAG, "handleMessage::MESSAGE_DEVICE_NAME");
-                    Toast.makeText(getApplicationContext(),
-                            "Connected to " + msg.getData().getString(Constants.DEVICE_NAME),
-                            Toast.LENGTH_SHORT).show();
-                    updateConnectionUI(mBluetoothService.getDevice().getName(),
-                            mBluetoothService.getDevice().getAddress());
-//                    updateConnectionUI(mBluetoothClass.getMmDevice().getName(),
-//                            mBluetoothClass.getMmDevice().getAddress());
-                    break;
-                case Constants.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
-                    // TODO: do something with the received string
-                    // How the controller should react to the received string
-
-
-                    break;
-                case Constants.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    String writeMessage = new String(writeBuf);
-                    Log.d(TAG, "handleMessage::MESSAGE_WRITE - message:" + writeMessage);
-                    // TODO: do something with the written string
-                    // The string has already been written to outStream, no need to resend it here.
-                    // Instead, peripheral operations on the string can be defined here.
-                    // E.g, show the message in dialog box or record the string in datastore, etc
-
-
-
-                    break;
-                case Constants.MESSAGE_STATE_CHANGE:
-                    Log.d(TAG, "handleMessage::MESSAGE_STATE_CHANGE");
-                    // do nothing
-                    break;
-                case Constants.MESSAGE_TOAST:
-                    Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST),
-                            Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
 
     ToggleButton.OnClickListener persist1ButtonListener = new ToggleButton.OnClickListener() {
         @Override
@@ -612,4 +591,51 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onMessageDeviceName(Message msg) {
+        Log.d(TAG, "handleMessage::MESSAGE_DEVICE_NAME");
+        Toast.makeText(getApplicationContext(),
+                "Connected to " + msg.getData().getString(Constants.DEVICE_NAME),
+                Toast.LENGTH_SHORT).show();
+
+        updateConnectionUI(mBluetoothService.getDevice().getName(),
+                mBluetoothService.getDevice().getAddress());
+    }
+
+    @Override
+    public void onMessageRead(Message msg) {
+        byte[] readBuf = (byte[]) msg.obj;
+        String readMessage = new String(readBuf, 0, msg.arg1);
+        Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
+
+        // TODO: do something with the received string
+        // How the controller should react to the received string
+
+    }
+
+    @Override
+    public void onMessageWrite(Message msg) {
+        byte[] writeBuf = (byte[]) msg.obj;
+        String writeMessage = new String(writeBuf);
+        Log.d(TAG, "handleMessage::MESSAGE_WRITE - message:" + writeMessage);
+
+        // TODO: do something with the written string
+        // The string has already been written to outStream, no need to resend it here.
+        // Instead, peripheral operations on the string can be defined here.
+        // E.g, show the message in dialog box or record the string in datastore, etc.
+
+
+    }
+
+    @Override
+    public void onMessageStateChange(Message msg) {
+        Log.d(TAG, "handleMessage::MESSAGE_STATE_CHANGE");
+        // do nothing
+    }
+
+    @Override
+    public void onMessageToast(Message msg) {
+        Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST),
+                Toast.LENGTH_SHORT).show();
+    }
 }

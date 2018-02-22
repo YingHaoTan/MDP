@@ -44,6 +44,18 @@
                     android:text="@string/connectionStringDefaultText"
                     android:textSize="24sp" />
 
+                <Button
+                    android:id="@+id/chatBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:text="@string/chatBtn"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"/>
+
             </LinearLayout>
 
             <RelativeLayout

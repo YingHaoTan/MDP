@@ -111,7 +111,6 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
                         throw new NullPointerException("nearbyDevicesAdapter is null!");
                     }
                     else {
-                        Log.d(TAG, "BroadcastReceiver::onReceive: notifyDataSetChanged");
                         Log.d(TAG, "BroadcastReceiver::onReceive: device list");
                         for (int i = 0; i < nearbyDeviceNameList.size(); i++) {
                             Log.d(TAG, nearbyDeviceNameList.get(i).getName());
@@ -131,6 +130,7 @@ public class DeviceSelectActivity extends AppCompatActivity implements ClickList
         @Override
         public void onClick(View v) {
             scanButton.setText(R.string.scanning_devices);
+            nearbyDeviceNameList.clear();
             doDiscovery();
         }
     };
