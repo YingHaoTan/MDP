@@ -29,6 +29,7 @@ public class Program {
         }
 
         Dimension rdim = new Dimension(3, 3);
+        
         MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", new Dimension(15, 20), new Dimension(3, 3));
         MdpWindowController controller = new MdpWindowController(window);
         MapFileHandler filehandler = new MapFileHandler();
