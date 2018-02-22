@@ -1,4 +1,4 @@
-package mdp.v2.models.maps;
+package mdp.v2.models;
 
 /**
  * State is an enumeration that contains all possible states of a map cell

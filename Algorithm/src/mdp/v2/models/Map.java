@@ -1,8 +1,6 @@
-package mdp.v2.models.maps;
+package mdp.v2.models;
 
 import java.awt.Dimension;
-
-import mdp.v2.models.BaseModel;
 
 /**
  * Map is a BaseModel that stores the state of every map cell

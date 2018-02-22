@@ -3,6 +3,7 @@ package mdp.v2.models.robots;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -50,6 +51,12 @@ public abstract class RobotBase {
 	public List<Sensor> getSensors() {
 		return sensors;
 	}
+	
+	/**
+	 * Gets sensor readings from all sensors installed in this RobotBase instance
+	 * @return
+	 */
+	public abstract Map<Sensor, Integer> getSensorReadings();
 	
 	/**
 	 * Sends a command to the robot
