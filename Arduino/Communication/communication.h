@@ -6,7 +6,7 @@
 #define TURN_RIGHT                                 0x04
 #define FORWARD                                    0x05
 
-#define PAYLOAD_SIZE                               10 //As long as it's bigger than StatusMessage
+#define PAYLOAD_SIZE                               8 //As long as it's bigger than StatusMessage
 
 struct Message
 {
@@ -31,5 +31,6 @@ struct InstructionMessage
 {
   uint8_t id;
   uint8_t action;
+  uint8_t obstacleInFront;
 };
 

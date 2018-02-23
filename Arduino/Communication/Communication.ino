@@ -3,54 +3,61 @@
 #define BUFFER_SIZE                               32
 
 // need to check if will overflow
-uint8_t last_sent = 1;
+uint8_t last_sent = 0;
 uint8_t incomingBuffer[BUFFER_SIZE];
 int bufferIndex = 0;
 
 // timer
 bool yetToReceiveAck = false;
+bool alreadyReceived = false;
 unsigned long timer = millis();
-unsigned long timeout = 250; // 250 milliseconds
+unsigned long timeout = 500; // 250 milliseconds
 
 
 void setup() {
   //The default is 8 data bits, no parity, one stop bit.
   Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
-
   if (Serial.available() > 0) {
     putIncomingUSBMessageToBuffer();
     int traversalIndex = 0;
     /*Serial.println(bufferIndex);
       Serial.println("TraversalIndex:");
       Serial.println(traversalIndex);*/
-    while (bufferIndex > traversalIndex + 3) {
-      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 3] == '!') {
+    while (bufferIndex > traversalIndex + 4) {
+      if (incomingBuffer[traversalIndex] == '~' && incomingBuffer[traversalIndex + 4] == '!') {
+        
         InstructionMessage instructMsg;
-        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 2);
+        memcpy(&instructMsg, &incomingBuffer[traversalIndex + 1], 3);
         /*Serial.println("ID received:");
          Serial.println(instructMsg.id);*/
-        if (last_sent == instructMsg.id) {
-         
+        if (last_sent == instructMsg.id && alreadyReceived == false) {
+          alreadyReceived = true;
           yetToReceiveAck = false;
           switch (instructMsg.action) {
             case TURN_LEFT:
+              //turnLeft();
               break;
             case TURN_RIGHT:
+              //turnRight();
               break;
             case FORWARD:
               break;
             case SCAN:
               sendStatusUpdate();
-              last_sent++;
+              incrementID();
+              //last_sent++;
+              alreadyReceived = false;
               break;
             case START:
               sendStatusUpdate();
-              last_sent++;
+              incrementID();
+              //last_sent++;
+              alreadyReceived = false;
               break;
-
           }
 
           bufferIndex = 0;
@@ -60,7 +67,7 @@ void loop() {
           // Received wrong instruction
           //Serial.println("RECEIVED WRONG INSTRUCTION");
         }
-        traversalIndex += 4;
+        traversalIndex += 5;
       }
       else {
         traversalIndex++;
@@ -72,6 +79,7 @@ void loop() {
     if(completedMove()){
   	sendStatusUpdate();
   	last_sent++;
+    alreadyReceived = false;
 
     }
   */
@@ -102,9 +110,9 @@ void putIncomingUSBMessageToBuffer() {
 }
 
 void resendStatusUpdate() {
-  last_sent = last_sent - 1;
+  decrementID();
   sendStatusUpdate();
-  last_sent = last_sent + 1;
+  incrementID();
 }
 
 
@@ -133,9 +141,23 @@ void sendStatusUpdate() {
 
   // Need to test
   Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
+  Serial.flush();
 
   //start_timer()
   timer = millis();
   yetToReceiveAck = true;
+}
+
+void incrementID(){
+  last_sent = (last_sent+1)%126;  
+}
+
+void decrementID(){
+  if(last_sent == 0){
+    last_sent = 125;  
+  }  
+  else{
+    last_sent = last_sent - 1;  
+  }
 }
 

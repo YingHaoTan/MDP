@@ -13,22 +13,29 @@ import mdp.models.RobotAction;
  */
 public class ArduinoInstruction extends StatusMessage{
     
-    private RobotAction actionToTake;
     private byte id;
+    private RobotAction actionToTake;
+    private byte obstacleInFront;
     
-    public ArduinoInstruction(int id, RobotAction actionToTake){
+    public ArduinoInstruction(int id, RobotAction actionToTake, boolean obstacleInFront){
         super(StatusMessageType.ARDUINO_INSTRUCTION);
         this.id = (byte)id;
+        this.obstacleInFront = (obstacleInFront) ? (byte)1 : (byte)0;
         this.actionToTake = actionToTake;
     }
 
     @Override
     public byte[] toBytes() {
-        byte[] toSend = new byte[3];
+        byte[] toSend = new byte[4];
         // Raspberry Pi need to check byte [0], then sends byte [1] to [2] to Arduino
         toSend[0] = StatusMessageType.ARDUINO_INSTRUCTION.getByte();
         toSend[1] = id;
         toSend[2] = actionToTake.getByte();
+        toSend[3] = obstacleInFront;
         return toSend;
+    }
+    
+    public int getID(){
+        return this.id;
     }
 }

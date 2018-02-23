@@ -57,16 +57,16 @@ public abstract class ExplorationBase extends MovementBase {
         this.starttime = System.currentTimeMillis();
     }
 
-    private int getCoveragePercentage() {
+    private int getTargetCoveragePercentage() {
         return this.coveragepercentage;
     }
 
     protected boolean reachedCoveragePercentage() {
-        int targetPercentage = getCoveragePercentage();
+        int targetPercentage = getTargetCoveragePercentage();
         int explored = 0;
         for (int y = 0; y < getMapState().getMapSystemDimension().height; y++) {
             for (int x = 0; x < getMapState().getMapSystemDimension().width; x++) {
-                if (getMapState().getMapCellState(new Point(x, y)) == CellState.NORMAL) {
+                if (getMapState().getMapCellState(new Point(x, y)) != CellState.UNEXPLORED) {
                     explored++;
                 }
             }
@@ -75,6 +75,18 @@ public abstract class ExplorationBase extends MovementBase {
             return true;
         }
         return false;
+    }
+    
+    protected int getCurrentCoveragePercentage(){
+    int explored = 0;
+        for (int y = 0; y < getMapState().getMapSystemDimension().height; y++) {
+            for (int x = 0; x < getMapState().getMapSystemDimension().width; x++) {
+                if (getMapState().getMapCellState(new Point(x, y)) != CellState.UNEXPLORED) {
+                    explored++;
+                }
+            }
+        }
+        return (explored * 100)/(getMapState().getMapSystemDimension().height * getMapState().getMapSystemDimension().width);
     }
 
     /**

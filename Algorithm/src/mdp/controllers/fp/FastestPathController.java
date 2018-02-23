@@ -40,8 +40,8 @@ public class FastestPathController extends FastestPathBase {
 	}
 
 	@Override
-	protected void preprocess() {
-		// Perform nothing as the actions are generated on-the-fly
+	protected boolean preprocess() {
+		return true;
 	}
 
 }

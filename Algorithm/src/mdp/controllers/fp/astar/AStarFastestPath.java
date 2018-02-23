@@ -44,7 +44,7 @@ public class AStarFastestPath extends FastestPathBase {
 	}
 
 	@Override
-	protected void preprocess() {
+	protected boolean preprocess() {
 		State initialstate = specs.calculateInitialState(getMapState(), getRobot());
 		Set<State> closedset = new HashSet<State>();
 		Set<State> openedset = new HashSet<State>();
@@ -84,6 +84,8 @@ public class AStarFastestPath extends FastestPathBase {
 		}
 		
 		current = initialstate;
+		
+		return policy != null;
 	}
 	
 	private List<State> reconstructPath(Map<State, State> pstatemap, State current) {
