@@ -1,0 +1,47 @@
+void goFORWARD(int noBlock) {
+  long kP = 7;
+  long kD = 3;
+  long error = 0;
+  long errorRate = 0;
+  long adjustment = 0;
+  static long lastError;
+  int setSpd1 = 300;
+  int setSpd2 = 300;
+  md.setSpeeds(setSpd1, setSpd2);
+
+  while (mRev[0] < noBlock && mRev[1] < noBlock){
+    Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+    error = tickTime[1] - tickTime[0];            //0 = right motor, 1 = left motor, lesser tick time mean faster
+    errorRate = error - lastError;
+    lastError = error;
+
+    if (error > 20) {                             //Right Motor faster then left motor
+      Serial << "Motor 1 faster than motor 2 by: " << error << endl;
+      adjustment = ((abs(error)*kP/10) + (errorRate*kD/10))/5;
+      Serial << "Current adjustment: " << adjustment << endl;
+      setSpd1 -= adjustment;
+      setSpd2 += adjustment;
+    }
+    
+    else if(error < -20) {
+      Serial << "Motor 2 faster than motor 1 by: " << error << endl;    
+      adjustment = ((abs(error)*kP/10) + (errorRate*kD/10))/5;
+      Serial << "adjustment setting: " << adjustment << endl;
+      setSpd1 += adjustment;
+      setSpd2 -= adjustment;
+    }
+
+    else{
+      Serial << "No change, error is:" << error << endl;
+    }
+
+    md.setSpeeds(setSpd1,setSpd2);
+    Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
+    delay(70);
+    Serial.println("----");
+  }
+
+  resetMCounters();
+  md.setBrakes(400, 400);
+  
+}
