@@ -28,7 +28,6 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.Bluetoot
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
-import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import java.util.ArrayList;
@@ -140,11 +139,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         mazeGridAdapter = new MazeGridAdapter(this, maze);
         mazeGridView.setAdapter(mazeGridAdapter);
 
-        //this para is for testing purposes
-        maze.updateGrid(2,2, CellState.OBSTACLE);
-        maze.updateRobot(7,4, Direction.DOWN);
-        mazeGridAdapter.updateMaze(maze);
-        mazeGridAdapter.notifyDataSetChanged();
+
 
         robotStatusTextView = (TextView) findViewById(R.id.robotStatusTextView);
     }
@@ -460,6 +455,11 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             //send message to robot
             mBluetoothService.write(translator.commandRobotStartPos(robotx , roboty, dir).getBytes());
 
+            //this para is for testing purposes
+            maze.updateRobot(robotx,roboty, dir);
+            mazeGridAdapter.updateMaze(maze);
+            mazeGridAdapter.notifyDataSetChanged();
+
         }
     };
 
@@ -476,6 +476,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             }
             //send message to robot
             mBluetoothService.write(translator.commandWayPoint(waypointx , waypointy).getBytes());
+
+            maze.updateWaypoint(waypointx,waypointy);
+            mazeGridAdapter.updateMaze(maze);
+            mazeGridAdapter.notifyDataSetChanged();
         }
     };
 

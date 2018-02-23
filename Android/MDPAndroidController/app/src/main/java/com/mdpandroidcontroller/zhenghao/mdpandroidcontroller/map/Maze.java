@@ -32,13 +32,14 @@ public class Maze {
     private int[] maze;
     private int robot_x;
     private int robot_y;
-    private Direction robot_d;
+    private Direction robot_d = Direction.UP;
     private int waypoint_x;
     private int waypoint_y ;
 
     public Maze(){
         maze = new int[MAZE_COLS*MAZE_ROWS];
-        waypoint_x = waypoint_y = robot_x = robot_y = -1;
+        waypoint_x = waypoint_y = -1;
+        robot_x = robot_y = -3;
     }
 
     public void updateWaypoint(int x , int y){
@@ -58,8 +59,6 @@ public class Maze {
     }
 
     public void updateGrid(int x, int y, CellState cs){
-        if(waypoint_x == x && waypoint_y == y)
-            return;
         if(cs == CellState.NORMAL){
             maze[x+y*MAZE_COLS] = NORMAL_GRID;
         }else if(cs == CellState.OBSTACLE){
@@ -76,12 +75,12 @@ public class Maze {
     }
 
     public void removeRobot(){
-        robot_x = -1;
-        robot_y = -1;
+        robot_x = -3;
+        robot_y = -3;
     }
 
     // to take in MDF files from algo in the future
-    public void updateMaze(){
+    public void updateMaze(byte[] mdf1, byte[] mdf2){
 
     }
 
@@ -105,12 +104,14 @@ public class Maze {
             }
             return CellState.ROBOT;
         }
+        if(x == waypoint_x && y ==waypoint_y){
+            return CellState.WAYPOINT;
+        }
+
         if(maze[x+y*MAZE_COLS] == NORMAL_GRID){
             return CellState.NORMAL;
         }else if(maze[x+y*MAZE_COLS] == OBSTACLE_GRID){
             return CellState.OBSTACLE;
-        }else if(maze[x+y*MAZE_COLS] == WAYPOINT_GRID){
-            return CellState.WAYPOINT;
         }else{
             return CellState.UNEXPLORED;
         }
