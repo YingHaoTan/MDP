@@ -3,6 +3,7 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 /**
  * RobotTranslator translates messages between the robot and controller for the robot itself
+ * put in algo
  * 
  * @author ernest
  *
@@ -102,7 +103,7 @@ public class RobotTranslator {
 	/**
 	 * 
 	 * Decodes a message that was sent from the controller
-	 * 
+	 * to decode message at the algo side when received from android
 	 * @param message
 	 */
 	public void decodeMessage(String message) {
