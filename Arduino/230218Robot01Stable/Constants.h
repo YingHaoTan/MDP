@@ -17,7 +17,7 @@
 #define offset2 0 //Left forward IR
 #define offset3 0 //Right forward IR
 #define offset4 0 //Front right IR. The only long range IR.
-#define offset5 14 //Front left IR
+#define offset5 0 //Front left IR
 #define offset6 0 //Back right IR
 
 #define shrtmodel 1080
@@ -42,10 +42,17 @@ double irRightReadings[2] = {0, 0};
 double irLeftReading = 0;
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
-SharpIR ir1(lfwdIr, shrtmodel, 0.0353, 0.0934);
-SharpIR ir2(mfwdIr, shrtmodel, 0.035407, 0.133212);
-SharpIR ir3(rfwdIr, shrtmodel, 0.032403, 0.153431);
+//SharpIR ir1(lfwdIr, shrtmodel, 0.0353, 0.0934);
+//SharpIR ir2(mfwdIr, shrtmodel, 0.035407, 0.133212);
+//SharpIR ir3(rfwdIr, shrtmodel, 0.032403, 0.153431);
+//
+//SharpIR ir1(lfwdIr, shrtmodel, 0.03489, 0.12015);
+//SharpIR ir2(mfwdIr, shrtmodel, 0.03599, 0.11123);
+//SharpIR ir3(rfwdIr, shrtmodel, 0.03499, 0.12947);
+SharpIR ir1(lfwdIr, shrtmodel, 0.035, 0.14);
+SharpIR ir2(mfwdIr, shrtmodel, 0.0361, 0.11123);
+SharpIR ir3(rfwdIr, shrtmodel, 0.03550, 0.14);
 SharpIR ir4(frgtIr, shrtmodel, 0.036148, 0.112737);
-SharpIR ir5(flftIr, longmodel, 0.0183, -0.0163);
+SharpIR ir5(flftIr, longmodel, 0.0360, -0.0163);
 SharpIR ir6(brgtIr, shrtmodel, 0.031142, 0.187284);
 DualVNH5019MotorShield md;

@@ -37,70 +37,70 @@ void setup() {
 }
 
 void loop() {
-  int action = readCommands();
+//  int action = readCommands();
   //int action[] = {1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 9};
-  static int x;
-
+//  static int x;
+  scanLEFT();
   //int action = 0;
-  switch (action) {
-    case 1:
-      Serial.println("Moving forward");
-      goFORWARD(1);
-      //            calibrateF = 1;
-      break;
-
-    case 2:
-      Serial.println("Moving left");
-      goLEFT();
-      //            calibrateF = 1;
-      break;
-
-    case 3:
-      Serial.println("Moving right");
-      goRIGHT();
-      //            calibrateF = 1;
-      break;
-
-    case 4:
-      Serial.println("Calibrating");
-      calibrateRIGHT();
-      break;
-
-    case 5:
-      Serial.println("Doing Full Scan");
-      scanFORWARD(&irFrontReadings[0]);
-      scanLEFT();
-      scanRIGHT(&irRightReadings[0]);
-      break;
-
-    case 6:
-      Serial.println("Accelerated movement");
-      goACCELERATE();
-      break;
-
-    case 7:
-      Serial.println("Going backwards");
-      md.setSpeeds(-300, -300);
-      delay(1500);
-      md.setBrakes(400, 400);
-      resetMCounters();
-      //            calibrateF = 1;
-      break;
-    case 8:
-      //While wall hugging right, if we potentially meet an L shaped block,
-      //1. Calibrate Right first to straighten robot
-      //2. Turn robot to right (In order to correct its vertical position
-      //3. Calibrate robot's front this time to ensure correct vertical position
-      //4. Turn back to the left again
-      //5. OPTIONAL recalibrate right to straighten robot
-      Serial.println("Full Calibration");
-      calibrateRIGHT();
-      goRIGHT();
-      calibrateFRONT();
-      goLEFT();
-      calibrateRIGHT();
-      break;
-  }
+//  switch (action) {
+//    case 1:
+//      Serial.println("Moving forward");
+//      goFORWARD(1);
+//      //            calibrateF = 1;
+//      break;
+//
+//    case 2:
+//      Serial.println("Moving left");
+//      goLEFT();
+//      //            calibrateF = 1;
+//      break;
+//
+//    case 3:
+//      Serial.println("Moving right");
+//      goRIGHT();
+//      //            calibrateF = 1;
+//      break;
+//
+//    case 4:
+//      Serial.println("Calibrating");
+//      calibrateRIGHT();
+//      break;
+//
+//    case 5:
+//      Serial.println("Doing Full Scan");
+//      scanFORWARD(&irFrontReadings[0]);
+//      scanLEFT();
+//      scanRIGHT(&irRightReadings[0]);
+//      break;
+//
+//    case 6:
+//      Serial.println("Accelerated movement");
+//      goACCELERATE();
+//      break;
+//
+//    case 7:
+//      Serial.println("Going backwards");
+//      md.setSpeeds(-300, -300);
+//      delay(1500);
+//      md.setBrakes(400, 400);
+//      resetMCounters();
+//      //            calibrateF = 1;
+//      break;
+//    case 8:
+//      //While wall hugging right, if we potentially meet an L shaped block,
+//      //1. Calibrate Right first to straighten robot
+//      //2. Turn robot to right (In order to correct its vertical position
+//      //3. Calibrate robot's front this time to ensure correct vertical position
+//      //4. Turn back to the left again
+//      //5. OPTIONAL recalibrate right to straighten robot
+//      Serial.println("Full Calibration");
+//      calibrateRIGHT();
+//      goRIGHT();
+//      calibrateFRONT();
+//      goLEFT();
+//      calibrateRIGHT();
+//      break;
+//  }
 
   delay(1000);
 
@@ -236,6 +236,10 @@ void scanFORWARD(double pData[]) {
   Serial << "Mean distance of left fwd sensor: " << pData[0] << endl;  // returns it to the serial monitor
   Serial << "Mean voltage of mid fwd sensor: " << pData[1] << endl;  // returns it to the serial monitor
   Serial << "Mean distance of right fwd sensor: " << pData[2] << endl;  // returns it to the serial monitor
+
+//   Serial << "Mean distance of left fwd sensor: " << analogRead(A1) << endl;  // returns it to the serial monitor
+//  Serial << "Mean voltage of mid fwd sensor: " << analogRead(A0) << endl;  // returns it to the serial monitor
+//  Serial << "Mean distance of right fwd sensor: " << analogRead(A2) << endl;  // returns it to the serial monitor
 }
 
 void scanLEFT() {
