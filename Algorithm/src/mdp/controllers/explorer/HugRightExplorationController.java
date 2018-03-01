@@ -312,6 +312,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
+                
                 if (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
                         if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
@@ -319,7 +320,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             return;
                         }
                     }
-
                 }
 
                 //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));

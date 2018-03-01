@@ -41,7 +41,7 @@ class Main(object):
 		message_end = False
 		while True:
 			while not message_end:
-				data = clientsock.recv(1024)                 
+				data = clientsock.recv(1024)             				
 				for i in range(len(data)):
 					# if new line
 					if(data[i] == 126):
@@ -55,9 +55,10 @@ class Main(object):
 			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ANDROID_UPDATE((byte)0x05);
 			if(received[0] == (2).to_bytes(1, byteorder='big')):
 				to_arduino_queue.put(received[1:4])
+				message_end = False
+				received = []
 				
-			received = []
-			message_end = False
+			
 			
 			# sends to bluetooth
 			'''if(received[0] == (5).to_bytes(1, byteorder='big')):

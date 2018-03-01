@@ -57,15 +57,7 @@ public class MDPTCPConnector extends Thread {
             Socket clientSocket = new Socket(ipAddr, port);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            
-            
-            //ArduinoInstruction instruction = new ArduinoInstruction(lastSent, RobotAction.START, false);
-            //lastSentArduinoMessage = instruction;
-            // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
-            //byte[] test = instruction.toBytes();
-            //outToServer.writeBytes(new String(instruction.toBytes()) + "~");
-            //yetToReceiveAck = true;
-            
+                      
             
             while (true) {
                 // If I receive something from Raspberry Pi
@@ -83,8 +75,6 @@ public class MDPTCPConnector extends Thread {
                     }
                     byte[] incoming = incomingStr.getBytes();
                     StatusMessageType messageType = StatusMessage.checkMessageType(incoming);
-                    //System.out.println("Sending Raspberry Pi stuffs");
-                    //outToServer.writeBytes("YO WHATUP FROM ALGORITHM CLIENT\n");
                     
                     switch(messageType){
                         /*case ANDROID_START:
@@ -98,7 +88,6 @@ public class MDPTCPConnector extends Thread {
                             break;
                         case ARDUINO_UPDATE:
                             ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
-                            //System.out.println("Receiving: " + arduinoUpdate.getId());
                             if(arduinoUpdate.getId() == lastSent){
                                 yetToReceiveAck = false;
                                 lastSent = incrementID(lastSent);
@@ -107,23 +96,14 @@ public class MDPTCPConnector extends Thread {
                                 } catch (InterruptedException ex) {
                                     Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
                                 }
-                                //System.out.println(arduinoUpdate.getFront1());   
-                                
-                                //incomingQueue.put(arduinoUpdate);    
-                                
                                 // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                 // outgoingAndroidQueue.add();
-                                
-                                //instruction = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
-                                //outgoingArduinoQueue.add(instruction);
-                                //outToServer.writeBytes(new String(instruction.toBytes()) + "~");
-                                
-                                
                             }
                             break;
                     }   
                 }       
                 if(!outgoingArduinoQueue.isEmpty()){
+                    // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
                     lastSentArduinoMessage = outgoingArduinoQueue.remove();
                     lastSentArduinoMessage.setID(lastSent);
                     outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
