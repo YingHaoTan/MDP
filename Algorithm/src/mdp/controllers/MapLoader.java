@@ -1,6 +1,6 @@
 package mdp.controllers;
 
-import mdp.graphics.map.MdpMap;
+import mdp.models.MapState;
 
 /**
  * MapLoader provides contract method needed for MdpWindowController to delegate
@@ -12,5 +12,5 @@ public interface MapLoader {
 	/**
 	 * Perform loading of map
 	 */
-	public void load(MdpMap map);
+	public void load(MapState map);
 }

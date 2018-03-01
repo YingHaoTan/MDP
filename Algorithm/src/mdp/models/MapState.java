@@ -204,22 +204,24 @@ public class MapState {
      * @return true if successful, false if unsuccessful
      */
     public boolean setMapCellState(Point point, CellState state) {
-
+    	boolean success = false;
+    	
         if (point.x >= 0 && point.y >= 0 && point.x < cellstates.length && point.y < cellstates[0].length) {
             this.cellstates[point.x][point.y] = state;
 
             if (state == CellState.WAYPOINT) {
                 // Clears previous waypoint
-                if (this.waypoint != null && this.waypoint != point) {
+                if (this.waypoint != null && this.waypoint != point)
                     this.setMapCellState(waypoint, CellState.NORMAL);
-                }
 
                 // Set waypoint value
                 this.waypoint = point;
             }
-            return true;
+            
+            success = true;
         }
-        return false;
+        
+        return success;
     }
 
     /**
