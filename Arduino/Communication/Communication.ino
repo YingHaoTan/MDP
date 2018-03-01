@@ -40,22 +40,30 @@ void loop() {
           switch (instructMsg.action) {
             case TURN_LEFT:
               //turnLeft();
+              sendStatusUpdate();
+              incrementID();
+              alreadyReceived = false;
               break;
             case TURN_RIGHT:
               //turnRight();
+              sendStatusUpdate();
+              incrementID();
+              alreadyReceived = false;
               break;
             case FORWARD:
+              //moveForward();
+              sendStatusUpdate();
+              incrementID();
+              alreadyReceived = false;
               break;
             case SCAN:
               sendStatusUpdate();
               incrementID();
-              //last_sent++;
               alreadyReceived = false;
               break;
             case START:
               sendStatusUpdate();
               incrementID();
-              //last_sent++;
               alreadyReceived = false;
               break;
           }
@@ -120,12 +128,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = 10;
-  statusPayload.front2 = 11;
-  statusPayload.front3 = 12;
-  statusPayload.right1 = 13;
-  statusPayload.right2 = 14;
-  statusPayload.left1 = 12;
+  statusPayload.front1 = 0;
+  statusPayload.front2 = 0;
+  statusPayload.front3 = 0;
+  statusPayload.right1 = 0;
+  statusPayload.right2 = 0;
+  statusPayload.left1 = 0;
   statusPayload.reached = 1;
 
 

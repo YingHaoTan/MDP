@@ -30,6 +30,8 @@ public abstract class RobotBase {
         this.sensors = new ArrayList<>();
         this.listeners = new ArrayList<>();
     }
+    
+    
 
     /**
      * Installs a sensor into this robot instance
@@ -39,6 +41,7 @@ public abstract class RobotBase {
     public void install(SensorConfiguration sensor) {
         this.sensors.add(sensor);
     }
+    
 
     /**
      * Gets a list of sensors installed in this robot instance

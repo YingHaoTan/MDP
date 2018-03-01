@@ -210,16 +210,24 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y + y));
             }
         }*/
-        
-        if(rPoint.y+1 < getMapState().getMapSystemDimension().height)
+
+        // Top of rPoint
+        if (rPoint.y + 1 < getMapState().getMapSystemDimension().height) {
             nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y + 1));
-        if(rPoint.x+1 < getMapState().getMapSystemDimension().width)
-            nearbyRobotPoints.add(new Point(rPoint.x+1, rPoint.y));
-        if(rPoint.y-1 > 0)
-            nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y-1));
-        if(rPoint.x-1 > 0)
-            nearbyRobotPoints.add(new Point(rPoint.x-1, rPoint.y));
-        
+        }
+        // Right of rPoint
+        if (rPoint.x + 1 < getMapState().getMapSystemDimension().width) {
+            nearbyRobotPoints.add(new Point(rPoint.x + 1, rPoint.y));
+        }
+        // Bottom of rPoint
+        if (rPoint.y - 1 > 0) {
+            nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y - 1));
+        }
+        // Left of rPoint
+        if (rPoint.x - 1 > 0) {
+            nearbyRobotPoints.add(new Point(rPoint.x - 1, rPoint.y));
+        }
+
         return nearbyRobotPoints;
     }
 
@@ -246,13 +254,12 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         sensorsScan();
-        
+
         // check explorated nodes;
-        if((reachedTimeLimit() || reachedCoveragePercentage()) && currentState != States.COMPLETED){
+        if ((reachedTimeLimit() || reachedCoveragePercentage()) && currentState != States.COMPLETED) {
             preComplete();
             return;
         }
-        
 
         if (currentState == States.BOUNDARY) {
             if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 20) {
@@ -290,8 +297,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
         }
         if (currentState == States.EXPLORATION) {
-            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
-                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+            System.out.println("Exploration here..");
+
+            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
                     Point tempPoint = new Point(x, y);
 
                     if (isUnexplored(tempPoint)) {
@@ -303,23 +312,22 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                if(!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)){
-                    for(int i = 0; i<neighbourPoints.get(exploringUnexplored).size(); i++){
-                        if(fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)){
+                if (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                    for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
                             neighbourCounter = i;
                             return;
                         }
                     }
-                    
-                }
-                
-                //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
 
+                }
+
+                //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
             } else {
                 preComplete();
             }
         }
-        
+
         if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
             complete();
         }
@@ -333,45 +341,42 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 //if( neighbourCounter > neighbourPoints.get(exploringUnexplored).size()){
 
                 //}
-                
                 /*if (neighbourCounter == neighbourPoints.get(exploringUnexplored).size()) {
                     fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false);
                 } else {
                     fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
                 }*/
-                
-                for(int i = neighbourCounter; i < neighbourPoints.get(exploringUnexplored).size(); i++){
-                    if(fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)){
+                for (int i = neighbourCounter; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                    if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
                         break;
                     }
                 }
-                
+
             } else {
                 exploringUnexplored++;
                 neighbourCounter = 0;
                 while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
                     exploringUnexplored++;
-                    
+
                     //System.out.println(unexploredPoints.get(exploringUnexplored) + " is " + isUnexplored(unexploredPoints.get(exploringUnexplored)));
                     if (exploringUnexplored == unexploredPoints.size()) {
                         preComplete();
                         return;
                     }
                 }
-                if(!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)){
-                    for(int i = 0; i<neighbourPoints.get(exploringUnexplored).size(); i++){
-                        if(fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)){
+                if (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                    for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
                             neighbourCounter = i;
                             break;
                         }
                     }
-                    
-                }
-                
-                //fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
 
+                }
+
+                //fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
             }
-        } else if(currentState != States.COMPLETED) {
+        } else if (currentState != States.COMPLETED) {
             preComplete();
         }
 

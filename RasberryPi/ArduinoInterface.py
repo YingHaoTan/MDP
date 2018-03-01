@@ -25,7 +25,7 @@ class ArduinoInterface(object):
 
 	# Read message from Arduino
 	def read_from_arduino(self):
-		time.sleep(.1)
+		time.sleep(.001)
 		while True:
 			if(self.ser.inWaiting()):
 				inByte = self.ser.read()
@@ -45,7 +45,7 @@ class ArduinoInterface(object):
 	def write_to_arduino(self, msg):
 		#print("Message to write to arduino: " + msg.decode() )
 		try:
-			time.sleep(.1)
+			time.sleep(.001)
 			self.ser.write(msg)
 			self.ser.flush()
 			print("Message written successfully")

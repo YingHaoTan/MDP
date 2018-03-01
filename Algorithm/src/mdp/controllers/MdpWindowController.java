@@ -25,6 +25,7 @@ import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
+import mdp.robots.PhysicalRobot;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 import mdp.robots.SimulatorRobot;
@@ -61,7 +62,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private MapLoader maploader;
 	private MapSaver mapsaver;
 	private SimulatorRobot srobot;
-	private RobotBase probot;
+	private PhysicalRobot probot;
 	private ExplorationBase explorer;
 	private FastestPathBase planner;
 
@@ -143,7 +144,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 * Sets the physical robot
 	 * @param probot
 	 */
-	public void setPhysicalRobot(RobotBase probot) {
+	public void setPhysicalRobot(PhysicalRobot probot) {
 		if (this.probot != null) {
 			this.probot.removeRobotActionListener(this);
 		}
@@ -346,6 +347,10 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 			srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
 			srobot.init(mstate);
 		}
+                
+                if (mode == ExecutionMode.PHYSICAL){
+                    probot.init(mstate);
+                }
 
 		mstate.setMapCellState(CellState.UNEXPLORED);
 

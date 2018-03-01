@@ -23,6 +23,12 @@ public class ArduinoInstruction extends StatusMessage{
         this.obstacleInFront = (obstacleInFront) ? (byte)1 : (byte)0;
         this.actionToTake = actionToTake;
     }
+    
+    public ArduinoInstruction(RobotAction actionToTake, boolean obstacleInFront){
+        super(StatusMessageType.ARDUINO_INSTRUCTION);
+        this.obstacleInFront = (obstacleInFront) ? (byte)1 : (byte)0;
+        this.actionToTake = actionToTake;
+    }
 
     @Override
     public byte[] toBytes() {
@@ -37,5 +43,9 @@ public class ArduinoInstruction extends StatusMessage{
     
     public int getID(){
         return this.id;
+    }
+    
+    public void setID(int id){
+        this.id = (byte)id;
     }
 }

@@ -74,7 +74,7 @@ public abstract class FastestPathBase implements RobotActionListener {
 		
 		return success;
 	}
-
+                
 	@Override
 	public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
 		Direction mdirection = next();
