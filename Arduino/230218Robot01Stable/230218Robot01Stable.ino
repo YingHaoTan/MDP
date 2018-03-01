@@ -28,79 +28,82 @@ void setup() {
 
   delay(2000);
 
-  //goFORWARD(7);
+
   //md.setSpeeds(300, 300);
   //delay(2000);
   //md.setBrakes(400, 400);
 
   //goACCELERATE();
+  goFORWARD(12);
 }
 
 void loop() {
-//  int action = readCommands();
+  
+  //int action = readCommands();
   //int action[] = {1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 4, 1, 1, 9};
 //  static int x;
-  scanLEFT();
-  //int action = 0;
-//  switch (action) {
-//    case 1:
-//      Serial.println("Moving forward");
-//      goFORWARD(1);
-//      //            calibrateF = 1;
-//      break;
-//
-//    case 2:
-//      Serial.println("Moving left");
-//      goLEFT();
-//      //            calibrateF = 1;
-//      break;
-//
-//    case 3:
-//      Serial.println("Moving right");
-//      goRIGHT();
-//      //            calibrateF = 1;
-//      break;
-//
-//    case 4:
-//      Serial.println("Calibrating");
-//      calibrateRIGHT();
-//      break;
-//
-//    case 5:
-//      Serial.println("Doing Full Scan");
-//      scanFORWARD(&irFrontReadings[0]);
-//      scanLEFT();
-//      scanRIGHT(&irRightReadings[0]);
-//      break;
-//
-//    case 6:
-//      Serial.println("Accelerated movement");
-//      goACCELERATE();
-//      break;
-//
-//    case 7:
-//      Serial.println("Going backwards");
-//      md.setSpeeds(-300, -300);
-//      delay(1500);
-//      md.setBrakes(400, 400);
-//      resetMCounters();
-//      //            calibrateF = 1;
-//      break;
-//    case 8:
-//      //While wall hugging right, if we potentially meet an L shaped block,
-//      //1. Calibrate Right first to straighten robot
-//      //2. Turn robot to right (In order to correct its vertical position
-//      //3. Calibrate robot's front this time to ensure correct vertical position
-//      //4. Turn back to the left again
-//      //5. OPTIONAL recalibrate right to straighten robot
-//      Serial.println("Full Calibration");
-//      calibrateRIGHT();
-//      goRIGHT();
-//      calibrateFRONT();
-//      goLEFT();
-//      calibrateRIGHT();
-//      break;
-//  }
+//  scanLEFT();
+//  scanFORWARD(&irFrontReadings[0]);
+  int action = 0;
+  switch (action) {
+    case 1:
+      Serial.println("Moving forward");
+      goFORWARD(1);
+      //            calibrateF = 1;
+      break;
+
+    case 2:
+      Serial.println("Moving left");
+      goLEFT();
+      //            calibrateF = 1;
+      break;
+
+    case 3:
+      Serial.println("Moving right");
+      goRIGHT();
+      //            calibrateF = 1;
+      break;
+
+    case 4:
+      Serial.println("Calibrating");
+      calibrateRIGHT();
+      break;
+
+    case 5:
+      Serial.println("Doing Full Scan");
+      scanFORWARD(&irFrontReadings[0]);
+      scanLEFT();
+      scanRIGHT(&irRightReadings[0]);
+      break;
+
+    case 6:
+      Serial.println("Accelerated movement");
+      goACCELERATE();
+      break;
+
+    case 7:
+      Serial.println("Going backwards");
+      md.setSpeeds(-300, -300);
+      delay(1500);
+      md.setBrakes(400, 400);
+      resetMCounters();
+      //            calibrateF = 1;
+      break;
+    case 8:
+      //While wall hugging right, if we potentially meet an L shaped block,
+      //1. Calibrate Right first to straighten robot
+      //2. Turn robot to right (In order to correct its vertical position
+      //3. Calibrate robot's front this time to ensure correct vertical position
+      //4. Turn back to the left again
+      //5. OPTIONAL recalibrate right to straighten robot
+      Serial.println("Full Calibration");
+      calibrateRIGHT();
+      goRIGHT();
+      calibrateFRONT();
+      goLEFT();
+      calibrateRIGHT();
+      break;
+  }
 
   delay(1000);
 
@@ -135,7 +138,7 @@ void goACCELERATE() {
 void goFORWARD(int noBlock) {
   long kP = 3;
   long kI = 0;
-  long kD = 3;
+  long kD = 2;
   long error = 0;
   long errorRate = 0;
   long pSum = 0;
@@ -147,14 +150,15 @@ void goFORWARD(int noBlock) {
   int lastTicks[2] = {0, 0};
   int setSpd1 = 300;              //Right motor
   int setSpd2 = 304;              //Left motor
-  long lastTime = millis();
+  static long lastTime = millis();
+  static int PIDFlag;
 
   md.setSpeeds(setSpd1, setSpd2);
-  delay(50);
+  delay(150);
 
   while (mRev[0] < noBlock && mRev[1] < noBlock) {
 
-    if (millis() - lastTime > 500) {
+    if (millis() - lastTime > 300 && PIDFlag  < 1) {
       Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
       error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
@@ -163,38 +167,43 @@ void goFORWARD(int noBlock) {
       lastError = error;
       totalErrors += error;
 
-      if (error > 5) {                             //Right Motor faster then left motor
-        Serial << "RIGHT faster than left by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+      if (error > 5) {                             //left Motor faster then left motor
+//        Serial << "LEFT faster than RIGHT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+        Serial << "LEFT faster than RIGHT by: " << error << endl;
         pSum = (abs(error) * kP / 10);
         dSum = (errorRate * kD / 10);
         iSum = (totalErrors * kI / 10);
-        adjustment = (pSum + dSum + iSum) / 2;
-        Serial << "pSum: " << pSum << " dSum: " << dSum << " iSum: " << iSum << " Final adjustment: " << adjustment << endl;
+        adjustment = (pSum - dSum + iSum) / 2;
+        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
         setSpd1 += adjustment;
         setSpd2 -= adjustment;
       }
 
       else if (error < -5) {
-        Serial << "LEFT faster than right by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+//        Serial << "RIGHT faster than LEFT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+        Serial << "RIGHT faster than LEFT by: " << error << endl;
         pSum = (abs(error) * kP / 10);
         dSum = (errorRate * kD / 10);
         iSum = (totalErrors * kI / 10);
-        adjustment = (pSum + dSum + iSum) / 2;
-        Serial << "pSum: " << pSum << " dSum: " << dSum << " iSum: " << iSum << " Final adjustment: " << adjustment << endl;
+        adjustment = (pSum - dSum + iSum) / 2;
+        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
         setSpd1 -= adjustment;
         setSpd2 += adjustment;
       }
 
       else {
         Serial << "No change, error is:" << error << endl;
+        PIDFlag++;
       }
 
       md.setSpeeds(setSpd1, setSpd2);
       Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
       delay(70);
       Serial.println("----");
+
+      lastTime = millis();
     }
-    lastTime = millis();
+    
   }
 
   resetMCounters();
@@ -245,6 +254,7 @@ void scanFORWARD(double pData[]) {
 void scanLEFT() {
   irLeftReading = ir5.distance() - offset5;
   Serial << "Mean distance of front side sensor (long): " << irLeftReading << endl;  // returns it to the serial monitor
+  Serial << "Mean distance of front side sensor (long): " << analogRead(A3) << endl;
 }
 
 void scanRIGHT(double *pData) {
@@ -253,6 +263,8 @@ void scanRIGHT(double *pData) {
 
   Serial << "Mean distance of front side sensor (short): " << pData[0] << endl; // returns it to the serial monitor
   Serial << "Mean distance of back side sensor: " << pData[1] << endl;  // returns it to the serial monitor
+// Serial << "Mean distance of front side sensor (short): " << analogRead(A5) << endl; // returns it to the serial monitor
+//  Serial << "Mean distance of back side sensor: " << analogRead(A4) << endl;
 }
 
 void calibratePos() {
