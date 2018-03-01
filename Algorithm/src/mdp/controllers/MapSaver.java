@@ -1,6 +1,6 @@
 package mdp.controllers;
 
-import mdp.graphics.map.MdpMap;
+import mdp.models.MapState;
 
 /**
  * MapSaver provides contract method needed for MdpWindowController to delegate map saving task
@@ -11,5 +11,5 @@ public interface MapSaver {
 	/**
 	 * Perform saving of map
 	 */
-	public void save(MdpMap map);
+	public void save(MapState map);
 }

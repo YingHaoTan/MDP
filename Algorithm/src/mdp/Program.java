@@ -10,8 +10,10 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import mdp.controllers.MdpWindowController;
+import mdp.controllers.XController;
 import mdp.controllers.explorer.ExplorationBase;
 import mdp.controllers.explorer.HugRightExplorationController;
+import mdp.controllers.fp.FastestPathBase;
 import mdp.controllers.fp.astar.AStarFastestPath;
 import mdp.controllers.fp.astar.BasicPathSpecification;
 import mdp.controllers.fp.astar.WaypointPathSpecification;
@@ -35,35 +37,36 @@ public class Program {
         Dimension rdim = new Dimension(3, 3);
         
         MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", new Dimension(15, 20), new Dimension(3, 3));
-        MdpWindowController controller = new MdpWindowController(window);
+        MdpWindowController wcontroller = new MdpWindowController(window);
+        XController xcontroller = new XController(window.getMap().getMapState());
+        
         MapFileHandler filehandler = new MapFileHandler();
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
         ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
-        //ExplorationBase explorer = new SnakeExplorationController();
+        FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
+        
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.LEFT, 1, 3, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
-
-        controller.setMapLoader(filehandler);
-        controller.setMapSaver(filehandler);
-        controller.setSimulatorRobot(srobot);
-        controller.setFastestPathPlanner(new AStarFastestPath(new WaypointPathSpecification()));
-        /*
-        FastestPath fp = new FastestPath();
-        FastestPath fp2 = new FastestPath();
         
-        controller.setFastestPath(fp);
-        explorer.setFastestPath(fp2);
-        */
-        controller.setExplorer(explorer);
+        xcontroller.setSimulatorRobot(srobot);
+        xcontroller.setFastestPathPlanner(fastestpath);
+        xcontroller.setExplorer(explorer);
+        xcontroller.setWindowController(wcontroller);
         
-        SynchronousQueue<StatusMessage> incomingQueue = new SynchronousQueue();
-        Queue<StatusMessage> outgoingArduinoQueue = new LinkedList();
-        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
+        wcontroller.setMapLoader(filehandler);
+        wcontroller.setMapSaver(filehandler);
+        wcontroller.setSimulatorRobot(srobot);
+        wcontroller.setFastestPathPlanner(fastestpath);
+        wcontroller.setExplorer(explorer);
+        wcontroller.setXController(xcontroller);
         
+        SynchronousQueue<StatusMessage> incomingQueue = new SynchronousQueue<>();
+        Queue<StatusMessage> outgoingArduinoQueue = new LinkedList<>();
+        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList<>();
         
         MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         mdpTCPConnector.start();

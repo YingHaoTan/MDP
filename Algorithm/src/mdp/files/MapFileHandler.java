@@ -11,8 +11,8 @@ import javax.swing.JFileChooser;
 
 import mdp.controllers.MapLoader;
 import mdp.controllers.MapSaver;
-import mdp.graphics.map.MdpMap;
 import mdp.models.MapDescriptorFormat;
+import mdp.models.MapState;
 
 /**
  * MapFileHandler implements MapSaver and MapLoader to save and load from the file system
@@ -28,7 +28,7 @@ public class MapFileHandler implements MapSaver, MapLoader {
 	}
 
 	@Override
-	public void load(MdpMap map) {
+	public void load(MapState map) {
 		if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			String filesubpath = chooser.getSelectedFile().getAbsolutePath();
 			filesubpath = filesubpath.substring(0, filesubpath.lastIndexOf("."));
@@ -46,8 +46,7 @@ public class MapFileHandler implements MapSaver, MapLoader {
 					mdf2 = reader.readLine();
 				}
 				
-				map.getMapState().parseString(mdf1, mdf2);
-				map.repaint();
+				map.parseString(mdf1, mdf2);
 			} catch(IOException e) {
 				// Handle case where an error occurs during file reading
 			}
@@ -55,17 +54,17 @@ public class MapFileHandler implements MapSaver, MapLoader {
 	}
 
 	@Override
-	public void save(MdpMap map) {
+	public void save(MapState map) {
 		if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			String filesubpath = chooser.getSelectedFile().getAbsolutePath();
 			
 			try {
 				try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filesubpath + ".mdf1")))) {
-					writer.write(map.getMapState().toString(MapDescriptorFormat.MDF1));
+					writer.write(map.toString(MapDescriptorFormat.MDF1));
 				}
 				
 				try(BufferedWriter writer = new BufferedWriter(new FileWriter(new File(filesubpath + ".mdf2")))) {
-					writer.write(map.getMapState().toString(MapDescriptorFormat.MDF2));
+					writer.write(map.toString(MapDescriptorFormat.MDF2));
 				}
 			} catch(IOException e) {
 				// Handle case where an error occurs during file writing

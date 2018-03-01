@@ -3,6 +3,8 @@ package mdp.controllers;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +37,7 @@ import mdp.robots.SimulatorRobot;
  *
  * @author Ying Hao
  */
-public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener, ExplorationCompletedListener, FastestPathCompletedListener {
+public class MdpWindowController implements CoordinateInputListener, MouseClickListener, ActionListener, RobotActionListener, CellStateUpdateListener, ExplorationCompletedListener, FastestPathCompletedListener, ItemListener {
 
 	/**
 	 * ExecutionState contains the enumeration of all possible mutually
@@ -64,6 +66,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private RobotBase probot;
 	private ExplorationBase explorer;
 	private FastestPathBase planner;
+	private XController xcontroller;
 
 	public MdpWindowController(MdpWindow window) {
 		this.map = window.getMap();
@@ -72,6 +75,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		map.addMouseListener(this);
 		inputpane.getStartCoordinateInput().addCoordinateInputListener(this);
 		inputpane.getEndCoordinateInput().addCoordinateInputListener(this);
+		inputpane.getExecutionModeInput().addItemListener(this);
 		inputpane.getLoadMapButton().addActionListener(this);
 		inputpane.getSaveMapButton().addActionListener(this);
 		inputpane.getExecutionButton().addActionListener(this);
@@ -123,12 +127,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 * @param srobot
 	 */
 	public void setSimulatorRobot(SimulatorRobot srobot) {
-		if (this.srobot != null) {
+		if (this.srobot != null)
 			this.srobot.removeRobotActionListener(this);
-		}
 
 		this.srobot = srobot;
-		this.srobot.addRobotActionListener(this);
+		if(inputpane.getExecutionModeInput().getSelectedValue() == ExecutionMode.SIMULATION)
+			srobot.addRobotActionListener(this);
 	}
 
 	/**
@@ -144,12 +148,12 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	 * @param probot
 	 */
 	public void setPhysicalRobot(RobotBase probot) {
-		if (this.probot != null) {
+		if (this.probot != null)
 			this.probot.removeRobotActionListener(this);
-		}
 
 		this.probot = probot;
-		this.probot.addRobotActionListener(this);
+		if(inputpane.getExecutionModeInput().getSelectedValue() == ExecutionMode.PHYSICAL)
+			probot.addRobotActionListener(this);
 	}
 
 	/**
@@ -193,6 +197,22 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 
 		this.planner = planner;
 		this.planner.addFastestPathCompletedListener(this);
+	}
+	
+	/**
+	 * Gets the XController
+	 * @return
+	 */
+	public XController getXController() {
+		return xcontroller;
+	}
+
+	/**
+	 * Sets the XController
+	 * @param xcontroller
+	 */
+	public void setXController(XController xcontroller) {
+		this.xcontroller = xcontroller;
 	}
 
 	@Override
@@ -246,17 +266,38 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == inputpane.getLoadMapButton()) {
-			loadmap();
+			this.maploader.load(map.getMapState());
 		} else if (e.getSource() == inputpane.getSaveMapButton()) {
-			savemap();
-		} else { 
+			this.mapsaver.save(map.getMapState());
+		} else if(xcontroller != null) { 
 			if (e.getSource() == inputpane.getExecutionButton()) {
 				execute();
 			} else if (e.getSource() == inputpane.getResetButton()) {
-				reset();
+				xcontroller.reset(map.getMapState());
+				inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
 			}
-
-			inputpane.sync(map.getMapState());
+		}
+		
+		inputpane.sync(map.getMapState());
+		map.repaint();
+	}
+	
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		RobotBase robot;
+		switch((ExecutionMode) e.getItem()) {
+			case PHYSICAL:
+				robot = probot;
+				break;
+			default:
+				robot = srobot;
+		}
+		
+		if(robot != null) {
+			if(e.getStateChange() == ItemEvent.SELECTED)
+				robot.addRobotActionListener(this);
+			else
+				robot.removeRobotActionListener(this);
 		}
 	}
 
@@ -311,86 +352,32 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		executionbtn.setText(ExecutionState.EXPLORE.toString());
 		inputpane.enable();
 	}
-
-	private void loadmap() {
-		if (this.maploader != null) {
-			this.maploader.load(map);
-			this.inputpane.sync(map.getMapState());
-		}
+	
+	/**
+	 * Request synchronization between input pane, map and models
+	 */
+	public void requestSynchronization() {
+		map.repaint();
+		inputpane.sync(map.getMapState());
 	}
-
-	private void savemap() {
-		if (this.mapsaver != null) {
-			this.mapsaver.save(map);
-		}
-	}
-
+	
 	private void execute() {
 		JButton executionbtn = inputpane.getExecutionButton();
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
 
-		if (explore)
-			explore();
-		else
-			fastestpath();
+		srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
+		
+		if (explore) {
+			int coverage = inputpane.getCoveragePercentage();
+			double timelimit = inputpane.getTimeLimit();
+			
+			xcontroller.explore(inputpane.getExecutionModeInput().getSelectedValue(), coverage, timelimit);
+		}
+		else {
+			xcontroller.fastestpath(inputpane.getExecutionModeInput().getSelectedValue());
+		}
 
 		inputpane.disable();
-	}
-
-	private void explore() {
-		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
-		MapState mstate = map.getMapState();
-
-
-		if (mode == ExecutionMode.SIMULATION){
-			srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
-			srobot.init(mstate);
-		}
-
-		mstate.setMapCellState(CellState.UNEXPLORED);
-
-		Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
-		exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
-
-		for (Point p : exploredpoints)
-			mstate.setMapCellState(p, CellState.NORMAL);
-
-		if(mstate.getWayPoint() != null)
-			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-
-		map.repaint();
-
-		if (explorer != null){
-			int coveragepercentage = inputpane.getCoveragePercentage();
-			double timelimit = inputpane.getTimeLimit();
-			explorer.explore(mstate.getMapSystemDimension(), mode == ExecutionMode.PHYSICAL ? probot : srobot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coveragepercentage, timelimit);
-		}
-	}
-
-	private void fastestpath() {
-		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
-		MapState mstate = map.getMapState();
-		RobotBase robot = mode == ExecutionMode.PHYSICAL ? probot : srobot;
-		
-		robot.reset();
-		
-		planner.move(mstate, robot, mstate.getEndPoint(), false);
-	}
-
-	private void reset() {
-		this.inputpane.getExecutionButton().setText(ExecutionState.EXPLORE.toString());
-
-		MapState mstate = map.getMapState();
-		mstate.reset();
-		if(srobot != null)
-			srobot.reset();
-		if(probot != null)
-			probot.reset();
-		
-		if(mstate.getWayPoint() != null)
-			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-
-		map.repaint();
 	}
 
 }
