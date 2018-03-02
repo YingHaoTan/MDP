@@ -89,7 +89,7 @@ class Main(object):
 			try:
 				## start connection
 			except: 
-				count++
+				count = count + 1
 	
 		while True:
 			try:
