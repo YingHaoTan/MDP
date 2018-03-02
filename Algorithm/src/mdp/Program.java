@@ -53,7 +53,7 @@ public class Program {
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 0, 2, 0.5));      
+        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 2, 0.5));      
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
         
@@ -67,7 +67,7 @@ public class Program {
         probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        probot.install(new SensorConfiguration(Direction.LEFT, 0, 2, 0.5));
+        probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
         wcontroller.setPhysicalRobot(probot);
         xcontroller.setPhysicalRobot(probot);
         
@@ -88,8 +88,9 @@ public class Program {
         xcontroller.setWindowController(wcontroller);
               
        
-        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingQueue, outgoingArduinoQueue, outgoingAndroidQueue);
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
+       
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);  
+        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
         mdpTCPConnector.start();
     }
 

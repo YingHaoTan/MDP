@@ -297,7 +297,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
         }
         if (currentState == States.EXPLORATION) {
-            System.out.println("Exploration here..");
+            //System.out.println("Exploration here..");
 
             for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
                 for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {

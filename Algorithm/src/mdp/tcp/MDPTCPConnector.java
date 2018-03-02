@@ -88,6 +88,7 @@ public class MDPTCPConnector extends Thread {
                             break;
                         case ARDUINO_UPDATE:
                             ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
+                            System.out.println("Receiving: " + arduinoUpdate.getId());
                             if(arduinoUpdate.getId() == lastSent){
                                 yetToReceiveAck = false;
                                 lastSent = incrementID(lastSent);
@@ -106,6 +107,7 @@ public class MDPTCPConnector extends Thread {
                     // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
                     lastSentArduinoMessage = outgoingArduinoQueue.remove();
                     lastSentArduinoMessage.setID(lastSent);
+                    System.out.println("Sending: " + lastSent);
                     outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                     yetToReceiveAck = true;
                     timer = System.currentTimeMillis();
@@ -115,7 +117,7 @@ public class MDPTCPConnector extends Thread {
                 }
                 if(yetToReceiveAck && System.currentTimeMillis() > timer + timeout){
                     if(lastSentArduinoMessage != null){
-                        //System.out.println("Resending:" + lastSentArduinoMessage.getID());
+                        System.out.println("Resending:" + lastSentArduinoMessage.getID());
                         outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                         timer = System.currentTimeMillis();
                     }

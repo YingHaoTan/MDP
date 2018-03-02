@@ -178,7 +178,6 @@ public class PhysicalRobot extends RobotBase {
         if (taskqueue.size() == 1) {
             timer.schedule(task, 0);
         }
-        //this.notify(mapdirection, actions);
     }
 
     private void setArduinoSensorReadings(ArduinoUpdate arduinoUpdate) {
