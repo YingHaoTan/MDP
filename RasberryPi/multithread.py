@@ -1,4 +1,5 @@
 import ArduinoInterface
+import BluetoothServerInterface
 import socket
 
 from queue import Queue
@@ -94,7 +95,7 @@ class Main(object):
 		## | android - rpi -> bluetooth | pc/algo - rpi -> wifi | arduino - rpi -> USB
 		## Communciation between each thread is through queue. 
 		
-		rpi = ##initiate and declare obj
+		rpi = BluetoothServerInterface.BluetoothServerInterface(host = host, port = port)##initiate and declare obj
 		## start connection
 	
 		while True:
