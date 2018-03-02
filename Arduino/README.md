@@ -2,6 +2,13 @@
 MDP Group 6 arduino source code repository
 
 Current Versions:
+
+- Stable: 020318Robot01
+    - Changes: 
+        - Added all the communications related codes, to run the communication, the call the commWithRPI() function in the loop()
+        - Created a seperate PID function PIDControl(), for readability and for easier changes
+        - And other changes
+
 - Stable: 230218Robot01Stable
     - Changes:
         - Fixed PID tuning the kP and kD constant to 3 and timed the PID function to activate at an interval of 500ms
@@ -13,6 +20,5 @@ Current Versions:
 To Dos:
 - Complete linearization for Left Side sensor and Front(Left) sensor
 - Tune the acccuracy of the IR Sensors
-- Tune motor again when the full load (RPi and powerbank) is added
-- Integrate communication between RPi3 and Arduino
 - Optimizations
+- Reimplement PID
