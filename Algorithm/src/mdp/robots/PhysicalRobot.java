@@ -198,7 +198,9 @@ public class PhysicalRobot extends RobotBase {
     
     public void stop(){
         //send stop message
-    
+        ArduinoInstruction arduinoInstruction = new ArduinoInstruction(RobotAction.STOP, false);
+        outgoingArduinoQueue.add(arduinoInstruction);
+
     }
 
     private void setArduinoSensorReadings(ArduinoUpdate arduinoUpdate) {

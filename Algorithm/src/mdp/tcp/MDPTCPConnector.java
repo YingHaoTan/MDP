@@ -15,6 +15,7 @@ import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mdp.models.RobotAction;
 
 /**
  *
@@ -25,6 +26,12 @@ public class MDPTCPConnector {
     private byte lastSent;
     private boolean yetToReceiveAck;
     private Socket clientSocket;
+    
+    
+    // Used for controlling the transmission of stop message
+    private boolean resendStop = false;
+    private boolean sentStop = false;
+    
     SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
     Queue<ArduinoInstruction> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
@@ -48,8 +55,24 @@ public class MDPTCPConnector {
         sender.start();
     }
 
-    public synchronized void incrementID(byte lastSent) {
+    private synchronized void incrementID(byte lastSent) {
         this.lastSent = (byte) ((byte) (lastSent + 1) % 126);
+    }
+    
+    private void setResendStop(boolean value){
+        this.resendStop = value;
+    }
+        
+    private void setSentStop(boolean value){
+        this.sentStop = value;
+    }
+    
+    private synchronized boolean getResendStop(){
+        return this.resendStop;
+    }
+    
+    private synchronized boolean getSentStop(){
+        return this.sentStop;
     }
 
     public class MDPTCPReceiver extends Thread {
@@ -111,6 +134,9 @@ public class MDPTCPConnector {
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                     // outgoingAndroidQueue.add();
                                 }
+                                else if(getSentStop()){
+                                    setResendStop(true);
+                                }
                                 break;
                         }
                     }
@@ -162,6 +188,13 @@ public class MDPTCPConnector {
                         lastSentArduinoMessage = outgoingArduinoQueue.remove();
                         lastSentArduinoMessage.setID(lastSent);
                         System.out.println("Sending: " + lastSent);
+                        if(lastSentArduinoMessage.getMessageAction() == RobotAction.STOP){
+                            setSentStop(true);
+                            System.out.println("Sent stop");
+                        } 
+                        else{
+                            setSentStop(false);
+                        }
                         outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                         yetToReceiveAck = true;
                         timer = System.currentTimeMillis();
@@ -170,11 +203,16 @@ public class MDPTCPConnector {
                         // sends whatever format u like
                     }
                     if (yetToReceiveAck && System.currentTimeMillis() > timer + timeout) {
-                        if (lastSentArduinoMessage != null) {
+                        if (lastSentArduinoMessage != null && lastSentArduinoMessage.getMessageAction() != RobotAction.STOP) {
                             System.out.println("Resending:" + lastSentArduinoMessage.getID());
                             outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                             timer = System.currentTimeMillis();
                         }
+                    }
+                    if(getResendStop()){
+                        ArduinoInstruction stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
+                        outToServer.writeBytes(new String(stopMessage.toBytes()) + "~");
+                        setResendStop(false);
                     }
                 }
             } catch (SocketException ex) {
@@ -185,6 +223,9 @@ public class MDPTCPConnector {
                 Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        
+        
 
     }
 
