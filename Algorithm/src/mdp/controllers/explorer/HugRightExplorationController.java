@@ -385,6 +385,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         getRobot().removeRobotActionListener(this);
+        getRobot().stop();
         super.complete();
     }
 

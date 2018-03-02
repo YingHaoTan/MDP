@@ -9,8 +9,9 @@
 
 // Does not do anything until RPi sends you new stuff
 #define STOP									   0x07
-#define CALIBRATION								   0x08
-#define SIDE									   0x09
+#define CAL_CORNER								   0x08 
+#define CAL_SIDE								   0x09
+
 
 #define PAYLOAD_SIZE                               8 //As long as it's bigger than StatusMessage
 

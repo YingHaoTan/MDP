@@ -179,6 +179,11 @@ public class PhysicalRobot extends RobotBase {
             timer.schedule(task, 0);
         }
     }
+    
+    public void stop(){
+        //send stop message
+    
+    }
 
     private void setArduinoSensorReadings(ArduinoUpdate arduinoUpdate) {
         int front1 = (int) (arduinoUpdate.getFront1());

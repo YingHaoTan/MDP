@@ -220,6 +220,11 @@ public class SimulatorRobot extends RobotBase {
         return distance;
     }
 
+    @Override
+    public void stop() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /**
      * NotifyTask is a TimerTask that notifies registered RobotActionListener on
      * a specific robot action sequence completion
