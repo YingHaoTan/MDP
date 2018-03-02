@@ -20,7 +20,7 @@ def __init__(self,port,host):
 	
 def connect(self):
     try:
-        self.android_sock, self.android_address = rpi_socket.accept()
+        self.android_sock, self.android_address = self.rpi_socket.accept()
 	if(self.android_address== '08:60:6E:AD:33:FC' ):
 		print("Accepted Connection from socket: " + self.android_sock + " Address: "+ self.android_address)
 		return 1
