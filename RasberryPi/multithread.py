@@ -81,20 +81,36 @@ class Main(object):
 		clientsock.close()
 		
 	def Bluetooth_Thread(self, to_bluetooth_queue, from_bluetooth_queue, to_pc_queue, from_pc_queue, host = '', port = 1):
+		
+		##Bluetooth work between android -> rpi -> algo/pc
+		##FOWARD
+		##receive data from client which will be taken from to_bluetooth_queue and then data will be passed into
+		##to_pc_queue
+		##BACKWARD
+		##apparently no need to care about backward transmission for now.
+		##After creating a connection at the other end of bluetoothComm is between rpi - android
+		##Not sure where to use the send method according to what I am thinking I think only the client will use the
+		##send function. Server will only be using the send function if there is backward communication going on.
+		## | android - rpi -> bluetooth | pc/algo - rpi -> wifi | arduino - rpi -> USB
+		## Communciation between each thread is through queue. 
+		
 		rpi = ##initiate and declare obj
 		## start connection
-		count = 0
-	
-		while count<3:
-			try:
-				## start connection
-			except: 
-				count = count + 1
 	
 		while True:
-			try:
 			
-			except:
+			data = rpi.receive_msg()
+			##have to check the encoding when data is passed in bluetooth communication
+			while data != q:
+				to_pc_queue.put(data)
+				data = rpi.receive_msg()
+				
+			##For backward transmission
+			while (not from_pc_queue.empty()):
+				send_data = from_pc_queue.get()
+				rpi.send_msg(send_data)
+
+		rpi.disconnect()
  
 	def threads_create(self):
 		try: 		
