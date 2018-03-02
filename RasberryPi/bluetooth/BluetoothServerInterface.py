@@ -4,15 +4,16 @@ import bluetooth
 #SERVER SIDE	
 	
 
-def __init__(self):
+def __init__(self,port,host):
 	self.android_sock = 0;
 	self.android_address = 0; 
 	#after getting bluetooth address, now must implement to transfer data.
 	#implement server sidsse
 	self.rpi_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 	#assign hostmac address for bluetooth adapters if needed as may have multiple adapters
-	self.port = 1
-	self.rpi_socket.bind(("",port))
+	self.port = port
+	self.host = host
+	self.rpi_socket.bind((host,port))
 	self.rpi_socket.listen(1)
 	self.size = 1024
 	
