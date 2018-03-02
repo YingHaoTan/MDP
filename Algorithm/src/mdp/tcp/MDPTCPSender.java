@@ -21,7 +21,7 @@ import mdp.tcp.StatusMessage.StatusMessageType;
  *
  * @author JINGYANG
  */
-public class MDPTCPConnector extends Thread {
+public class MDPTCPSender extends Thread {
 
     String ipAddr;
     int port;
@@ -30,7 +30,7 @@ public class MDPTCPConnector extends Thread {
     Queue<StatusMessage> outgoingAndroidQueue;
     
 
-    public MDPTCPConnector(String ipAddr, int port, SynchronousQueue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
+    public MDPTCPSender(String ipAddr, int port, SynchronousQueue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
         this.ipAddr = ipAddr;
         this.port = port;
         this.incomingArduinoQueue = incomingArduinoQueue;
@@ -52,7 +52,7 @@ public class MDPTCPConnector extends Thread {
             long timer = System.currentTimeMillis();
             
             // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
-            long timeout = 500;
+            long timeout = 5000;
             
             Socket clientSocket = new Socket(ipAddr, port);
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -95,14 +95,18 @@ public class MDPTCPConnector extends Thread {
                                 try {
                                     incomingArduinoQueue.put(arduinoUpdate);
                                 } catch (InterruptedException ex) {
-                                    Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
                                 }
+                                // Sends Android map updates, maybe put this in PhysicalRobot.move()
+                                // outgoingAndroidQueue.add();
                                 // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                 // outgoingAndroidQueue.add();
                             }
                             break;
                     }   
                 }       
+                
+                
                 if(!outgoingArduinoQueue.isEmpty()){
                     // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
                     lastSentArduinoMessage = outgoingArduinoQueue.remove();
@@ -124,9 +128,9 @@ public class MDPTCPConnector extends Thread {
                 }                
             }
         } catch (SocketException ex) {
-            Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

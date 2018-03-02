@@ -67,6 +67,7 @@ public abstract class MovementBase {
             if (reading > 0) {
                 Direction sDirection = getRobot().getSensorDirection(sensor);
                 Point sCoordinate = getRobot().getSensorCoordinate(sensor);
+                
 
                 // Should also check for out-of-bounds (more applicable in physical robot)
                 switch (sDirection) {
@@ -99,6 +100,10 @@ public abstract class MovementBase {
                 int maxRange = sensor.getMaxDistance();
                 Direction sDirection = getRobot().getSensorDirection(sensor);
                 Point sCoordinate = getRobot().getSensorCoordinate(sensor);
+                
+                //System.out.println(sDirection);
+                //System.out.println(sCoordinate);
+                
                 switch (sDirection) {
                     case UP:
                         for (int range = 1; range <= maxRange; range++) {

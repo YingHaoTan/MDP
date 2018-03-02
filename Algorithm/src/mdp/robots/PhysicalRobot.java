@@ -72,6 +72,12 @@ public class PhysicalRobot extends RobotBase {
             //Waits for TCP's reply   
             ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.take();
             setArduinoSensorReadings(incomingArduinoUpdate);
+            System.out.println(incomingArduinoUpdate.getFront1());
+            System.out.println(incomingArduinoUpdate.getFront2());
+            System.out.println(incomingArduinoUpdate.getFront3());
+            System.out.println(incomingArduinoUpdate.getRight1());
+            System.out.println(incomingArduinoUpdate.getRight2());
+            System.out.println(incomingArduinoUpdate.getLeft1());
         } catch (InterruptedException ex) {
             Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -145,6 +151,8 @@ public class PhysicalRobot extends RobotBase {
             // How do I know from here whether I have obstacleInFront or not.. I'm putting this as false from here
             // 1) The MapState containing the scanned obstacles is inside ExplorationBase.java
 
+            System.out.println(action + "- Before sending message");
+            
             ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
             outgoingArduinoQueue.add(arduinoInstruction);
 
@@ -156,7 +164,9 @@ public class PhysicalRobot extends RobotBase {
                 Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            System.out.println(action);
+            System.out.println(action + "- Action received");
+            
+            
         }
 
         // Update supposed robot location

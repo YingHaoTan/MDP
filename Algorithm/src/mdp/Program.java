@@ -25,7 +25,7 @@ import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
 import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
-import mdp.tcp.MDPTCPConnector;
+import mdp.tcp.MDPTCPSender;
 import mdp.tcp.StatusMessage;
 
 public class Program {
@@ -47,13 +47,13 @@ public class Program {
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
         
         // SimulatorRobot
-        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
+        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 2, 0.5));      
+        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 4, 0.5));      
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
         
@@ -61,7 +61,7 @@ public class Program {
         SynchronousQueue<ArduinoUpdate> incomingArduinoQueue = new SynchronousQueue();
         Queue<ArduinoInstruction> outgoingArduinoQueue = new LinkedList();
         Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
-        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.UP, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
+        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
@@ -89,8 +89,8 @@ public class Program {
               
        
        
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);  
-        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
+        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);  
+        MDPTCPSender mdpTCPConnector = new MDPTCPSender("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
         mdpTCPConnector.start();
     }
 
