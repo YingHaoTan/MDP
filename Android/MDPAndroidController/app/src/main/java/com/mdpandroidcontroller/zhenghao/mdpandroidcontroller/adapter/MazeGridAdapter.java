@@ -43,10 +43,17 @@ public class MazeGridAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
 
-        View temp = new View(context);
-        // using AbsListView.LayoutParams instead of ViewGroup.LayoutParams for tablet version compatibility
-        AbsListView.LayoutParams lp = new AbsListView.LayoutParams((viewGroup.getWidth()/Maze.MAZE_COLS),(viewGroup.getWidth()/Maze.MAZE_COLS));
-        temp.setLayoutParams(lp);
+        View temp;
+
+        if (view == null) {
+            temp = new View(context);
+            // using AbsListView.LayoutParams instead of ViewGroup.LayoutParams for tablet version compatibility
+            AbsListView.LayoutParams lp = new AbsListView.LayoutParams((viewGroup.getWidth()/Maze.MAZE_COLS),(viewGroup.getWidth()/Maze.MAZE_COLS));
+            temp.setLayoutParams(lp);
+        }
+        else {
+            temp = view;
+        }
 
         CellState state = maze.getState(i % Maze.MAZE_COLS, Maze.MAZE_ROWS-1-(i / Maze.MAZE_COLS) );
 

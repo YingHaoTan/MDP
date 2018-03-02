@@ -225,7 +225,7 @@ public class ControllerTranslator {
 					y = Integer.parseInt(message.substring(6, 8));
 					isBlocked = (message.substring(8, 10) == CommConstants.MAP_TYPE_BLOCK);
 					//update map
-					mParentActivity.onDoMapUpdateFull();
+					mParentActivity.onDoMapUpdatePartial();
 					return;
 				}catch(NumberFormatException exception){
 					//handle error

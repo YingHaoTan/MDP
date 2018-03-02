@@ -662,6 +662,12 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     @Override
     public void onDoMapUpdateFull() {
+        if (updateModeSwitch.isChecked()) {
+            // Do auto update
+        }
+        else {
+            // Manual update
+        }
 
     }
 
