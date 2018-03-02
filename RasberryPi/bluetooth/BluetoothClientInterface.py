@@ -27,6 +27,7 @@ class BluetoothClientInterface(object):
 
     def receive_msg():
         data = self.android_socket.recv(size)
+        return data
 
     def send_msg(msg):
         self.android_socket.send(msg)
