@@ -1,9 +1,13 @@
 package mdp;
 
 import java.awt.Dimension;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -25,7 +29,7 @@ import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
 import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
-import mdp.tcp.MDPTCPSender;
+import mdp.tcp.MDPTCPConnector;
 import mdp.tcp.StatusMessage;
 
 public class Program {
@@ -53,7 +57,7 @@ public class Program {
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 1, 4, 0.5));      
+        srobot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));      
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
         
@@ -87,11 +91,9 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
               
-       
-       
-        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);  
-        MDPTCPSender mdpTCPConnector = new MDPTCPSender("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
-        mdpTCPConnector.start();
+        
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
+        mdpTCPConnector.startThreads();
     }
 
 }

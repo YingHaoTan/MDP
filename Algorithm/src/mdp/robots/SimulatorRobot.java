@@ -96,9 +96,9 @@ public class SimulatorRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        /*for(RobotAction action : actions){
+        for(RobotAction action : actions){
             System.out.println(action);
-        }*/
+        }
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -222,7 +222,7 @@ public class SimulatorRobot extends RobotBase {
 
     @Override
     public void stop() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Simulated Robot stopped.");
     }
 
     /**

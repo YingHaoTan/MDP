@@ -24,6 +24,7 @@ import mdp.models.SensorConfiguration;
 import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.StatusMessage;
+import java.util.Date;
 
 /**
  *
@@ -66,18 +67,20 @@ public class PhysicalRobot extends RobotBase {
 
         // Tells TCP to send START command
         ArduinoInstruction initMessage = new ArduinoInstruction(RobotAction.START, false);
+        
         outgoingArduinoQueue.add(initMessage);
 
         try {
             //Waits for TCP's reply   
             ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.take();
+            
             setArduinoSensorReadings(incomingArduinoUpdate);
-            System.out.println(incomingArduinoUpdate.getFront1());
+            /*System.out.println(incomingArduinoUpdate.getFront1());
             System.out.println(incomingArduinoUpdate.getFront2());
             System.out.println(incomingArduinoUpdate.getFront3());
             System.out.println(incomingArduinoUpdate.getRight1());
             System.out.println(incomingArduinoUpdate.getRight2());
-            System.out.println(incomingArduinoUpdate.getLeft1());
+            System.out.println(incomingArduinoUpdate.getLeft1());*/
         } catch (InterruptedException ex) {
             Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -150,15 +153,18 @@ public class PhysicalRobot extends RobotBase {
         for (RobotAction action : actions) {
             // How do I know from here whether I have obstacleInFront or not.. I'm putting this as false from here
             // 1) The MapState containing the scanned obstacles is inside ExplorationBase.java
-
+            System.out.println("==========================");
             System.out.println(action + "- Before sending message");
-            
+            Date date = new Date();
+            System.out.println("Put-into-queue:"+ date.toString());
             ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
             outgoingArduinoQueue.add(arduinoInstruction);
 
             try {
                 ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.take();
                 setArduinoSensorReadings(incomingArduinoUpdate);
+                date = new Date();
+                System.out.println("Take-from-queue:"+ date.toString());
 
             } catch (InterruptedException ex) {
                 Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
