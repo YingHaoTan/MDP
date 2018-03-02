@@ -1,4 +1,5 @@
 import ArduinoInterface
+import BluetoothServerInterface
 import socket
 
 from queue import Queue
@@ -32,7 +33,8 @@ class Main(object):
 			
 			
 			
-	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_bluetooth_queue, from_bluetooth_queue, host='', port=5000):
+
+	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_android_queue, from_android_queue, host='', port=5000):
 		serversock = socket.socket()	#create a new socket object
 		serversock.bind((host, port))	#bind socket
 		serversock.setblocking(False)
@@ -81,7 +83,7 @@ class Main(object):
 			
 			# sends to bluetooth
 			'''if(received[0] == (5).to_bytes(1, byteorder='big')):
-				to_bluetooth_queue.put()
+				to_android_queue.put()
 			'''
 			
 			# receives from Arduino, doesn't block
@@ -95,32 +97,65 @@ class Main(object):
 				clientsock.sendall(string_to_send_tcp.encode("ascii"))
 			
 			# receives from Bluetooth, doesn't block
-			if(not from_bluetooth_queue.empty()):
+			if(not from_android_queue.empty()):
 				pass
+			
+			#send to algo
+			
+			#receive from algo
 			
 
 		clientsock.close()
 		
-	def Bluetooth_Thread(self, to_bluetooth_queue, from_bluetooth_queue, to_pc_queue, from_pc_queue, host = '', port = 1):
-		pass
+	def Bluetooth_Thread(self, to_android_queue, from_android_queue, to_algo_queue, from_algo_queue, host = '', port = 1):
+		
+		##Bluetooth work between android -> rpi -> algo/pc
+		##FOWARD
+		##receive data from client which will be taken from to_bluetooth_queue and then data will be passed into
+		##to_pc_queue
+		##BACKWARD
+		##apparently no need to care about backward transmission for now.
+		##After creating a connection at the other end of bluetoothComm is between rpi - android
+		##Not sure where to use the send method according to what I am thinking I think only the client will use the
+		##send function. Server will only be using the send function if there is backward communication going on.
+		## | android - rpi -> bluetooth | pc/algo - rpi -> wifi | arduino - rpi -> USB
+		## Communciation between each thread is through queue. 
+		
+		rpi = BluetoothServerInterface.BluetoothServerInterface(host = host, port = port)##initiate and declare obj
+		## start connection
+	
+		while True:
+			
+			data = rpi.receive_msg()
+			##have to check the encoding when data is passed in bluetooth communication
+			if data != q:
+				to_algo_queue.put(data)
+				data = rpi.receive_msg()
+				
+			##For backward transmission
+			##while (not from_algo_queue.empty()):
+				##send_data = from_algo_queue.get()
+				##rpi.send_msg(send_data)
+
+		rpi.disconnect()
  
 	def threads_create(self):
 		try: 		
 			to_arduino_queue = Queue()
 			from_arduino_queue = Queue()
 			
-			to_bluetooth_queue = Queue()
-			from_bluetooth_queue = Queue()
+			to_android_queue = Queue()
+			from_android_queue = Queue()
 			
-			to_pc_queue = Queue()
-			from_pc_queue = Queue()
+			to_algo_queue = Queue()
+			from_algo_queue = Queue()
 			
 			##think theres problem with the queue passed in. I think it should also pcqueue.
 			##t1 need all the queue since it is at the center of the communication.
-			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_bluetooth_queue, from_bluetooth_queue, '', 5000))
+			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_android_queue, from_android_queue, '', 5000))
 			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'COM13', 115200))
 			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
-			t3 = Thread(target = self.Bluetooth_Thread, args = (to_bluetooth_queue, from_bluetooth_queue, to_pc_queue, from_pc_queue, '', 1))
+			t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, to_algo_queue, from_algo_queue, '', 1))
 
 	
 			t1.start()
