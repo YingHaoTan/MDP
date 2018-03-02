@@ -16,6 +16,13 @@
     <string name="chatReceivedMsgDefaultText">No Message Received</string>
     <string name="chatSendMsgDefaultText">Tap Here to Enter Text</string>
     <string name="chatSendBtn">Send</string>
+    <string name="status">Robot Status</string>
+    <string name="defaultStatus">NULL</string>
+
+    <!-- Strings for robot status-->
+    <string name="statusMoving">Moving</string>
+    <string name="statusStop">Stopped</string>
+    <string name="statusTurn">Turning</string>
 
     <!-- added by Ernest-->
     <string name="executionModeText">Execution Mode:</string>

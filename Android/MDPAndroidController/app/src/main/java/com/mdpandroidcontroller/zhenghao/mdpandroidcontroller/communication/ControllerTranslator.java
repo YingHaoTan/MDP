@@ -10,10 +10,25 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
  *
  */
 public class ControllerTranslator {
-	//variables and constructors
-	private static ControllerTranslator instance = null;
 
-	protected ControllerTranslator(){
+	public interface ControllerTranslatorCallBack {
+		void onDoMove();
+
+		void onDoTurn();
+
+		void onDoStop();
+
+		void onDoMapUpdateFull();
+
+		void onDoMapUpdatePartial();
+	}
+
+	//variables and constructors
+	private static final String TAG = "ControllerTranslator";
+	private static ControllerTranslator instance = null;
+	private ControllerTranslatorCallBack mParentActivity = null;
+
+	private ControllerTranslator(){
 		//to prevent instantiation elsewhere. edit accordingly if required.
 	}
 
@@ -22,6 +37,11 @@ public class ControllerTranslator {
 			instance = new ControllerTranslator();
 		}
 		return instance;
+	}
+
+	public ControllerTranslator withParentActivity (ControllerTranslatorCallBack parentActivity) {
+		mParentActivity = parentActivity;
+		return this;
 	}
 
 	/**
@@ -168,10 +188,13 @@ public class ControllerTranslator {
 			if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_ROBOT)) {
 				if(message.substring(4,6).equals(CommConstants.ROBOT_MOVING)){
 					//do moving actions
+					mParentActivity.onDoMove();
 				}else if(message.substring(4,6).equals(CommConstants.ROBOT_TURNING)){
 					//do turning actions
+					mParentActivity.onDoTurn();
 				}else if(message.substring(4,6).equals(CommConstants.ROBOT_STOPPED)){
 					//do stopping actions
+					mParentActivity.onDoStop();
 				}else{
 					try{
 						x = Integer.parseInt(message.substring(4, 6));
@@ -190,7 +213,7 @@ public class ControllerTranslator {
 							//error
 							return;
 						}
-						//update update map
+						//update robot position on map
 						return;
 					}catch (NumberFormatException exception){
 						//handle error
@@ -202,6 +225,7 @@ public class ControllerTranslator {
 					y = Integer.parseInt(message.substring(6, 8));
 					isBlocked = (message.substring(8, 10) == CommConstants.MAP_TYPE_BLOCK);
 					//update map
+					mParentActivity.onDoMapUpdateFull();
 					return;
 				}catch(NumberFormatException exception){
 					//handle error

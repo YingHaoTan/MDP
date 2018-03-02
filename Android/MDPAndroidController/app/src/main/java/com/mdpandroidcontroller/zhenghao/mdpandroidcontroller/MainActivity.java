@@ -40,7 +40,8 @@ import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.S
 import static com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants.STATE_NONE;
 
 
-public class MainActivity extends AppCompatActivity implements ControlMessageHandler.ControlMessageCallBack{
+public class MainActivity extends AppCompatActivity implements ControlMessageHandler.ControlMessageCallBack,
+        ControllerTranslator.ControllerTranslatorCallBack{
 
     private static final String TAG = "MainActivity";
 
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         connectionString = (TextView) findViewById(R.id.connectionStr);
 
         context = this.getBaseContext();
-        translator = ControllerTranslator.getInstance();
+        translator = ControllerTranslator.getInstance().withParentActivity(this);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // If the adapter is null, then Bluetooth is not supported
@@ -614,6 +615,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
         // TODO: do something with the received string
         // How the controller should react to the received string
+        translator.decodeMessage(readMessage);
 
     }
 
@@ -641,5 +643,30 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     public void onMessageToast(Message msg) {
         Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST),
                 Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDoMove() {
+        robotStatusTextView.setText(R.string.statusMoving);
+    }
+
+    @Override
+    public void onDoTurn() {
+        robotStatusTextView.setText(R.string.statusTurn);
+    }
+
+    @Override
+    public void onDoStop() {
+        robotStatusTextView.setText(R.string.statusStop);
+    }
+
+    @Override
+    public void onDoMapUpdateFull() {
+
+    }
+
+    @Override
+    public void onDoMapUpdatePartial() {
+
     }
 }
