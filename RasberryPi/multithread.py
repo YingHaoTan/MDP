@@ -80,9 +80,21 @@ class Main(object):
 
 		clientsock.close()
 		
-	def Bluetooth_Thread(self, to_bluetooth_queue, from_bluetooth_queue):
-		# put your bluetooth stuffs here
-		pass
+	def Bluetooth_Thread(self, to_bluetooth_queue, from_bluetooth_queue, to_pc_queue, from_pc_queue, host = '', port = 1):
+		rpi = ##initiate and declare obj
+		## start connection
+		count = 0
+	
+		while count<3:
+			try:
+				## start connection
+			except: 
+				count = count + 1
+	
+		while True:
+			try:
+			
+			except:
  
 	def threads_create(self):
 		try: 		
@@ -92,11 +104,19 @@ class Main(object):
 			to_bluetooth_queue = Queue()
 			from_bluetooth_queue = Queue()
 			
+			to_pc_queue = Queue()
+			from_pc_queue = Queue()
 			
+			##think theres problem with the queue passed in. I think it should also pcqueue.
+			##t1 need all the queue since it is at the center of the communication.
 			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_bluetooth_queue, from_bluetooth_queue, '', 5000))
 			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'COM13', 115200))
+			t3 = Thread(target = self.Bluetooth_Thread, args = (to_bluetooth_queue, from_bluetooth_queue, to_pc_queue, from_pc_queue, '', 1))
+
+	
 			t1.start()
 			t2.start()
+			t3.start()
 	
 		except Exception as e:
 			print(str(e))
