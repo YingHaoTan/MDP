@@ -101,7 +101,7 @@ class Main(object):
 			
 			data = rpi.receive_msg()
 			##have to check the encoding when data is passed in bluetooth communication
-			while data != q:
+			if data != q:
 				to_pc_queue.put(data)
 				data = rpi.receive_msg()
 				
