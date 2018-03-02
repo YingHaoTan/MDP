@@ -5,8 +5,6 @@ import bluetooth
 	
 
 def __init__(self,port,host):
-	self.android_sock = 0;
-	self.android_address = 0; 
 	#after getting bluetooth address, now must implement to transfer data.
 	#implement server sidsse
 	self.rpi_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
@@ -20,7 +18,14 @@ def __init__(self,port,host):
 def connect():
     try:
         self.android_sock, self.android_address = rpi_socket.accept()
-        print("Accepted Connection from: " + self.android_sock + self.android_address)
+	if(self.android_address== '' ):
+		print("Accepted Connection from: " + self.android_sock + self.android_address)
+		return 1
+	else:
+	 	print("Connection is not the nexus 7") 
+		continue
+    except:
+	print("Failed conncetion") 
         return 1
 
     except:
@@ -35,7 +40,6 @@ def disconnect():
         self.android_sock.close()
         self.rpi_sock.close()
         print("Bluetooth device have been successfully disconnected")
-    
     except:
         print("Failed to disconnect")
 
