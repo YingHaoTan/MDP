@@ -10,12 +10,11 @@ class BluetoothClientInterface(object):
 
     def connect():
         try:
-            self.android_socket.connect((self.android_addr, self.port))
-            return 1
-        except:
-            print("Bluetooth Connection Error")
-            android_sock.close()
-            return 0
+                self.android_socket.connect((self.android_addr, self.port))
+        except: 
+                print("Bluetooth Connection Error")
+                android_sock.close()
+                return 0
                 
     def disconnect():
         try:
