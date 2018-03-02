@@ -1,13 +1,8 @@
 #to implement without the library look up http://blog.kevindoran.co/bluetooth-programming-with-python-3/
 import bluetooth
 
-target_name = "Nexus 7"
-target_addr = "08:60:6E:AD:33:FC"
-
-
 #SERVER SIDE	
-		
-
+	
 
 def __init__(self):
 	self.android_sock = 0;
