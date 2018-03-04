@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
@@ -192,6 +194,15 @@ public class MDPTCPConnector {
                 
                 /*ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.STOP, true);
                 outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
+                List<RobotAction> actions = new ArrayList();
+                actions.add(RobotAction.START);
+                actions.add(RobotAction.FORWARD);
+                actions.add(RobotAction.FORWARD);
+                
+                
+                /*ArduinoStream strm = new ArduinoStream(0, actions);
+                outToServer.writeBytes(new String(strm.toBytes()) + "~");
+                */
                 
                 while (true) {
                     Thread.sleep((long) 0.1);

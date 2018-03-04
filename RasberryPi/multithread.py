@@ -84,7 +84,7 @@ class Main(object):
 					to_arduino_queue.put(received)
 					
 				elif (received[0] == ARDUINO_STREAM):
-					print('Received Arduino stream' + str(len(received)))
+					print('Received Arduino stream :' + str(len(received)))
 					print(received)
 					to_arduino_queue.put(received)
 

@@ -16,7 +16,7 @@
 
 
 
-#define PAYLOAD_SIZE                               8 //As long as it's bigger than StatusMessage
+#define PAYLOAD_SIZE                               128 //As long as it's bigger than StatusMessage
 
 struct Message
 {
@@ -47,6 +47,6 @@ struct InstructionMessage
 struct StreamMessage
 {
   uint8_t id;
-  uint8_t streamActions[128]; //in case theres a lot of actions..
+  uint8_t streamActions[PAYLOAD_SIZE]; //in case theres a lot of actions..
 };
 

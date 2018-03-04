@@ -1,8 +1,12 @@
 #include "communication.h"
+#include "RingBuffer.h"
 
 #define BUFFER_SIZE                               256
 
 // need to check if will overflow
+RingBuffer usbBufferIn;
+
+
 uint8_t last_sent = 0;
 uint8_t incomingBuffer[BUFFER_SIZE];
 int bufferIndex = 0;
@@ -19,86 +23,118 @@ void setup() {
   //The default is 8 data bits, no parity, one stop bit.
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
+  RingBuffer_init(&usbBufferIn);
 }
 
 void loop() {
   if (Serial.available() > 0) {
     putIncomingUSBMessageToBuffer();
     int traversalIndex = 0;
-    while (bufferIndex > traversalIndex) {
-      if (incomingBuffer[traversalIndex] == '~') {
-        uint8_t messageType = incomingBuffer[traversalIndex + 1];
+    uint8_t tmpInBuffer = 0;
+    
+    if (usbBufferIn.count >= 6) {
+      
+      if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 0) == true && tmpInBuffer == '~') {
+        uint8_t messageType = 0;
+        if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 1) == true) {
+          messageType = tmpInBuffer;
+        }
         if (messageType == ARDUINO_INSTRUCTION) {
-          if (incomingBuffer[traversalIndex + 5] == '!') {
-            InstructionMessage instructMsg;
-            memcpy(&instructMsg, &incomingBuffer[traversalIndex + 2], 3);
-            if (last_sent == instructMsg.id && alreadyReceived == false) {
-              alreadyReceived = true;
-              yetToReceiveAck = false;
-              switch (instructMsg.action) {
-                case TURN_LEFT:
-                  //turnLeft();
-                  //delay(1000);
-                  sendStatusUpdate();
-                  incrementID();
-                  alreadyReceived = false;
-                  break;
-                case TURN_RIGHT:
-                  //turnRight();
-                  //delay(1000);
-                  sendStatusUpdate();
-                  incrementID();
-                  alreadyReceived = false;
-                  break;
-                case FORWARD:
-                  //moveForward();
-                  //delay(1000);
-                  sendStatusUpdate();
-                  incrementID();
-                  alreadyReceived = false;
-                  break;
-                case SCAN:
-                  sendStatusUpdate();
-                  incrementID();
-                  alreadyReceived = false;
-                  break;
-                case START:
-                  sendStatusUpdate();
-                  incrementID();
-                  alreadyReceived = false;
-                  break;
-                case STOP:
-                  Serial.flush();
-                  yetToReceiveAck = false;
+          if (5 < usbBufferIn.count) {
+            if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 5) == true && tmpInBuffer == '!') {
+              
+              InstructionMessage instructMsg;
+              
+              RingBuffer_get(&usbBufferIn, &instructMsg.id , 2);
+              RingBuffer_get(&usbBufferIn, &instructMsg.action, 3);
+              RingBuffer_get(&usbBufferIn, &instructMsg.obstacleInFront, 4);
+          
+              if (last_sent == instructMsg.id && alreadyReceived == false) {
+                
+                alreadyReceived = true;
+                yetToReceiveAck = false;
+                switch (instructMsg.action) {
+                  case TURN_LEFT:
+                    //turnLeft();
+                    //delay(1000);
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case TURN_RIGHT:
+                    //turnRight();
+                    //delay(1000);
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case FORWARD:
+                    //moveForward();
+                    //delay(1000);
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case SCAN:
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case START:
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case STOP:
+                    //Serial.flush();
+                    yetToReceiveAck = false;
+                }
+                RingBuffer_erase(&usbBufferIn, 6);
               }
-
-              bufferIndex = 0;
-              break;
+              
+            } else {
+              RingBuffer_pop(&usbBufferIn);
             }
-            else {
-              // Received wrong instruction
-              //Serial.println("RECEIVED WRONG INSTRUCTION");
-            }
-            traversalIndex += 6;
-          } else {
-            traversalIndex++;
           }
-        }
-        else if(messageType == ARDUINO_STREAM){
-            //Stuck at this part
-            uint8_t length1 = (uint8_t)incomingBuffer[traversalIndex+3];
-            if(length1 == 32){
-              digitalWrite(LED_BUILTIN, HIGH);
+        } else if(messageType == ARDUINO_STREAM){
+            StreamMessage streamMsg;
+            uint8_t payloadSize = 0;
+            // may not matter
+            RingBuffer_get(&usbBufferIn, &streamMsg.id, 2);
+            RingBuffer_get(&usbBufferIn, &payloadSize, 3);
+
+            uint8_t tmpPayload[payloadSize] = {0};
+
+            //Serial.write(payloadSize);
+            for(int i = 0; i < payloadSize; i++){
+              RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4+i);
             }
-        }
-        else{
-          traversalIndex++;  
-        }
-      }
-      else {
-        traversalIndex++;
+            memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
+
+            // you have all your actions inside streamMsg.streamActions;   
+
+            RingBuffer_erase(&usbBufferIn, 5 + payloadSize);
+                       
+          }
+      } else {
+        RingBuffer_pop(&usbBufferIn);
       }
     }
+    /*else if (messageType == ARDUINO_STREAM) {
+      //Stuck at this part
+      uint8_t length1 = (uint8_t)incomingBuffer[traversalIndex + 3];
+      if (length1 == 32) {
+        digitalWrite(LED_BUILTIN, HIGH);
+      }
+      }
+      else {
+      traversalIndex++;
+      }
+      }
+      else {
+      RingBuffer_pop(&usbBufferIn);
+      }
+      }*/
   }
   /*
 
@@ -117,14 +153,28 @@ void loop() {
 }
 
 void putIncomingUSBMessageToBuffer() {
-  uint8_t tmpBuffer[BUFFER_SIZE] = {0}; //not allocated
+  uint8_t tmpBuffer[1024] = {0}; //not allocated
   uint8_t length = 0;
 
   while (Serial.available()) {
     tmpBuffer[length] = Serial.read();
     length++;
   }
-  for (uint8_t i = 0; i < length; i++) {
+  if (length) {
+    for (uint16_t i = 0; i < length; i++) {
+      RingBuffer_push(&usbBufferIn, tmpBuffer[i]);
+    }
+  }
+
+
+  /*uint8_t tmpBuffer[BUFFER_SIZE] = {0}; //not allocated
+    uint8_t length = 0;
+
+    while (Serial.available()) {
+    tmpBuffer[length] = Serial.read();
+    length++;
+    }
+    for (uint8_t i = 0; i < length; i++) {
     incomingBuffer[bufferIndex] = tmpBuffer[i];
     bufferIndex++;
 
@@ -132,9 +182,7 @@ void putIncomingUSBMessageToBuffer() {
     if (bufferIndex == BUFFER_SIZE) {
       bufferIndex = 0;
     }
-  }
-
-  delay(1);
+    }*/
 }
 
 void resendStatusUpdate() {
@@ -169,7 +217,7 @@ void sendStatusUpdate() {
 
   // Need to test
   Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
-  Serial.flush();
+  //Serial.flush();
 
   //start_timer()
   timer = millis();
