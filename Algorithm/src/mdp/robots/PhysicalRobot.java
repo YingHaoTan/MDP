@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +26,8 @@ import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.StatusMessage;
 import java.util.Date;
+import mdp.tcp.ArduinoMessage;
+import mdp.tcp.ArduinoStream;
 
 /**
  *
@@ -34,18 +35,18 @@ import java.util.Date;
  */
 public class PhysicalRobot extends RobotBase {
 
-    private SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
-    private Queue<ArduinoInstruction> outgoingArduinoQueue;
+    private Queue<ArduinoUpdate> incomingArduinoQueue;
+    private Queue<ArduinoMessage> outgoingArduinoQueue;
     private Queue<StatusMessage> outgoingAndroidQueue;
     private Map<SensorConfiguration, Integer> readings = new HashMap<>();
 
     private Timer timer;
     private Queue<PhysicalRobot.NotifyTask> taskqueue;
-
+    private long timerDelay = (long) 10;
     // Just to store robot supposed position
     private MapState mstate;
 
-    public PhysicalRobot(Dimension dimension, Direction orientation, SynchronousQueue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoInstruction> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
+    public PhysicalRobot(Dimension dimension, Direction orientation, Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         super(dimension, orientation);
         this.taskqueue = new LinkedList<>();
         this.incomingArduinoQueue = incomingArduinoQueue;
@@ -69,23 +70,31 @@ public class PhysicalRobot extends RobotBase {
 
         // Tells TCP to send START command
         ArduinoInstruction initMessage = new ArduinoInstruction(RobotAction.START, false);
-        
+
         outgoingArduinoQueue.add(initMessage);
 
-        try {
-            //Waits for TCP's reply   
-            ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.take();
-            
-            setArduinoSensorReadings(incomingArduinoUpdate);
-            /*System.out.println(incomingArduinoUpdate.getFront1());
+        //Waits for TCP's reply   
+        while (true) {
+            //System.out.println("size from physical robot=" + incomingArduinoQueue.size());
+            if (!incomingArduinoQueue.isEmpty()) {
+                ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.remove();
+                setArduinoSensorReadings(incomingArduinoUpdate);
+
+                break;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        /*System.out.println(incomingArduinoUpdate.getFront1());
             System.out.println(incomingArduinoUpdate.getFront2());
             System.out.println(incomingArduinoUpdate.getFront3());
             System.out.println(incomingArduinoUpdate.getRight1());
             System.out.println(incomingArduinoUpdate.getRight2());
             System.out.println(incomingArduinoUpdate.getLeft1());*/
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @Override
@@ -158,23 +167,27 @@ public class PhysicalRobot extends RobotBase {
             System.out.println("==========================");
             System.out.println(action + "- Before sending message");
             Date date = new Date();
-            System.out.println("Put-into-queue:"+ date.toString());
+            System.out.println("Put-into-queue:" + date.toString());
             ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
             outgoingArduinoQueue.add(arduinoInstruction);
 
-            try {
-                ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.take();
-                setArduinoSensorReadings(incomingArduinoUpdate);
-                date = new Date();
-                System.out.println("Take-from-queue:"+ date.toString());
+            while (true) {
+                if (!incomingArduinoQueue.isEmpty()) {
+                    ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.remove();
+                    setArduinoSensorReadings(incomingArduinoUpdate);
+                    date = new Date();
+                    System.out.println("Take-from-queue:" + date.toString());
 
-            } catch (InterruptedException ex) {
-                Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(action + "- Action received");
+                    break;
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            
-            System.out.println(action + "- Action received");
-            
-            
+
         }
 
         // Update supposed robot location
@@ -190,15 +203,40 @@ public class PhysicalRobot extends RobotBase {
         }
         
         // sendCalibrationData();
-
+        
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
-            timer.schedule(task, 0);
+            timer.schedule(task, timerDelay);
         }
     }
-    
-    public void stop(){
+
+    @Override
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+        int orientationIndex = 0;
+
+        // Crafts message
+        ArduinoStream streamMessage = new ArduinoStream(actions);
+        outgoingArduinoQueue.add(streamMessage);
+
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
+                NotifyTask task = new NotifyTask(null, new RobotAction[]{actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, timerDelay);
+                }
+            } else {
+                NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[]{actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, timerDelay);
+                }
+            }
+        }
+    }
+
+    public void stop() {
         //send stop message
         ArduinoInstruction arduinoInstruction = new ArduinoInstruction(RobotAction.STOP, false);
         outgoingArduinoQueue.add(arduinoInstruction);
@@ -276,7 +314,7 @@ public class PhysicalRobot extends RobotBase {
             PhysicalRobot.this.taskqueue.poll();
 
             if (PhysicalRobot.this.taskqueue.size() > 0) {
-                timer.schedule(PhysicalRobot.this.taskqueue.peek(), 0);
+                timer.schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
             }
         }
 

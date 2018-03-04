@@ -32,11 +32,12 @@ public class MDPTCPConnector {
     private boolean resendStop = false;
     private boolean sentStop = false;
     
-    SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
-    Queue<ArduinoInstruction> outgoingArduinoQueue;
+    //SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
+    Queue<ArduinoUpdate> incomingArduinoQueue;
+    Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
-    public MDPTCPConnector(SynchronousQueue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
+    public MDPTCPConnector(Queue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
         try {
             this.clientSocket = new Socket("localhost", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
@@ -79,9 +80,9 @@ public class MDPTCPConnector {
 
         Socket connectedSocket;
 
-        SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
+        Queue<ArduinoUpdate> incomingArduinoQueue;
 
-        public MDPTCPReceiver(Socket connectedSocket, SynchronousQueue incomingArduinoQueue) {
+        public MDPTCPReceiver(Socket connectedSocket, Queue incomingArduinoQueue) {
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.connectedSocket = connectedSocket;
 
@@ -124,11 +125,8 @@ public class MDPTCPConnector {
                                 if (arduinoUpdate.getId() == lastSent) {
                                     yetToReceiveAck = false;
                                     incrementID(lastSent);
-                                    try {
-                                        incomingArduinoQueue.put(arduinoUpdate);
-                                    } catch (InterruptedException ex) {
-                                        Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
+                                    incomingArduinoQueue.add(arduinoUpdate);
+                                    //System.out.println("size from mdp receiver=" + incomingArduinoQueue.size());
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                     // outgoingAndroidQueue.add();
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()
@@ -156,7 +154,7 @@ public class MDPTCPConnector {
     public class MDPTCPSender extends Thread {
 
         Socket connectedSocket;
-        Queue<ArduinoInstruction> outgoingArduinoQueue;
+        Queue<ArduinoMessage> outgoingArduinoQueue;
         Queue<StatusMessage> outgoingAndroidQueue;
 
         public MDPTCPSender(Socket connectedSocket, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
@@ -173,7 +171,7 @@ public class MDPTCPConnector {
                 /*byte[] test = {0x01,0x01};
                 System.out.println(StatusMessage.checkMessageType(test));
                  */
-                ArduinoInstruction lastSentArduinoMessage = null;
+                ArduinoMessage lastSentArduinoMessage = null;
                 long timer = System.currentTimeMillis();
 
                 // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
@@ -210,7 +208,7 @@ public class MDPTCPConnector {
                         }
                     }
                     if(getResendStop()){
-                        ArduinoInstruction stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
+                        ArduinoMessage stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
                         outToServer.writeBytes(new String(stopMessage.toBytes()) + "~");
                         setResendStop(false);
                     }

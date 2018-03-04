@@ -44,7 +44,10 @@ class Main(object):
 		#print ("Connection from: " + str(clientaddr))
 		received = []
 		message_end = False
-		
+
+
+		ARDUINO_INSTRUCTION = (2).to_bytes(1, byteorder='big')
+		ARDUINO_STREAM = (3).to_bytes(1, byteorder='big')
 		while True:
 			try:
 				clientsock, clientaddr = serversock.accept()
@@ -63,6 +66,7 @@ class Main(object):
 						if(data[i] == 126):
 							message_end = True
 							print("Received from TCP: " + str(datetime.datetime.now()))
+							print(received)
 							break
 						received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
@@ -71,14 +75,19 @@ class Main(object):
 				
 			
 			# sends to Arduino
-			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ANDROID_UPDATE((byte)0x05);
+			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
 			if message_end:
-				if(received[0] == (2).to_bytes(1, byteorder='big')):
+				if(received[0] == ARDUINO_INSTRUCTION):
 					print("Sends to Arduino: " + str(datetime.datetime.now()))
 					to_arduino_queue.put(received[1:4])
-					message_end = False
-					received = []
-				
+					
+				elif (received[0] == ARDUINO_STREAM):
+					print('Received Arduino stream')
+					print(received)
+
+				message_end = False
+				received = []
+
 			
 			
 			# sends to bluetooth
@@ -93,7 +102,6 @@ class Main(object):
 				# Ends with a ~
 				string_to_send_tcp += "~"
 				print("sending to PC")
-				print(string_to_send_tcp.encode("ascii"))
 				clientsock.sendall(string_to_send_tcp.encode("ascii"))
 			
 			# receives from Bluetooth, doesn't block

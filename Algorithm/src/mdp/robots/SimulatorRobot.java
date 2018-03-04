@@ -95,8 +95,8 @@ public class SimulatorRobot extends RobotBase {
         } else if (mapdirection == Direction.RIGHT) {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
-        
-        for(RobotAction action : actions){
+
+        for (RobotAction action : actions) {
             System.out.println(action);
         }
 
@@ -105,6 +105,29 @@ public class SimulatorRobot extends RobotBase {
         if (taskqueue.size() == 1) {
             timer.schedule(task, delay);
         }
+    }
+
+    @Override
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+        int orientationIndex = 0;
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
+                NotifyTask task = new NotifyTask(null, new RobotAction[] {actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, delay);
+                }
+            }
+            else{
+                NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[] {actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, delay);
+                }
+                
+            }
+        }
+        
     }
 
     /**
