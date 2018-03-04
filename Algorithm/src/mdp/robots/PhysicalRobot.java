@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,12 +38,9 @@ public class PhysicalRobot extends RobotBase {
     private Queue<ArduinoMessage> outgoingArduinoQueue;
     private Queue<StatusMessage> outgoingAndroidQueue;
     private Map<SensorConfiguration, Integer> readings = new HashMap<>();
-
-    private Timer timer;
     private Queue<PhysicalRobot.NotifyTask> taskqueue;
     private long timerDelay = (long) 10;
     // Just to store robot supposed position
-    private MapState mstate;
 
     public PhysicalRobot(Dimension dimension, Direction orientation, Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         super(dimension, orientation);
@@ -64,10 +60,10 @@ public class PhysicalRobot extends RobotBase {
     }
 
     // This mstate should match Android's input. Tt's using the simulator's grid for now until integration with Android
+    @Override
     public void init(MapState mstate) {
-        this.timer = new Timer(true);
-        this.mstate = mstate.clone();
-
+    	super.init(mstate);
+    	
         // Tells TCP to send START command
         ArduinoInstruction initMessage = new ArduinoInstruction(RobotAction.START, false);
 
@@ -82,6 +78,7 @@ public class PhysicalRobot extends RobotBase {
 
                 break;
             }
+            
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ex) {
@@ -95,68 +92,6 @@ public class PhysicalRobot extends RobotBase {
             System.out.println(incomingArduinoUpdate.getRight1());
             System.out.println(incomingArduinoUpdate.getRight2());
             System.out.println(incomingArduinoUpdate.getLeft1());*/
-    }
-
-    @Override
-    public Direction getSensorDirection(SensorConfiguration sensor) {
-        Direction orientation = this.getCurrentOrientation();
-        Direction sdirection = sensor.getDirection();
-
-        if (orientation == Direction.DOWN) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.DOWN;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.UP;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.RIGHT;
-            } else {
-                sdirection = Direction.LEFT;
-            }
-        } else if (orientation == Direction.LEFT) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.LEFT;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.RIGHT;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.DOWN;
-            } else {
-                sdirection = Direction.UP;
-            }
-        } else if (orientation == Direction.RIGHT) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.RIGHT;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.LEFT;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.UP;
-            } else {
-                sdirection = Direction.DOWN;
-            }
-        }
-
-        return sdirection;
-    }
-
-    @Override
-    public Point getSensorCoordinate(SensorConfiguration sensor) {
-        List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
-        Point location = points.get(points.size() / 2);
-
-        Dimension rdim = mstate.getRobotDimension();
-        Direction sdirection = this.getSensorDirection(sensor);
-        Point scoordinate;
-
-        if (sdirection == Direction.UP) {
-            scoordinate = new Point(location.x + sensor.getCoordinate(), location.y + rdim.height / 2);
-        } else if (sdirection == Direction.DOWN) {
-            scoordinate = new Point(location.x - sensor.getCoordinate(), location.y - rdim.height / 2);
-        } else if (sdirection == Direction.LEFT) {
-            scoordinate = new Point(location.x - rdim.width / 2, location.y + sensor.getCoordinate());
-        } else {
-            scoordinate = new Point(location.x + rdim.width / 2, location.y - sensor.getCoordinate());
-        }
-
-        return scoordinate;
     }
 
     @Override
@@ -191,6 +126,7 @@ public class PhysicalRobot extends RobotBase {
         }
 
         // Update supposed robot location
+        MapState mstate = this.getMapState();
         Point location = mstate.getRobotPoint();
         if (mapdirection == Direction.UP) {
             mstate.setRobotPoint(new Point(location.x, location.y + 1));
@@ -202,12 +138,12 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        // sendCalibrationData();
+        sendCalibrationData();
         
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
-            timer.schedule(task, timerDelay);
+            this.getScheduler().schedule(task, timerDelay);
         }
     }
 
@@ -224,13 +160,13 @@ public class PhysicalRobot extends RobotBase {
                 NotifyTask task = new NotifyTask(null, new RobotAction[]{actions.get(i)});
                 taskqueue.offer(task);
                 if (taskqueue.size() == 1) {
-                    timer.schedule(task, timerDelay);
+                    this.getScheduler().schedule(task, timerDelay);
                 }
             } else {
                 NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[]{actions.get(i)});
                 taskqueue.offer(task);
                 if (taskqueue.size() == 1) {
-                    timer.schedule(task, timerDelay);
+                    this.getScheduler().schedule(task, timerDelay);
                 }
             }
         }
@@ -282,13 +218,52 @@ public class PhysicalRobot extends RobotBase {
                     if (sensor.getCoordinate() == 0) {
                         readings.put(sensor, left1);
                     }
+				default:
+					break;
             }
         }
     }
     
     private void sendCalibrationData() {
+    	MapState mstate = this.getMapState();
+    	Point rlocation = mstate.getRobotPoint();
+    	CellState up, down, left, right;
+    	
+    	switch(getCurrentOrientation()) {
+    		case UP:
+    			up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			left = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			right = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+				break;
+			case DOWN:
+				up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			left = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			right = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+				break;
+			case LEFT:
+				up = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			down = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+				break;
+			case RIGHT:
+				up = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			down = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+				break;
+			default:
+				up = CellState.NORMAL;
+    			down = CellState.NORMAL;
+    			left = CellState.NORMAL;
+    			right = CellState.NORMAL;
+				break;
+    	}
+    	
     	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
-    		if(spec.isInPosition(CellState.NORMAL, CellState.NORMAL, CellState.NORMAL, CellState.NORMAL))
+    		if(spec.isInPosition(up, down, left, right))
     			outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
     }
 
@@ -314,7 +289,7 @@ public class PhysicalRobot extends RobotBase {
             PhysicalRobot.this.taskqueue.poll();
 
             if (PhysicalRobot.this.taskqueue.size() > 0) {
-                timer.schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
+                PhysicalRobot.this.getScheduler().schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
             }
         }
 
