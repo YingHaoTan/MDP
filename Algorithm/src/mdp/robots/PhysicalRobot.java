@@ -25,6 +25,8 @@ import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.StatusMessage;
 import java.util.Date;
+import mdp.tcp.ArduinoMessage;
+import mdp.tcp.ArduinoStream;
 
 /**
  *
@@ -33,17 +35,17 @@ import java.util.Date;
 public class PhysicalRobot extends RobotBase {
 
     private SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
-    private Queue<ArduinoInstruction> outgoingArduinoQueue;
+    private Queue<ArduinoMessage> outgoingArduinoQueue;
     private Queue<StatusMessage> outgoingAndroidQueue;
     private Map<SensorConfiguration, Integer> readings = new HashMap<>();
 
     private Timer timer;
     private Queue<PhysicalRobot.NotifyTask> taskqueue;
-
+    private long timerDelay = (long)10;
     // Just to store robot supposed position
     private MapState mstate;
 
-    public PhysicalRobot(Dimension dimension, Direction orientation, SynchronousQueue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoInstruction> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
+    public PhysicalRobot(Dimension dimension, Direction orientation, SynchronousQueue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         super(dimension, orientation);
         this.taskqueue = new LinkedList<>();
         this.incomingArduinoQueue = incomingArduinoQueue;
@@ -192,9 +194,37 @@ public class PhysicalRobot extends RobotBase {
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
-            timer.schedule(task, 0);
+            timer.schedule(task, timerDelay);
         }
     }
+    
+    @Override
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+        int orientationIndex = 0;
+        
+        // Crafts message
+        ArduinoStream streamMessage = new ArduinoStream(actions);
+        outgoingArduinoQueue.add(streamMessage);
+        
+        for (int i = 0; i < actions.size(); i++) {
+            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
+                NotifyTask task = new NotifyTask(null, new RobotAction[] {actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, timerDelay);
+                }
+            }
+            else{
+                NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[] {actions.get(i)});
+                taskqueue.offer(task);
+                if (taskqueue.size() == 1) {
+                    timer.schedule(task, timerDelay);
+                }   
+            }
+        }
+    }
+
+    
     
     public void stop(){
         //send stop message
@@ -246,6 +276,8 @@ public class PhysicalRobot extends RobotBase {
         }
     }
 
+    
+
     /**
      * NotifyTask is a TimerTask that notifies registered RobotActionListener on
      * a specific robot action sequence completion
@@ -268,7 +300,7 @@ public class PhysicalRobot extends RobotBase {
             PhysicalRobot.this.taskqueue.poll();
 
             if (PhysicalRobot.this.taskqueue.size() > 0) {
-                timer.schedule(PhysicalRobot.this.taskqueue.peek(), 0);
+                timer.schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
             }
         }
 

@@ -11,7 +11,7 @@ package mdp.tcp;
  */
 public abstract class StatusMessage {
     enum StatusMessageType{
-        ARDUINO_UPDATE((byte)(0x01)),  ARDUINO_INSTRUCTION((byte)(0x02)), ANDROID_START((byte)0x03), ANDROID_INSTRUCTION((byte)0x04), ANDROID_UPDATE((byte)0x05);
+        ARDUINO_UPDATE((byte)(0x01)),  ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_START((byte)0x04), ANDROID_INSTRUCTION((byte)0x05), ANDROID_UPDATE((byte)0x06);
         private byte value;
         
         StatusMessageType(byte value){

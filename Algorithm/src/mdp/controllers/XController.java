@@ -148,7 +148,7 @@ public class XController {
 	public void fastestpath(ExecutionMode mode) {
 		RobotBase robot = getActiveRobot(mode);
 		if(planner != null)
-			planner.move(mstate, robot, mstate.getEndPoint(), false);
+			planner.move(mstate, robot, mstate.getEndPoint(), true);
 	}
 	
 	/**

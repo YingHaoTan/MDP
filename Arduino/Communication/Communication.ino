@@ -40,21 +40,21 @@ void loop() {
           switch (instructMsg.action) {
             case TURN_LEFT:
               //turnLeft();
-              delay(1000);
+              //delay(1000);
               sendStatusUpdate();
               incrementID();
               alreadyReceived = false;
               break;
             case TURN_RIGHT:
               //turnRight();
-              delay(1000);
+              //delay(1000);
               sendStatusUpdate();
               incrementID();
               alreadyReceived = false;
               break;
             case FORWARD:
               //moveForward();
-              delay(1000);
+              //delay(1000);
               sendStatusUpdate();
               incrementID();
               alreadyReceived = false;

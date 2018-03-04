@@ -28,6 +28,7 @@ import mdp.models.SensorConfiguration;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
 import mdp.tcp.ArduinoInstruction;
+import mdp.tcp.ArduinoMessage;
 import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.MDPTCPConnector;
 import mdp.tcp.StatusMessage;
@@ -63,7 +64,7 @@ public class Program {
         
         // PhysicalRobot
         SynchronousQueue<ArduinoUpdate> incomingArduinoQueue = new SynchronousQueue();
-        Queue<ArduinoInstruction> outgoingArduinoQueue = new LinkedList();
+        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList();
         Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
         PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));

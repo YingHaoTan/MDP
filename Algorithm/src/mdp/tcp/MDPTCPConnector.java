@@ -33,7 +33,7 @@ public class MDPTCPConnector {
     private boolean sentStop = false;
     
     SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
-    Queue<ArduinoInstruction> outgoingArduinoQueue;
+    Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
     public MDPTCPConnector(SynchronousQueue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
@@ -156,7 +156,7 @@ public class MDPTCPConnector {
     public class MDPTCPSender extends Thread {
 
         Socket connectedSocket;
-        Queue<ArduinoInstruction> outgoingArduinoQueue;
+        Queue<ArduinoMessage> outgoingArduinoQueue;
         Queue<StatusMessage> outgoingAndroidQueue;
 
         public MDPTCPSender(Socket connectedSocket, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
@@ -173,7 +173,7 @@ public class MDPTCPConnector {
                 /*byte[] test = {0x01,0x01};
                 System.out.println(StatusMessage.checkMessageType(test));
                  */
-                ArduinoInstruction lastSentArduinoMessage = null;
+                ArduinoMessage lastSentArduinoMessage = null;
                 long timer = System.currentTimeMillis();
 
                 // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
@@ -210,7 +210,7 @@ public class MDPTCPConnector {
                         }
                     }
                     if(getResendStop()){
-                        ArduinoInstruction stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
+                        ArduinoMessage stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
                         outToServer.writeBytes(new String(stopMessage.toBytes()) + "~");
                         setResendStop(false);
                     }

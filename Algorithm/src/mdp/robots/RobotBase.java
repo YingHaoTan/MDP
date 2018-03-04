@@ -30,8 +30,6 @@ public abstract class RobotBase {
         this.sensors = new ArrayList<>();
         this.listeners = new ArrayList<>();
     }
-    
-    
 
     /**
      * Installs a sensor into this robot instance
@@ -41,7 +39,6 @@ public abstract class RobotBase {
     public void install(SensorConfiguration sensor) {
         this.sensors.add(sensor);
     }
-    
 
     /**
      * Gets a list of sensors installed in this robot instance
@@ -144,9 +141,61 @@ public abstract class RobotBase {
         actionsequence.add(RobotAction.FORWARD);
 
         setCurrentOrientation(mapdirection);
-        
+
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
+    }
+
+    public void moveStream(ArrayList<Direction> streamDirections) {
+        
+        List<RobotAction> actionsequence = new ArrayList<>();
+        List<Direction> orientations = new ArrayList<>();
+        for (int i = 0; i < streamDirections.size(); i++) {
+            Direction mapdirection = streamDirections.get(i);
+
+            if (orientation == Direction.UP) {
+                if (mapdirection == Direction.LEFT) {
+                    actionsequence.add(RobotAction.TURN_LEFT);
+                } else if (mapdirection == Direction.RIGHT) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                } else if (mapdirection == Direction.DOWN) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                }
+            } else if (orientation == Direction.DOWN) {
+                if (mapdirection == Direction.RIGHT) {
+                    actionsequence.add(RobotAction.TURN_LEFT);
+                } else if (mapdirection == Direction.LEFT) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                } else if (mapdirection == Direction.UP) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                }
+            } else if (orientation == Direction.LEFT) {
+                if (mapdirection == Direction.DOWN) {
+                    actionsequence.add(RobotAction.TURN_LEFT);
+                } else if (mapdirection == Direction.UP) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                } else if (mapdirection == Direction.RIGHT) {
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.TURN_RIGHT);
+                }
+            } else if (mapdirection == Direction.UP) {
+                actionsequence.add(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.DOWN) {
+                actionsequence.add(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.LEFT) {
+                actionsequence.add(RobotAction.TURN_RIGHT);
+                actionsequence.add(RobotAction.TURN_RIGHT);
+            }
+            
+            actionsequence.add(RobotAction.FORWARD);
+            orientations.add(mapdirection);
+            setCurrentOrientation(mapdirection);
+        }
+        
+        moveRobotStream(actionsequence, orientations);
+
     }
 
     public void move(RobotAction action) {
@@ -170,8 +219,7 @@ public abstract class RobotBase {
                         break;
 
                 }
-            } 
-            else {
+            } else {
                 switch (getCurrentOrientation()) {
                     case UP:
                         newDirection = Direction.LEFT;
@@ -194,19 +242,19 @@ public abstract class RobotBase {
             move(orientation, action);
         }
     }
-    
+
     /*
     *  Things to do when you stop the robot
-    */ 
+     */
     public abstract void stop();
-    
+
     /**
      * Resets the robot orientation
      */
     public void reset() {
-    	orientation  = initialorientation;
+        orientation = initialorientation;
     }
-    
+
     /**
      * Notifies all RobotActionListener instances registered to this Robot
      * instance
@@ -255,4 +303,9 @@ public abstract class RobotBase {
      */
     protected abstract void move(Direction mapdirection, RobotAction... actions);
 
+    
+    /**
+     * Have to set orientation inside here...
+     */
+    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations);
 }
