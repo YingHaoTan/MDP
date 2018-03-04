@@ -17,6 +17,8 @@ import java.util.TimerTask;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
@@ -142,9 +144,6 @@ public class PhysicalRobot extends RobotBase {
     @Override
     protected void move(Direction mapdirection, RobotAction... actions) {
         for (RobotAction action : actions) {
-            // How do I know from here whether I have obstacleInFront or not.. I'm putting this as false from here
-            // 1) The MapState containing the scanned obstacles is inside ExplorationBase.java
-
             ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
             outgoingArduinoQueue.add(arduinoInstruction);
 
@@ -171,7 +170,7 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        
+        // sendCalibrationData();
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -222,6 +221,12 @@ public class PhysicalRobot extends RobotBase {
                     }
             }
         }
+    }
+    
+    private void sendCalibrationData() {
+    	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
+    		if(spec.isInPosition(CellState.NORMAL, CellState.NORMAL, CellState.NORMAL, CellState.NORMAL))
+    			outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
     }
 
     /**

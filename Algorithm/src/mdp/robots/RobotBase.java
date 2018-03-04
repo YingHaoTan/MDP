@@ -21,6 +21,7 @@ public abstract class RobotBase {
     private Direction initialorientation;
     private Direction orientation;
     private List<SensorConfiguration> sensors;
+    private List<CalibrationSpecification> cspecs;
     private List<RobotActionListener> listeners;
 
     public RobotBase(Dimension dimension, Direction orientation) {
@@ -28,6 +29,7 @@ public abstract class RobotBase {
         this.initialorientation = orientation;
         this.orientation = orientation;
         this.sensors = new ArrayList<>();
+        this.cspecs = new ArrayList<>();
         this.listeners = new ArrayList<>();
     }
     
@@ -50,6 +52,14 @@ public abstract class RobotBase {
      */
     public List<SensorConfiguration> getSensors() {
         return new ArrayList<>(this.sensors);
+    }
+    
+    /**
+     * Gets a list of calibration specifications added to this robot instance
+     * @return
+     */
+    public List<CalibrationSpecification> getCalibrationSpecifications() {
+    	return new ArrayList<>(this.cspecs);
     }
 
     /**
@@ -94,6 +104,22 @@ public abstract class RobotBase {
      */
     public void removeRobotActionListener(RobotActionListener listener) {
         this.listeners.remove(listener);
+    }
+    
+    /**
+     * Adds a CalibrationSpecification
+     * @param spec
+     */
+    public void addCalibrationSpecification(CalibrationSpecification spec) {
+    	this.cspecs.add(spec);
+    }
+    
+    /**
+     * Removes a CalibrationSpecification
+     * @param spec
+     */
+    public void removeCalibrationSpecification(CalibrationSpecification spec) {
+    	this.cspecs.remove(spec);
     }
 
     /**
