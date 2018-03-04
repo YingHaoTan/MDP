@@ -14,9 +14,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
@@ -200,7 +201,9 @@ public class PhysicalRobot extends RobotBase {
         } else if (mapdirection == Direction.RIGHT) {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
-
+        
+        // sendCalibrationData();
+        
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
@@ -281,6 +284,12 @@ public class PhysicalRobot extends RobotBase {
                     }
             }
         }
+    }
+    
+    private void sendCalibrationData() {
+    	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
+    		if(spec.isInPosition(CellState.NORMAL, CellState.NORMAL, CellState.NORMAL, CellState.NORMAL))
+    			outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
     }
 
     /**
