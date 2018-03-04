@@ -32,11 +32,12 @@ public class MDPTCPConnector {
     private boolean resendStop = false;
     private boolean sentStop = false;
     
-    SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
+    //SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
+    Queue<ArduinoUpdate> incomingArduinoQueue;
     Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
-    public MDPTCPConnector(SynchronousQueue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
+    public MDPTCPConnector(Queue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
         try {
             this.clientSocket = new Socket("localhost", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
@@ -79,9 +80,9 @@ public class MDPTCPConnector {
 
         Socket connectedSocket;
 
-        SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
+        Queue<ArduinoUpdate> incomingArduinoQueue;
 
-        public MDPTCPReceiver(Socket connectedSocket, SynchronousQueue incomingArduinoQueue) {
+        public MDPTCPReceiver(Socket connectedSocket, Queue incomingArduinoQueue) {
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.connectedSocket = connectedSocket;
 
@@ -124,11 +125,8 @@ public class MDPTCPConnector {
                                 if (arduinoUpdate.getId() == lastSent) {
                                     yetToReceiveAck = false;
                                     incrementID(lastSent);
-                                    try {
-                                        incomingArduinoQueue.put(arduinoUpdate);
-                                    } catch (InterruptedException ex) {
-                                        Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
+                                    incomingArduinoQueue.add(arduinoUpdate);
+                                    //System.out.println("size from mdp receiver=" + incomingArduinoQueue.size());
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                     // outgoingAndroidQueue.add();
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()

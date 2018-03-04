@@ -63,7 +63,7 @@ public class Program {
         xcontroller.setSimulatorRobot(srobot);
         
         // PhysicalRobot
-        SynchronousQueue<ArduinoUpdate> incomingArduinoQueue = new SynchronousQueue();
+        Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList();
         Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList();
         Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
         PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
