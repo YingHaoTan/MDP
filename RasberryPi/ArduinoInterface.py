@@ -19,27 +19,32 @@ class ArduinoInterface(object):
 		try:
 			self.ser = serial.Serial(self.port, self.baudrate)
 			if (self.ser.isOpen()):
+				self.ser.setDTR(False)
+				time.sleep(1)
+				self.ser.flush()
+				self.ser.setDTR(True)
 				print("Serial Port: " + self.ser.portstr + " is successfully opened")
+				
 		except serial.SerialException as e:
 			print("Serial Port: {} failed to open. Error: {}".format(self.port, e))
 
 	# Read message from Arduino
 	def read_from_arduino(self):
 		time.sleep(.001)
-		while True:
-			if(self.ser.inWaiting()):
-				inByte = self.ser.read()
-				if(inByte == bytes('~', 'ascii')):
-					toReturn = []
-					counter = 0
-					while True:
-						nextByte = self.ser.read()
-						counter+=1
-						
-						if(nextByte == bytes('!', 'ascii') and counter == 10):
-							return toReturn
-						else:
-							toReturn.append(nextByte)
+		#while True:
+		if(self.ser.inWaiting()):
+			inByte = self.ser.read()
+			if(inByte == bytes('~', 'ascii')):
+				toReturn = []
+				counter = 0
+				while True:
+					nextByte = self.ser.read()
+					counter+=1	
+					if(nextByte == bytes('!', 'ascii') and counter == 10):
+						return toReturn
+					else:
+						toReturn.append(nextByte)
+		return None
 		
 	# Write message to Arduino
 	def write_to_arduino(self, msg):

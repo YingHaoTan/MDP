@@ -221,6 +221,11 @@ public abstract class RobotBase {
         }
     }
     
+    /*
+    *  Things to do when you stop the robot
+    */ 
+    public abstract void stop();
+    
     /**
      * Resets the robot orientation
      */

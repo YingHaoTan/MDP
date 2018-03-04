@@ -1,9 +1,13 @@
 package mdp;
 
 import java.awt.Dimension;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -47,7 +51,7 @@ public class Program {
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
         
         // SimulatorRobot
-        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
+        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
@@ -61,13 +65,13 @@ public class Program {
         SynchronousQueue<ArduinoUpdate> incomingArduinoQueue = new SynchronousQueue();
         Queue<ArduinoInstruction> outgoingArduinoQueue = new LinkedList();
         Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
-        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.UP, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
+        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        probot.install(new SensorConfiguration(Direction.LEFT, 0, 2, 0.5));
+        probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
         wcontroller.setPhysicalRobot(probot);
         xcontroller.setPhysicalRobot(probot);
         
@@ -87,10 +91,9 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
               
-       
-        //MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("192.168.6.6", 5000, incomingQueue, outgoingArduinoQueue, outgoingAndroidQueue);
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector("localhost", 5000, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);      
-        mdpTCPConnector.start();
+        
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
+        mdpTCPConnector.startThreads();
     }
 
 }

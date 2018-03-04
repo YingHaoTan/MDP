@@ -1,17 +1,12 @@
 #define ARDUINO_UPDATE                             0x01
 
-#define START									   0x01
-#define SCAN									   0x02
+#define START									                     0x01
+#define SCAN									                     0x02
 #define TURN_LEFT                                  0x03
 #define TURN_RIGHT                                 0x04
 #define FORWARD                                    0x05
-#define REVERSE									   0x06
-
-// Does not do anything until RPi sends you new stuff
-#define STOP									   0x07
-#define CAL_CORNER								   0x08 
-#define CAL_SIDE								   0x09
-
+#define CAL_CORNER                                 0x06
+#define CAL_SIDE                                   0x07
 
 #define PAYLOAD_SIZE                               8 //As long as it's bigger than StatusMessage
 
@@ -41,3 +36,14 @@ struct InstructionMessage
   uint8_t obstacleInFront;
 };
 
+#define BUFFER_SIZE                               32
+
+uint8_t last_sent = 0;
+uint8_t incomingBuffer[BUFFER_SIZE];
+int bufferIndex = 0;
+
+// timer
+bool yetToReceiveAck = false;
+bool alreadyReceived = false;
+unsigned long timer = millis();
+unsigned long timeout = 500; // 250 milliseconds

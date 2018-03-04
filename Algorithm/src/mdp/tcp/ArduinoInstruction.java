@@ -48,4 +48,8 @@ public class ArduinoInstruction extends StatusMessage{
     public void setID(int id){
         this.id = (byte)id;
     }
+    
+    public RobotAction getMessageAction(){
+        return this.actionToTake;
+    }
 }

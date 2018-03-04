@@ -220,6 +220,11 @@ public class SimulatorRobot extends RobotBase {
         return distance;
     }
 
+    @Override
+    public void stop() {
+        System.out.println("Simulated Robot stopped.");
+    }
+
     /**
      * NotifyTask is a TimerTask that notifies registered RobotActionListener on
      * a specific robot action sequence completion
