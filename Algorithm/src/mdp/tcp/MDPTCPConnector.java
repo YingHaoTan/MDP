@@ -31,6 +31,7 @@ public class MDPTCPConnector {
     // Used for controlling the transmission of stop message
     private boolean resendStop = false;
     private boolean sentStop = false;
+    private boolean stopFlag = false;
     
     //SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
     Queue<ArduinoUpdate> incomingArduinoQueue;
@@ -39,7 +40,7 @@ public class MDPTCPConnector {
 
     public MDPTCPConnector(Queue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
         try {
-            this.clientSocket = new Socket("localhost", 5000);
+            this.clientSocket = new Socket("", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;
@@ -74,6 +75,14 @@ public class MDPTCPConnector {
     
     private synchronized boolean getSentStop(){
         return this.sentStop;
+    }
+    
+    private synchronized boolean getStopFlag(){
+        return this.stopFlag;
+    }
+    
+    private synchronized void setStopFlag(boolean value){
+        this.stopFlag = value;
     }
 
     public class MDPTCPReceiver extends Thread {
@@ -122,7 +131,8 @@ public class MDPTCPConnector {
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
                                 System.out.println("Receiving: " + arduinoUpdate.getId());
-                                if (arduinoUpdate.getId() == lastSent) {
+                                System.out.println("Last sent is" + lastSent);
+                                if (arduinoUpdate.getId() == lastSent && !getSentStop()) {
                                     yetToReceiveAck = false;
                                     incrementID(lastSent);
                                     incomingArduinoQueue.add(arduinoUpdate);
@@ -179,37 +189,45 @@ public class MDPTCPConnector {
 
                 DataOutputStream outToServer = new DataOutputStream(connectedSocket.getOutputStream());
 
+                
+                /*ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.STOP, true);
+                outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
+                
                 while (true) {
                     Thread.sleep((long) 0.1);
                     if (!outgoingArduinoQueue.isEmpty()) {
                         // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
                         lastSentArduinoMessage = outgoingArduinoQueue.remove();
                         lastSentArduinoMessage.setID(lastSent);
-                        System.out.println("Sending: " + lastSent);
+                        System.out.println("Sending: " + lastSent + " " + lastSentArduinoMessage.getMessageAction());
+                        
+                        outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
+                        yetToReceiveAck = true;
+                        timer = System.currentTimeMillis();
+                        
                         if(lastSentArduinoMessage.getMessageAction() == RobotAction.STOP){
                             setSentStop(true);
-                            System.out.println("Sent stop");
+
                         } 
                         else{
                             setSentStop(false);
                         }
-                        outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
-                        yetToReceiveAck = true;
-                        timer = System.currentTimeMillis();
                     }
                     if (!outgoingAndroidQueue.isEmpty()) {
                         // sends whatever format u like
                     }
                     if (yetToReceiveAck && System.currentTimeMillis() > timer + timeout) {
-                        if (lastSentArduinoMessage != null && lastSentArduinoMessage.getMessageAction() != RobotAction.STOP) {
+                        if ((lastSentArduinoMessage != null) && (lastSentArduinoMessage.getMessageAction() != RobotAction.STOP)) {
                             System.out.println("Resending:" + lastSentArduinoMessage.getID());
                             outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                             timer = System.currentTimeMillis();
                         }
                     }
-                    if(getResendStop()){
+                    if(getResendStop() && System.currentTimeMillis() > timer + timeout){
+                        System.out.println("Resending STOP :" + lastSent);
                         ArduinoMessage stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
                         outToServer.writeBytes(new String(stopMessage.toBytes()) + "~");
+                        timer = System.currentTimeMillis();
                         setResendStop(false);
                     }
                 }

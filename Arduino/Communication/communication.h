@@ -1,16 +1,19 @@
 #define ARDUINO_UPDATE                             0x01
+#define ARDUINO_INSTRUCTION                        0x02
+#define ARDUINO_STREAM                             0x03
 
-#define START									   0x01
+#define START									                      0x01
 #define SCAN									   0x02
 #define TURN_LEFT                                  0x03
 #define TURN_RIGHT                                 0x04
 #define FORWARD                                    0x05
-#define REVERSE									   0x06
+#define REVERSE									                    0x06
+#define STOP                                        0x07
+#define CAL_CORNER                                  0x08 
+#define CAL_SIDE                                    0x09
 
 // Does not do anything until RPi sends you new stuff
-#define STOP									   0x07
-#define CAL_CORNER								   0x08 
-#define CAL_SIDE								   0x09
+
 
 
 #define PAYLOAD_SIZE                               8 //As long as it's bigger than StatusMessage
@@ -39,5 +42,11 @@ struct InstructionMessage
   uint8_t id;
   uint8_t action;
   uint8_t obstacleInFront;
+};
+
+struct StreamMessage
+{
+  uint8_t id;
+  uint8_t streamActions[128]; //in case theres a lot of actions..
 };
 

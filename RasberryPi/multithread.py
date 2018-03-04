@@ -1,5 +1,5 @@
 import ArduinoInterface
-import BluetoothServerInterface
+#import BluetoothServerInterface
 import socket
 
 from queue import Queue
@@ -27,6 +27,8 @@ class Main(object):
 			temp = arduino.read_from_arduino()
 			if temp is not None:
 				string_to_send_tcp = ""
+				print("Receives from Arduino:")
+				print(temp)
 				for i in range(len(temp)):
 					string_to_send_tcp += temp[i].decode("ascii")			
 				from_arduino_queue.put(string_to_send_tcp)
@@ -66,7 +68,6 @@ class Main(object):
 						if(data[i] == 126):
 							message_end = True
 							print("Received from TCP: " + str(datetime.datetime.now()))
-							print(received)
 							break
 						received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
@@ -76,14 +77,16 @@ class Main(object):
 			
 			# sends to Arduino
 			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
-			if message_end:
+			if message_end and len(received) > 0:
 				if(received[0] == ARDUINO_INSTRUCTION):
 					print("Sends to Arduino: " + str(datetime.datetime.now()))
-					to_arduino_queue.put(received[1:4])
+					print(received)
+					to_arduino_queue.put(received)
 					
 				elif (received[0] == ARDUINO_STREAM):
-					print('Received Arduino stream')
+					print('Received Arduino stream' + str(len(received)))
 					print(received)
+					to_arduino_queue.put(received)
 
 				message_end = False
 				received = []
@@ -161,14 +164,18 @@ class Main(object):
 			##think theres problem with the queue passed in. I think it should also pcqueue.
 			##t1 need all the queue since it is at the center of the communication.
 			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_android_queue, from_android_queue, '', 5000))
-			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'COM13', 115200))
+
+			serial_ports = ArduinoInterface.list_ports()
+
+
+			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,serial_ports[0], 115200))
 			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
-			t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, to_algo_queue, from_algo_queue, '', 1))
+			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, to_algo_queue, from_algo_queue, '', 1))
 
 	
 			t1.start()
 			t2.start()
-			t3.start()
+			#t3.start()
 	
 		except Exception as e:
 			print(str(e))

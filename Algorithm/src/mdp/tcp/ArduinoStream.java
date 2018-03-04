@@ -44,6 +44,7 @@ public class ArduinoStream extends ArduinoMessage{
         for(int i = 0; i < actions.size(); i++){
             toSend[3+i] = actions.get(i).getByte();
         }
+        System.out.println("Length of stream:" + actions.size());
         return toSend;
     }
 

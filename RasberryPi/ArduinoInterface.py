@@ -1,7 +1,7 @@
 # interfaces the Arduino with the Raspberry Pi
 import serial
 import time
-
+import serial.tools.list_ports
 class ArduinoInterface(object):
 
 	def __init__(self, port, baud_rate):
@@ -61,3 +61,5 @@ class ArduinoInterface(object):
 		self.ser.close()
 		print("Arduino connection closed")
 
+def list_ports():
+	return [comport.device for comport in serial.tools.list_ports.comports()]
