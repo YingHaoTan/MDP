@@ -49,7 +49,6 @@ struct StreamMessage
 
 #define BUFFER_SIZE                               256
 
-uint8_t last_sent = 0;
 
 
 // timer

@@ -7,6 +7,8 @@
 
 RingBuffer usbBufferIn;
 
+uint8_t last_sent = 0;
+
 void setup() {
   Serial.begin(115200);
   RingBuffer_init(&usbBufferIn);
@@ -36,28 +38,73 @@ void loop() {
 
 
 //------------Functions for robot movements------------//
+//void goFORWARD(int noBlock) {
+//  int setSpdR = 300;              //Right motor
+//  int setSpdL = 304;              //Left motor
+//  long lastTime = millis();
+//  
+//  md.setSpeeds(setSpdR, setSpdL);
+//  delay(50);
+//
+//  while (mRev[0] < noBlock && mRev[1] < noBlock){
+//
+//    if(millis() - lastTime > 500){
+//      PIDControl(&setSpdR, &setSpdL);
+//      md.setSpeeds(setSpdR,setSpdL);
+//      //Serial << "Setting speeds to:" << "M1 Speed: " << setSpdR << " M2 Speed: " << setSpdL << endl;
+//      
+//      lastTime = millis();
+//    }
+//  }
+//  md.setBrakes(400, 400);
+//  resetMCounters();
+//  
+//}
+
+//Another way to implement PID
 void goFORWARD(int noBlock) {
-  int setSpdR = 300;              //Right motor
-  int setSpdL = 304;              //Left motor
+  int kP = 100;
+  int kI = 0;
+  int kD = 0;
+  int error = 0;
+  int errorRate = 0;
+  int adjustment = 0;
+  int totalErrors = 0;
+  int lastError = 0;
+  int lastTicks[2] = {0, 0};
+  int setSpd1 = 300;              //Right motor
+  int setSpd2 = 304;              //Left motor
   long lastTime = millis();
   
-  md.setSpeeds(setSpdR, setSpdL);
+  md.setSpeeds(setSpd1, setSpd2);
   delay(50);
 
-  while (mRev[0] < noBlock && mRev[1] < noBlock){
-
-    if(millis() - lastTime > 500){
-      PIDControl(&setSpdR, &setSpdL);
-      md.setSpeeds(setSpdR,setSpdL);
-      //Serial << "Setting speeds to:" << "M1 Speed: " << setSpdR << " M2 Speed: " << setSpdL << endl;
+  while (mRev[0] < noBlock && mRev[1] < noBlock) {
+    if (millis() - lastTime > 100) {
       
       lastTime = millis();
+      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      lastTicks[0] = mCounter[0];
+      lastTicks[1] = mCounter[1];
+      errorRate = error - lastError;
+      lastError = error;
+      totalErrors += error;
+      if (abs(error) > 5) {
+          adjustment = kP * error + kI * totalErrors + kD * errorRate;
+          adjustment /= 100;
+          setSpd1 += adjustment;
+          setSpd2 -= adjustment;
+          md.setSpeeds(setSpd1, setSpd2);
+          Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
+      }
     }
   }
-  md.setBrakes(400, 400);
   resetMCounters();
-  
+  md.setBrakes(400, 400);
 }
+
+
 
 void goRIGHT(){
   while(mCounter[0] < turnRightTicks && mCounter[1] < turnRightTicks)
@@ -72,7 +119,7 @@ void goLEFT(){
     md.setSpeeds(350, -350);
   md.setBrakes(400, 400);
   delay(300);
-  tickCorrection();
+//  tickCorrection();
   resetMCounters();
 }
 
@@ -115,13 +162,13 @@ void PIDControl(int *setSpdR, int *setSpdL){
   }
 }
 
-void tickCorrection(int *rightTicks, int *leftTicks){
-  errorRight = rightTicks - mCounter[0];
-  errorLeft = leftTicks - mCounter[1];
-  while(mCounter[0] < errorRight && mCounter[1] < errorLeft){
-    md.setSpeeds((errorRight/abs(errorRight)*150), (errorLeft/abs(errorLeft)*150));
-  }
-}
+//void tickCorrection(int *rightTicks, int *leftTicks){
+//  int errorRight = rightTicks - mCounter[0];
+//  int errorLeft = leftTicks - mCounter[1];
+//  while(mCounter[0] < errorRight && mCounter[1] < errorLeft){
+//    md.setSpeeds((errorRight/abs(errorRight)*150), (errorLeft/abs(errorLeft)*150));
+//  }
+//}
 
 void calibratePos() {
   calibrateRIGHT();
@@ -265,6 +312,7 @@ void commWithRPI() {
         if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 1) == true) {
           messageType = tmpInBuffer;
         }
+        
         if (messageType == ARDUINO_INSTRUCTION) {
           if (5 < usbBufferIn.count) {
             if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 5) == true && tmpInBuffer == '!') {
@@ -275,7 +323,7 @@ void commWithRPI() {
               RingBuffer_get( & usbBufferIn, & instructMsg.action, 3);
               RingBuffer_get( & usbBufferIn, & instructMsg.obstacleInFront, 4);
 
-              if (last_sent == instructMsg.id && alreadyReceived == false) {
+              //if (last_sent == instructMsg.id && alreadyReceived == false) {
 
                 alreadyReceived = true;
                 yetToReceiveAck = false;
@@ -291,6 +339,7 @@ void commWithRPI() {
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
+                  break;
                 case FORWARD:
                   goFORWARD(1);
                   sendStatusUpdate();
@@ -327,9 +376,10 @@ void commWithRPI() {
                   break;
                 case STOP:
                   yetToReceiveAck = false;
+                  break;
                 }
                 RingBuffer_erase( & usbBufferIn, 6);
-              }
+              //}
 
             } else {
               RingBuffer_pop( & usbBufferIn);
