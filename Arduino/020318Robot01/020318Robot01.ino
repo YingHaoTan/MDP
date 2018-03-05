@@ -312,6 +312,7 @@ void commWithRPI() {
         if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 1) == true) {
           messageType = tmpInBuffer;
         }
+        
         if (messageType == ARDUINO_INSTRUCTION) {
           if (5 < usbBufferIn.count) {
             if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 5) == true && tmpInBuffer == '!') {
@@ -322,7 +323,7 @@ void commWithRPI() {
               RingBuffer_get( & usbBufferIn, & instructMsg.action, 3);
               RingBuffer_get( & usbBufferIn, & instructMsg.obstacleInFront, 4);
 
-              if (last_sent == instructMsg.id && alreadyReceived == false) {
+              //if (last_sent == instructMsg.id && alreadyReceived == false) {
 
                 alreadyReceived = true;
                 yetToReceiveAck = false;
@@ -338,6 +339,7 @@ void commWithRPI() {
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
+                  break;
                 case FORWARD:
                   goFORWARD(1);
                   sendStatusUpdate();
@@ -374,9 +376,10 @@ void commWithRPI() {
                   break;
                 case STOP:
                   yetToReceiveAck = false;
+                  break;
                 }
                 RingBuffer_erase( & usbBufferIn, 6);
-              }
+              //}
 
             } else {
               RingBuffer_pop( & usbBufferIn);
