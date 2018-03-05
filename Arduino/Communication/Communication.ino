@@ -3,7 +3,6 @@
 
 #define BUFFER_SIZE                               256
 
-// need to check if will overflow
 RingBuffer usbBufferIn;
 
 
@@ -120,21 +119,6 @@ void loop() {
         RingBuffer_pop(&usbBufferIn);
       }
     }
-    /*else if (messageType == ARDUINO_STREAM) {
-      //Stuck at this part
-      uint8_t length1 = (uint8_t)incomingBuffer[traversalIndex + 3];
-      if (length1 == 32) {
-        digitalWrite(LED_BUILTIN, HIGH);
-      }
-      }
-      else {
-      traversalIndex++;
-      }
-      }
-      else {
-      RingBuffer_pop(&usbBufferIn);
-      }
-      }*/
   }
   /*
 
