@@ -64,8 +64,9 @@ class Main(object):
     #read from android and pass to pc queue
     def read_android(self, pc_queue):
         while True:
-            data = self.android.read()
-            pc_queue.put(data)
+            if(not pc_queue.empty()): 
+                data = self.android.read()
+                pc_queue.put(data)
 
 
     #write to android from android queue
@@ -132,6 +133,7 @@ class Main(object):
 
         except Exception as e:
             print(str(e))
+      
 
 
     def disconnect_all(self):
@@ -148,4 +150,5 @@ if __name__ == "__main__":
     start = Main()
     start.start_connection()
     start.initialise()
+   
 
