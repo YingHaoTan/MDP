@@ -32,14 +32,15 @@ class Main(object):
 				for i in range(len(temp)):
 					string_to_send_tcp += temp[i].decode("ascii")			
 				from_arduino_queue.put(string_to_send_tcp)
-			time.sleep(0.5)
 			
+			time.sleep(0.001)
 			
 
 	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_android_queue, from_android_queue, host='', port=5000):
 		serversock = socket.socket()	#create a new socket object
 		serversock.bind((host, port))	#bind socket
 		serversock.setblocking(False)
+		serversock.settimeout(0.0)
 		serversock.listen(1)
 		print ("Listening")
 		#clientsock, clientaddr = serversock.accept()
@@ -53,6 +54,8 @@ class Main(object):
 		while True:
 			try:
 				clientsock, clientaddr = serversock.accept()
+				clientsock.setblocking(False)
+				clientsock.settimeout(0.0)
 				print ("Connection from: " + str(clientaddr))
 				break
 			except:
@@ -60,9 +63,12 @@ class Main(object):
 				
 		
 		while True:
+			print('Gello')
 			while not message_end:
 				try:
-					data = clientsock.recv(1024)             				
+					print('Before blocking')  
+					data = clientsock.recv(1024)  
+					         				
 					for i in range(len(data)):
 						# if new line
 						if(data[i] == 126):
@@ -71,7 +77,9 @@ class Main(object):
 							break
 						received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
+					print('exception')
 					break
+			print('GelloEnd')
 					
 				
 			
@@ -106,15 +114,17 @@ class Main(object):
 				string_to_send_tcp += "~"
 				print("sending to PC")
 				clientsock.sendall(string_to_send_tcp.encode("ascii"))
-			
+
+
 			# receives from Bluetooth, doesn't block
-			if(not from_android_queue.empty()):
-				pass
+			#if(not from_android_queue.empty()):
+			#	pass
 			
+
+			time.sleep(0.001)
 			#send to algo
 			
 			#receive from algo
-			
 
 		clientsock.close()
 		
@@ -166,9 +176,13 @@ class Main(object):
 			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_android_queue, from_android_queue, '', 5000))
 
 			serial_ports = ArduinoInterface.list_ports()
+			for port in serial_ports:
+				print(port)
+				if 'ACM' in port or 'COM' in port:
+					to_connect = port
+			
 
-
-			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,serial_ports[0], 115200))
+			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
 			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
 			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, to_algo_queue, from_algo_queue, '', 1))
 

@@ -41,7 +41,7 @@ public class MDPTCPConnector {
 
     public MDPTCPConnector(Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         try {
-            this.clientSocket = new Socket("", 5000);
+            this.clientSocket = new Socket("192.168.6.6", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;

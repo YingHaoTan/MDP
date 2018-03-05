@@ -72,5 +72,5 @@ class ArduinoInterface(object):
 		self.start_arduino_connection() 
 		print("Reconnecting..") 
 
-	def list_ports():
-		return [comport.device for comport in serial.tools.list_ports.comports()]
+def list_ports():
+	return [comport.device for comport in serial.tools.list_ports.comports()]
