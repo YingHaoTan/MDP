@@ -1,12 +1,10 @@
 package mdp.controllers.explorer;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import mdp.models.CellState;
-import mdp.models.MapState;
 import mdp.robots.RobotBase;
 
 /**

@@ -57,7 +57,6 @@ public abstract class MovementBase {
 
             //System.out.println("Direction: " + getRobot().getSensorDirection(sensor) + ", Coordinate:" + getRobot().getSensorCoordinate(sensor));
             int reading = readings.get(sensor);
-            int test = reading;
             // Limits sensor range
             if (reading > sensor.getMaxDistance()) {
                 reading = 0;

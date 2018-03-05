@@ -134,7 +134,9 @@ public class XController {
 		if(mstate.getWayPoint() != null)
 			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
                 
-                robot.init(mstate.clone());
+        robot.init(mstate.clone());
+        if(mode == ExecutionMode.SIMULATION)
+        	srobot.setSimulationMapState(simulationState);
 
 		if (explorer != null)
 			explorer.explore(robot, coverage, timelimit);
