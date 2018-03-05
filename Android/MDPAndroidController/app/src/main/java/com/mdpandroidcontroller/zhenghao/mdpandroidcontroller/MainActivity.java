@@ -109,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private ControllerTranslator translator = null;
 
+    // hacky variable to pass checklist
+    boolean mapChecker = false;
+    boolean robotChecker = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: starts");
@@ -587,8 +591,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     Button.OnClickListener updateButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             //send message to robot via bluetooth
+            mapChecker = true;
+            robotChecker = true;
+            mBluetoothService.write(translator.commandUpdateNow().getBytes());
 
         }
     };
@@ -732,12 +738,44 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     }
 
     @Override
-    public void onDoMapUpdateFull() {
+    public void onDoRobotPos(int x, int y, Direction d){
+
         if (updateModeSwitch.isChecked()) {
             // Do auto update
+            maze.updateRobot(x,y,d);
+            mazeGridAdapter.updateMaze(maze);
+            mazeGridAdapter.notifyDataSetChanged();
         }
         else {
             // Manual update
+            // modify to rely on the update button later on
+            if(robotChecker){
+                robotChecker = false;
+                maze.updateRobot(x,y,d);
+                mazeGridAdapter.updateMaze(maze);
+                mazeGridAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onDoMapUpdateFull(String mdf1, String mdf2) {
+
+        if (updateModeSwitch.isChecked()) {
+            // Do auto update
+            maze.updateMaze(mdf1,mdf2);
+            mazeGridAdapter.updateMaze(maze);
+            mazeGridAdapter.notifyDataSetChanged();
+        }
+        else {
+            // Manual update
+            // modify to rely on the update button later on
+            if(mapChecker){
+                mapChecker = false;
+                maze.updateMaze(mdf1,mdf2);
+                mazeGridAdapter.updateMaze(maze);
+                mazeGridAdapter.notifyDataSetChanged();
+            }
         }
 
     }

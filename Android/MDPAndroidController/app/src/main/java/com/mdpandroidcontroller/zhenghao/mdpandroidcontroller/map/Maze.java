@@ -1,7 +1,12 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map;
 
+import android.text.TextUtils;
+
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
+
+import java.math.BigInteger;
+import java.util.Collections;
 
 /**
  *
@@ -80,8 +85,34 @@ public class Maze {
     }
 
     // to take in MDF files from algo in the future
-    public void updateMaze(byte[] mdf1, byte[] mdf2){
+    public void updateMaze(String mdf1, String mdf2){
+        String mdf1bin = new BigInteger(mdf1, 16).toString(2);
+        String mdf2bin = new BigInteger(mdf2, 16).toString(2);
 
+        mdf2bin = TextUtils.join("", Collections.nCopies(mdf2.length() * 4 - mdf2bin.length(), "0")) + mdf2bin;
+
+        int mdf1counter = 0;
+        int mdf2counter = 0;
+        mdf1bin = mdf1bin.substring(2, mdf1bin.length() - 2);
+
+        for (int y = 0; y < MAZE_ROWS; y++) {
+            for (int x = 0; x < MAZE_COLS; x++) {
+                if (mdf1bin.substring(mdf1counter, mdf1counter + 1).equals("0")) {
+                    updateGrid(x, y, CellState.UNEXPLORED);
+                } else {
+                    if (mdf2bin.substring(mdf2counter, mdf2counter + 1).equals("1")) {
+                        updateGrid(x, y, CellState.OBSTACLE);
+                    }
+                    else {
+                        updateGrid(x, y, CellState.NORMAL);
+                    }
+
+                    mdf2counter++;
+                }
+
+                mdf1counter++;
+            }
+        }
     }
 
     /**
