@@ -188,12 +188,12 @@ public class MDPTCPConnector {
                 long timer = System.currentTimeMillis();
 
                 // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
-                long timeout = 5000;
+                long timeout = 2000;
 
                 DataOutputStream outToServer = new DataOutputStream(connectedSocket.getOutputStream());
 
                 
-                /*ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.STOP, true);
+               /* ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
                 outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
                 List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.START);
@@ -228,20 +228,22 @@ public class MDPTCPConnector {
                     if (!outgoingAndroidQueue.isEmpty()) {
                         // sends whatever format u like
                     }
+                    /*
                     if (yetToReceiveAck && System.currentTimeMillis() > timer + timeout) {
                         if ((lastSentArduinoMessage != null) && (lastSentArduinoMessage.getMessageAction() != RobotAction.STOP)) {
                             System.out.println("Resending:" + lastSentArduinoMessage.getID());
                             outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
                             timer = System.currentTimeMillis();
                         }
-                    }
+                    }*/
+                    /*
                     if(getResendStop() && System.currentTimeMillis() > timer + timeout){
                         System.out.println("Resending STOP :" + lastSent);
                         ArduinoMessage stopMessage = new ArduinoInstruction(lastSent, RobotAction.STOP, false);
                         outToServer.writeBytes(new String(stopMessage.toBytes()) + "~");
                         timer = System.currentTimeMillis();
                         setResendStop(false);
-                    }
+                    }*/
                 }
             } catch (SocketException ex) {
                 Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);

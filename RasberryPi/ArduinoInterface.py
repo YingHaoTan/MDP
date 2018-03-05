@@ -45,7 +45,7 @@ class ArduinoInterface(object):
 					counter+=1	
 					#print(nextByte)
 					if(nextByte == bytes('!', 'ascii') and counter == 10):
-						print(toReturn)
+						#print(toReturn)
 						return toReturn
 					else:
 						toReturn.append(nextByte)

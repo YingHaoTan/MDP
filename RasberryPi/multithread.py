@@ -5,7 +5,7 @@ import socket
 from queue import Queue
 from threading import Thread
 import datetime
-
+import time
 
 class Main(object):
 
@@ -32,7 +32,7 @@ class Main(object):
 				for i in range(len(temp)):
 					string_to_send_tcp += temp[i].decode("ascii")			
 				from_arduino_queue.put(string_to_send_tcp)
-			
+			time.sleep(0.5)
 			
 			
 
