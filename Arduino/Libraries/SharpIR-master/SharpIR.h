@@ -14,19 +14,18 @@
 #ifndef SharpIR_h
 #define SharpIR_h
 
-#define NB_SAMPLE 25
+#define NB_SAMPLE 11
+
 
 #ifdef ARDUINO
   #include "Arduino.h"
-#elif defined(SPARK)
-  #include "Particle.h"
 #endif
 
 class SharpIR
 {
   public:
 
-    SharpIR (int irPin, long sensorModel);
+    SharpIR (int irPin, long sensorModel, double grad, double intercept);
     int distance();
 
   private:
@@ -35,6 +34,8 @@ class SharpIR
     
     int _irPin;
     long _model;
+	double _grad;
+	double _intercept;
 };
 
 #endif
