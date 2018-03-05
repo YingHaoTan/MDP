@@ -3,7 +3,7 @@
 #define ARDUINO_STREAM                             0x03
 
 #define START									                      0x01
-#define SCAN									   0x02
+#define SCAN									                      0x02
 #define TURN_LEFT                                  0x03
 #define TURN_RIGHT                                 0x04
 #define FORWARD                                    0x05
@@ -16,12 +16,12 @@
 
 
 
-#define PAYLOAD_SIZE                               128 //As long as it's bigger than StatusMessage
+#define PAYLOAD_SIZE                               128 
 
 struct Message
 {
   uint8_t type; // To be checked by the Raspberry Pi
-  uint8_t payload[PAYLOAD_SIZE];
+  uint8_t payload[8];
 };
 
 // 1 byte each

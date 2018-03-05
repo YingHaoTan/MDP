@@ -35,6 +35,7 @@ class ArduinoInterface(object):
 		if(self.ser.inWaiting()):
 			inByte = self.ser.read()
 			#print("DAFUG:")
+			
 			#print(inByte)
 			if(inByte == bytes('~', 'ascii')):
 				toReturn = []
@@ -42,7 +43,9 @@ class ArduinoInterface(object):
 				while True:
 					nextByte = self.ser.read()
 					counter+=1	
+					#print(nextByte)
 					if(nextByte == bytes('!', 'ascii') and counter == 10):
+						print(toReturn)
 						return toReturn
 					else:
 						toReturn.append(nextByte)

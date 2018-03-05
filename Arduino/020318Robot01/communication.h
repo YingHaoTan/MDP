@@ -17,7 +17,7 @@
 struct Message
 {
   uint8_t type; // To be checked by the Raspberry Pi
-  uint8_t payload[PAYLOAD_SIZE];
+  uint8_t payload[8];
 };
 
 // 1 byte each

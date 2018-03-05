@@ -80,6 +80,7 @@ void loop() {
                     alreadyReceived = false;
                     break;
                   case START:
+                    digitalWrite(LED_BUILTIN, HIGH);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
