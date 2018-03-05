@@ -29,6 +29,7 @@ void setup() {
 
   delay(2000);
   //Serial.println("Initializations Done");
+  goFORWARD(7);
 }
 
 void loop() {
@@ -65,7 +66,7 @@ void loop() {
 void goFORWARD(int noBlock) {
   int kP = 100;
   int kI = 0;
-  int kD = 0;
+  int kD = 8;
   int error = 0;
   int errorRate = 0;
   int adjustment = 0;
@@ -90,7 +91,7 @@ void goFORWARD(int noBlock) {
       errorRate = error - lastError;
       lastError = error;
       totalErrors += error;
-      if (abs(error) > 5) {
+      if (abs(error) > 0) {
           adjustment = kP * error + kI * totalErrors + kD * errorRate;
           adjustment /= 100;
           setSpd1 += adjustment;
