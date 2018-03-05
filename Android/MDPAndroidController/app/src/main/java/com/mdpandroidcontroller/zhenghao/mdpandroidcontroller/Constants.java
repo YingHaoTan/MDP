@@ -29,4 +29,12 @@ public class Constants {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+    // For voice control
+    public static final String VOICE_COMMAND_FORWARD = "move forward";
+    public static final String VOICE_COMMAND_LEFT = "turn left";
+    public static final String VOICE_COMMAND_RIGHT = "turn right";
+    public static final String VOICE_COMMAND_BACKWARD = "move backward";
+    public static final String[] VOICE_COMMOND_PHRASES =
+            {VOICE_COMMAND_FORWARD, VOICE_COMMAND_LEFT, VOICE_COMMAND_RIGHT, VOICE_COMMAND_BACKWARD};
+
 }

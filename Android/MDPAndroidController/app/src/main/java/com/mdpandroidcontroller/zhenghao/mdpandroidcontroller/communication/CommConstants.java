@@ -46,9 +46,6 @@ public class CommConstants {
 
 	public static final String MESSAGE_TYPE_CONFIG	= "CF";
 	//to add more configuration patterns in the future
-
-	
-	
 	
 	
 }

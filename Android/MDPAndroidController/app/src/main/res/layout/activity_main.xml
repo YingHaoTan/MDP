@@ -190,6 +190,31 @@
                     android:layout_weight="1"
                     android:text="@string/updateButtonText" />
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/controlTable"
+                    android:layout_marginEnd="14dp"
+                    android:layout_toStartOf="@+id/goTable"
+                    android:text="@string/alternativeControl" />
+
+                <Button
+                    android:id="@+id/voiceControlButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_alignStart="@+id/textView"
+                    android:layout_below="@+id/textView"
+                    android:text="@string/voiceControlBtn" />
+
+                <TextView
+                    android:id="@+id/voiceControlResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/voiceControlButton"
+                    android:layout_below="@+id/voiceControlButton"
+                    android:text="@string/voiceInputText" />
+
                 <TableLayout
                     android:id="@+id/goTable"
                     android:layout_width="140sp"

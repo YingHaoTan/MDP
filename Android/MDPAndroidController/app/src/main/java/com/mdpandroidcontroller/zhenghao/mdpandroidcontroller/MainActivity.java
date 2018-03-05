@@ -3,10 +3,12 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,7 +33,9 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static android.view.View.GONE;
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_DEVICE_SELECT = 2;
+
+    private final int REQ_CODE_SPEECH_INPUT = 100;
 
     private Context context = null;
 
@@ -87,8 +93,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     private ToggleButton manualControlButton = null;
 
     private TextView updateModeTextView = null;
+    private TextView voiceControlResult = null;
     private Switch updateModeSwitch = null;
     private Button updateButton = null;
+    private Button voiceControlButton = null;
 
     private TableLayout goTable = null;
     private TableLayout controlTable = null;
@@ -172,6 +180,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         leftButton.setOnClickListener(leftButtonListener);
         rightButton = (Button) findViewById(R.id.rightButton);
         rightButton.setOnClickListener(rightButtonListener);
+
+        voiceControlButton = (Button) findViewById(R.id.voiceControlButton);
+        voiceControlButton.setOnClickListener(voiceControlButtonListener);
+        voiceControlResult = (TextView) findViewById(R.id.voiceControlResult);
     }
 
     private void settingsPopupInit(){
@@ -230,9 +242,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
                 Log.w(TAG, "Bluetooth service is not started properly");
                 return;
             }
-//            if (mBluetoothClass == null) {
-//                mBluetoothClass = BluetoothClass.getInstance();
-//            }
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             ArrayList<BluetoothDevice> pairedDevicesList = new ArrayList<>();
@@ -290,10 +299,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
                 mBluetoothService = BluetoothService.getInstance();
                 mBluetoothService.initHandler(mHandler);
             }
-//            if (mBluetoothClass == null) {
-//                mBluetoothClass = BluetoothClass.getInstance();
-//                mBluetoothClass.setmHandler(mHandler);
-//            }
         }
     }
 
@@ -313,10 +318,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         else if (mBluetoothService.getState() == STATE_NONE) {
             mBluetoothService.start();
         }
-
-//        if (mBluetoothClass == null) {
-//            mBluetoothClass = BluetoothClass.getInstance();
-//        }
     }
 
     @Override
@@ -334,6 +335,55 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             Log.d(TAG, "onActivityResult: selected device - " + deviceName + " " + deviceAddress);
 
             connectDevice(deviceAddress);
+        }
+        else if (requestCode == REQ_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && null != data) {
+                // An array of potential results
+                ArrayList<String> result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                Log.d(TAG, "voice control onActivityResult - data: " + result.toString());
+
+                onVoiceControlInputReceived(result);
+            }
+            else {
+                Log.e(TAG, "voice control onActivityResult - error!");
+            }
+        }
+    }
+
+    private void onVoiceControlInputReceived(ArrayList<String> result) {
+        // Check if the result arraylist contains any command phrase
+        List<String> commandPhrasesList = Arrays.asList(Constants.VOICE_COMMOND_PHRASES);
+        String inputPhrase;
+
+        for (int i = 0; i < result.size(); i++) {
+            if (commandPhrasesList.contains(result.get(i))) {
+                voiceControlResult.setText(result.get(i));
+                inputPhrase = convertVoicePhraseToCommand(result.get(i));
+                if (inputPhrase != null) {
+                    Log.d(TAG, "voice control command to send: " + inputPhrase);
+                    mBluetoothService.write(inputPhrase.getBytes());
+                }
+                return;
+            }
+        }
+        voiceControlResult.setText(R.string.voiceInputTextFailed);
+    }
+
+    private String convertVoicePhraseToCommand(String phrase) {
+        // Use switch for now, ideally should use enum
+        switch (phrase) {
+            case Constants.VOICE_COMMAND_FORWARD:
+                return translator.commandMoveForward();
+            case Constants.VOICE_COMMAND_LEFT:
+                return translator.commandTurnLeft();
+            case Constants.VOICE_COMMAND_RIGHT:
+                return translator.commandTurnRight();
+            case Constants.VOICE_COMMAND_BACKWARD:
+                return translator.commandMoveBack();
+            default:
+                Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
+                return null;
         }
     }
 
@@ -596,6 +646,30 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         }
     };
 
+    Button.OnClickListener voiceControlButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "voiceControlButton onClick");
+            promptSpeechInput();
+        }
+    };
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt));
+
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.speech_not_supported),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onMessageDeviceName(Message msg) {
         Log.d(TAG, "handleMessage::MESSAGE_DEVICE_NAME");
@@ -613,10 +687,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         String readMessage = new String(readBuf, 0, msg.arg1);
         Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
 
-        // TODO: do something with the received string
-        // How the controller should react to the received string
         translator.decodeMessage(readMessage);
-
     }
 
     @Override

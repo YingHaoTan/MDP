@@ -18,6 +18,12 @@
     <string name="chatSendBtn">Send</string>
     <string name="status">Robot Status</string>
     <string name="defaultStatus">NULL</string>
+    <string name="voiceControlBtn">Voice Control</string>
+    <string name="voiceInputText">Click button to start</string>
+    <string name="voiceInputTextFailed">Please say again...</string>
+    <string name="alternativeControl">Alternative Control Mode:</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
 
     <!-- Strings for robot status-->
     <string name="statusMoving">Moving</string>
