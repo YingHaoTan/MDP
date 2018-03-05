@@ -5,14 +5,14 @@ import bluetooth
 # SERVER SIDE
 class BluetoothInterface:
 
-    def __init__(self, port, host):
+    def __init__(self):
         # after getting bluetooth address, now must implement to transfer data.
         # implement server sidsse
         self.rpi_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
         # assign hostmac address for bluetooth adapters if needed as may have multiple adapters
         self.size = 1024
-        self.port = port
-        self.host = host
+        self.port = 12 
+        self.host = ''
         try:
             self.rpi_socket.bind((host, port))
             self.rpi_socket.listen(1)
