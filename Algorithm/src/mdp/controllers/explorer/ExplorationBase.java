@@ -36,26 +36,8 @@ public abstract class ExplorationBase extends MovementBase {
         this.timelimit = timelimit;
         
         setRobot(robot);
-        /*
-        MapState mstate = new MapState(mapdim, robot.getDimension());
-        mstate.setMapCellState(CellState.UNEXPLORED);
-        mstate.setEndPoint(ecoordinate);
-        mstate.setRobotPoint(rcoordinate);
-        mstate.setStartPoint(rcoordinate);
-
-        if (waypoint != null) {
-            mstate.setMapCellState(waypoint, CellState.WAYPOINT);
-        }*/
-
         setMapState(robot.getMapState());
 
-        /*
-        for (int x = 0; x < robotdim.width; x++) {
-            for (int y = 0; y < robotdim.height; y++) {
-                mstate.setMapCellState(new Point(rcoordinate.x + x, rcoordinate.y + y), CellState.NORMAL);
-            }
-        }
-        */
         this.starttime = System.currentTimeMillis();
     }
 

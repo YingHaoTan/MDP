@@ -55,8 +55,6 @@ public class Program {
         srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));      
-        wcontroller.setSimulatorRobot(srobot);
-        xcontroller.setSimulatorRobot(srobot);
         
         // PhysicalRobot
         Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList<>();
@@ -69,8 +67,13 @@ public class Program {
         probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
+        
         /*
         probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.setCalibrationType(RobotAction.CAL_SIDE)
+        		.build());
+        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
         		.add(Direction.RIGHT)
         		.setCalibrationType(RobotAction.CAL_SIDE)
         		.build());*/
@@ -84,11 +87,11 @@ public class Program {
         		.add(Direction.UP)
         		.setCalibrationType(RobotAction.CAL_CORNER)
         		.build());
+        
+        wcontroller.setSimulatorRobot(srobot);
+        xcontroller.setSimulatorRobot(srobot);
         wcontroller.setPhysicalRobot(probot);
         xcontroller.setPhysicalRobot(probot);
-        
-        
-        
         
         wcontroller.setMapLoader(filehandler);
         wcontroller.setMapSaver(filehandler);
@@ -97,7 +100,6 @@ public class Program {
         wcontroller.setExplorer(explorer);
         
         wcontroller.setXController(xcontroller);
-        
         
         xcontroller.setFastestPathPlanner(fastestpath);
         xcontroller.setExplorer(explorer);
