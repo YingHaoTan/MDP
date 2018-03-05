@@ -26,6 +26,13 @@ public class CommConstants {
 			public static final String COMMAND_MOVE_BACK		= "BK";
 			public static final String COMMAND_MOVE_LEFT_TURN	= "LT";
 			public static final String COMMAND_MOVE_RIGHT_TURN	= "RT";
+
+		public static final String COMMAND_TYPE_UPDATE	= "UD";
+
+			public static final String UPDATE_AUTO 			= "AU";
+			public static final String UPDATE_MANUAL 		= "MA";
+
+				public static final String MANUAL_UPDATE_NOW	= "UN";
 			
 	public static final String MESSAGE_TYPE_STATUS	= "ST";
 	
@@ -33,7 +40,7 @@ public class CommConstants {
 
 			public static final String ROBOT_MOVING				= "MO";
 			public static final String ROBOT_TURNING			= "TU";
-			public static final String ROBOT_STOPPED			= "ST";
+			public static final String ROBOT_STOPPED			= "SP";
 			public static final String ROBOT_DIRECTION_UP		= "UP";
 			public static final String ROBOT_DIRECTION_DOWN		= "DN";
 			public static final String ROBOT_DIRECTION_LEFT		= "LE";

@@ -2,6 +2,10 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * ControllerTranslator translates instructions between robot and controller for the controller
  * this is a singleton class
@@ -18,7 +22,9 @@ public class ControllerTranslator {
 
 		void onDoStop();
 
-		void onDoMapUpdateFull();
+		void onDoRobotPos(int x, int y, Direction d);
+
+		void onDoMapUpdateFull(String mdf1, String mdf2);
 
 		void onDoMapUpdatePartial();
 	}
@@ -161,6 +167,24 @@ public class ControllerTranslator {
 		return message;
 	}
 
+	public String commandUpdateAuto(){
+		String message = "";
+
+		return message;
+	}
+
+	public String commandUpdateManual(){
+		String message = "";
+
+		return message;
+	}
+
+	public String commandUpdateNow(){
+		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_MANUAL + CommConstants.MANUAL_UPDATE_NOW;
+
+		return message;
+	}
+
 	/**
 	 * generate string with configuration information to robot
 	 *
@@ -189,12 +213,15 @@ public class ControllerTranslator {
 				if(message.substring(4,6).equals(CommConstants.ROBOT_MOVING)){
 					//do moving actions
 					mParentActivity.onDoMove();
+					return;
 				}else if(message.substring(4,6).equals(CommConstants.ROBOT_TURNING)){
 					//do turning actions
 					mParentActivity.onDoTurn();
+					return;
 				}else if(message.substring(4,6).equals(CommConstants.ROBOT_STOPPED)){
 					//do stopping actions
 					mParentActivity.onDoStop();
+					return;
 				}else{
 					try{
 						x = Integer.parseInt(message.substring(4, 6));
@@ -232,6 +259,62 @@ public class ControllerTranslator {
 				}
 			}
 		}
+		// proceed to read input for amd for now
+		readFromAMD(message);
+
 		// print error here if required
+	}
+
+	private void readFromAMD(String message){
+		JSONArray array = null;
+		String value = null;
+		try {
+
+			JSONObject jsonObj = new JSONObject(message);
+			JSONArray jsonAry = jsonObj.names();
+
+			if(jsonAry.get(0).toString().equals("robotPosition")){
+				value = jsonObj.getString("robotPosition");
+				value = value.substring(1,value.length()-1);
+				String arr[] = value.split(",");
+				int x = Integer.parseInt(arr[0]);
+				int y = Integer.parseInt(arr[1]);
+				int d = Integer.parseInt(arr[2]);
+
+				Direction dir;
+
+				switch(d){
+					case 0:
+						dir = Direction.UP;
+						break;
+					case 90:
+						dir = Direction.RIGHT;
+						break;
+					case 180:
+						dir = Direction.DOWN;
+						break;
+					case 270:
+						dir = Direction.LEFT;
+						break;
+					default:
+						dir = Direction.UP;
+						break;
+				}
+				mParentActivity.onDoRobotPos(x,y,dir);
+
+			}else if(jsonAry.get(0).toString().equals("grid")){
+				value = jsonObj.getString("grid");
+				String mdf1 = "";
+
+				// set mdf1 to "know" all grid in the maze for AMD tool
+				while(mdf1.length() < 76){
+					mdf1 += "F";
+				}
+				mParentActivity.onDoMapUpdateFull(mdf1, value);
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }
