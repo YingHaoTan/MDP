@@ -49,19 +49,16 @@ void loop() {
     case 1:
       Serial.println("Moving forward");
       goFORWARD(1);
-      //            calibrateF = 1;
       break;
 
     case 2:
       Serial.println("Moving left");
       goLEFT();
-      //            calibrateF = 1;
       break;
 
     case 3:
       Serial.println("Moving right");
       goRIGHT();
-      //            calibrateF = 1;
       break;
 
     case 4:
@@ -87,7 +84,6 @@ void loop() {
       delay(1500);
       md.setBrakes(400, 400);
       resetMCounters();
-      //            calibrateF = 1;
       break;
     case 8:
       //While wall hugging right, if we potentially meet an L shaped block,
@@ -135,30 +131,99 @@ void goACCELERATE() {
   md.setBrakes(400, 400);
 }
 
+//void goFORWARD(int noBlock) {
+//  long kP = 3;
+//  long kI = 0;
+//  long kD = 2;
+//  long error = 0;
+//  long errorRate = 0;
+//  long pSum = 0;
+//  long dSum = 0;
+//  long iSum = 0;
+//  long adjustment = 0;
+//  long totalErrors = 0;
+//  long lastError = 0;
+//  int lastTicks[2] = {0, 0};
+//  int setSpd1 = 300;              //Right motor
+//  int setSpd2 = 304;              //Left motor
+//  static long lastTime = millis();
+////  static int PIDFlag;
+//
+//  md.setSpeeds(setSpd1, setSpd2);
+//  delay(150);
+//
+//  while (mRev[0] < noBlock && mRev[1] < noBlock) {
+//
+//    if (millis() - lastTime > 300) {
+//      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+//      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+//      lastTicks[0] = mCounter[0];
+//      lastTicks[1] = mCounter[1];
+//      errorRate = error - lastError;
+//      lastError = error;
+//      totalErrors += error;
+//
+//      if (error > 5) {                             //left Motor faster then left motor
+////        Serial << "LEFT faster than RIGHT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+//        Serial << "LEFT faster than RIGHT by: " << error << endl;
+//        pSum = (abs(error) * kP / 10);
+//        dSum = (errorRate * kD / 10);
+//        iSum = (totalErrors * kI / 10);
+//        adjustment = (pSum - dSum + iSum) / 2;
+//        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
+//        setSpd1 += adjustment;
+//        setSpd2 -= adjustment;
+//      }
+//
+//      else if (error < -5) {
+////        Serial << "RIGHT faster than LEFT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
+//        Serial << "RIGHT faster than LEFT by: " << error << endl;
+//        pSum = (abs(error) * kP / 10);
+//        dSum = (errorRate * kD / 10);
+//        iSum = (totalErrors * kI / 10);
+//        adjustment = (pSum - dSum + iSum) / 2;
+//        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
+//        setSpd1 -= adjustment;
+//        setSpd2 += adjustment;
+//      }
+//
+//      else {
+//        Serial << "No change, error is:" << error << endl;
+//        PIDFlag++;
+//      }
+//
+//      md.setSpeeds(setSpd1, setSpd2);
+//      Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
+//      delay(70);
+//      Serial.println("----");
+//      lastTime = millis();
+//    }
+//  }
+//  resetMCounters();
+//  md.setBrakes(400, 400);
+//}
+
+
 void goFORWARD(int noBlock) {
-  long kP = 3;
-  long kI = 0;
-  long kD = 2;
-  long error = 0;
-  long errorRate = 0;
-  long pSum = 0;
-  long dSum = 0;
-  long iSum = 0;
-  long adjustment = 0;
-  long totalErrors = 0;
-  long lastError = 0;
+  int kP = 200;
+  int kI = 0;
+  int kD = 0;
+  int error = 0;
+  int errorRate = 0;
+  int adjustment = 0;
+  int totalErrors = 0;
+  int lastError = 0;
   int lastTicks[2] = {0, 0};
   int setSpd1 = 300;              //Right motor
   int setSpd2 = 304;              //Left motor
-  static long lastTime = millis();
-  static int PIDFlag;
-
+  long lastTime = millis();
+  
   md.setSpeeds(setSpd1, setSpd2);
-  delay(150);
+  delay(200);
 
   while (mRev[0] < noBlock && mRev[1] < noBlock) {
-
-    if (millis() - lastTime > 300 && PIDFlag  < 1) {
+    if (millis() - lastTime > 100) {
+      lastTime = millis();
       Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
       error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
@@ -166,50 +231,18 @@ void goFORWARD(int noBlock) {
       errorRate = error - lastError;
       lastError = error;
       totalErrors += error;
-
-      if (error > 5) {                             //left Motor faster then left motor
-//        Serial << "LEFT faster than RIGHT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
-        Serial << "LEFT faster than RIGHT by: " << error << endl;
-        pSum = (abs(error) * kP / 10);
-        dSum = (errorRate * kD / 10);
-        iSum = (totalErrors * kI / 10);
-        adjustment = (pSum - dSum + iSum) / 2;
-        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
-        setSpd1 += adjustment;
-        setSpd2 -= adjustment;
+      if (abs(error) > 5) {
+          adjustment = kP * error + kI * totalErrors + kD * errorRate;
+          adjustment /= 100;
+          setSpd1 += adjustment;
+          setSpd2 -= adjustment;
+          md.setSpeeds(setSpd1, setSpd2);
+          Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
       }
-
-      else if (error < -5) {
-//        Serial << "RIGHT faster than LEFT by: " << error << " m1Ticks: " << mCounter[0] << "m2Ticks: " << mCounter[1] << endl;
-        Serial << "RIGHT faster than LEFT by: " << error << endl;
-        pSum = (abs(error) * kP / 10);
-        dSum = (errorRate * kD / 10);
-        iSum = (totalErrors * kI / 10);
-        adjustment = (pSum - dSum + iSum) / 2;
-        Serial << "pSum: " << pSum << " dSum: " << dSum << " Final adjustment: " << adjustment << endl;
-        setSpd1 -= adjustment;
-        setSpd2 += adjustment;
-      }
-
-      else {
-        Serial << "No change, error is:" << error << endl;
-        PIDFlag++;
-      }
-
-      md.setSpeeds(setSpd1, setSpd2);
-      Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
-      delay(70);
-      Serial.println("----");
-
-      lastTime = millis();
     }
-    
   }
-
   resetMCounters();
-
   md.setBrakes(400, 400);
-
 }
 
 void goRIGHT() {
