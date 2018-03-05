@@ -1,5 +1,6 @@
 package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication;
 
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import org.json.JSONArray;
@@ -26,7 +27,7 @@ public class ControllerTranslator {
 
 		void onDoMapUpdateFull(String mdf1, String mdf2);
 
-		void onDoMapUpdatePartial();
+		void onDoMapUpdatePartial(int x, int y, CellState cs);
 	}
 
 	//variables and constructors
@@ -167,20 +168,46 @@ public class ControllerTranslator {
 		return message;
 	}
 
+	/**
+	 * Generate message to let robot know its auto update mode
+	 *
+	 * @return
+	 */
 	public String commandUpdateAuto(){
-		String message = "";
+		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_AUTO;
 
 		return message;
 	}
 
+	/**
+	 * Generate message to let robot know its manual update mode
+	 *
+	 * @return
+	 */
 	public String commandUpdateManual(){
-		String message = "";
+		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_MANUAL;
 
 		return message;
 	}
 
+	/**
+	 * Generate message to tell robot to update android controller during manual mode
+	 *
+	 * @return
+	 */
 	public String commandUpdateNow(){
 		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_MANUAL + CommConstants.MANUAL_UPDATE_NOW;
+
+		return message;
+	}
+
+	/**
+	 * Generate message to ask robot to forget arena
+	 *
+	 * @return
+	 */
+	public String commandReset(){
+		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_RESET;
 
 		return message;
 	}
@@ -192,8 +219,8 @@ public class ControllerTranslator {
 	 *
 	 * @return
 	 */
-	public String generateConfiString(){
-		String message = CommConstants.MESSAGE_TYPE_CONFIG;
+	public String generateConfigString(String config){
+		String message = CommConstants.MESSAGE_TYPE_CONFIG + config;
 
 		return message;
 	}
@@ -241,6 +268,7 @@ public class ControllerTranslator {
 							return;
 						}
 						//update robot position on map
+						mParentActivity.onDoRobotPos(x,y,d);
 						return;
 					}catch (NumberFormatException exception){
 						//handle error
@@ -250,13 +278,21 @@ public class ControllerTranslator {
 				try{
 					x = Integer.parseInt(message.substring(4, 6));
 					y = Integer.parseInt(message.substring(6, 8));
-					isBlocked = (message.substring(8, 10) == CommConstants.MAP_TYPE_BLOCK);
 					//update map
-					mParentActivity.onDoMapUpdatePartial();
+					if(message.substring(8, 10).equals(CommConstants.MAP_TYPE_BLOCK)){
+						mParentActivity.onDoMapUpdatePartial(x,y,CellState.OBSTACLE);
+					}else{
+						mParentActivity.onDoMapUpdatePartial(x,y,CellState.NORMAL);
+					}
 					return;
 				}catch(NumberFormatException exception){
 					//handle error
 				}
+			}else if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_MDF)){
+				String arr[] = message.split(CommConstants.DELIMITER);
+				String mdf1 = arr[1];
+				String mdf2 = arr[2];
+				mParentActivity.onDoMapUpdateFull(mdf1 , mdf2);
 			}
 		}
 		// proceed to read input for amd for now
@@ -265,6 +301,11 @@ public class ControllerTranslator {
 		// print error here if required
 	}
 
+	/**
+	 * method to pass android checklist
+	 *
+	 * @param message
+	 */
 	private void readFromAMD(String message){
 		JSONArray array = null;
 		String value = null;

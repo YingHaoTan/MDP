@@ -9,11 +9,12 @@
 
     <TextView
         android:id="@+id/settingsClose"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:text="X"
+        android:textSize="30dp"
         android:textStyle="bold"
-        android:layout_gravity="end"
+        android:layout_gravity="right"
         android:gravity="center"/>
 
     <RelativeLayout
@@ -206,5 +207,35 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/deleteTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:text="@string/resetStringText"/>
+
+        <TextView
+            android:id="@+id/deleteDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:layout_below="@id/deleteTextView"
+            android:text="@string/resetDescriptionText"/>
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/deleteTextView"
+            android:layout_alignParentEnd="true"
+            android:text="reset"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

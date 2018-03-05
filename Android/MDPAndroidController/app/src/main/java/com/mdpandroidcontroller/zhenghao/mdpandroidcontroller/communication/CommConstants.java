@@ -33,6 +33,8 @@ public class CommConstants {
 			public static final String UPDATE_MANUAL 		= "MA";
 
 				public static final String MANUAL_UPDATE_NOW	= "UN";
+
+		public static final String COMMAND_TYPE_RESET	= "RS";
 			
 	public static final String MESSAGE_TYPE_STATUS	= "ST";
 	
@@ -51,8 +53,12 @@ public class CommConstants {
 			public static final String MAP_TYPE_CLEAR	= "CL";
 			public static final String MAP_TYPE_BLOCK	= "BL";
 
+		public static final String STATUS_TYPE_MDF		= "MD";
+
 	public static final String MESSAGE_TYPE_CONFIG	= "CF";
 	//to add more configuration patterns in the future
+
+	public static final String DELIMITER = "~";
 	
 	
 }

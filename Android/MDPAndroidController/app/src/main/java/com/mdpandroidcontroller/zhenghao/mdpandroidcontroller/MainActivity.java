@@ -30,6 +30,7 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.Bluetoot
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
 import java.util.ArrayList;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     private EditText persistText = null;
     private Button persistSaveButton, persistSendButton = null;
 
+    private Button resetButton = null;
+
 
     //variables for controller portion
     private ToggleButton explorationButton = null;
@@ -110,8 +113,8 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     private ControllerTranslator translator = null;
 
     // hacky variable to pass checklist
-    boolean mapChecker = false;
-    boolean robotChecker = false;
+    //boolean mapChecker = false;
+    //boolean robotChecker = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,8 +154,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         maze = new Maze();
         mazeGridAdapter = new MazeGridAdapter(this, maze);
         mazeGridView.setAdapter(mazeGridAdapter);
-
-
 
         robotStatusTextView = (TextView) findViewById(R.id.robotStatusTextView);
     }
@@ -236,6 +237,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         persistText = (EditText) settingsDialog.findViewById(R.id.persistText);
         MDPPersistentManager pm = MDPPersistentManager.getInstance(context);
         persistText.setText(pm.getPersistString(MDPPersistentManager.PERSIST_1));
+
+        resetButton = (Button) settingsDialog.findViewById(R.id.resetButton);
+        resetButton.setOnClickListener(resetButtonListener);
     }
 
     Button.OnClickListener connectButtonListener = new Button.OnClickListener() {
@@ -532,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             //send message to robot
             mBluetoothService.write(translator.commandWayPoint(waypointx , waypointy).getBytes());
 
+            // for testing now
             maze.updateWaypoint(waypointx,waypointy);
             mazeGridAdapter.updateMaze(maze);
             mazeGridAdapter.notifyDataSetChanged();
@@ -581,9 +586,11 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             if(updateModeSwitch.isChecked()){
                 updateModeTextView.setText(R.string.autoModeText);
                 updateButton.setVisibility(GONE);
+                mBluetoothService.write(translator.commandUpdateAuto().getBytes());
             }else{
                 updateModeTextView.setText(R.string.manualModeText);
                 updateButton.setVisibility(VISIBLE);
+                mBluetoothService.write(translator.commandUpdateManual().getBytes());
             }
         }
     };
@@ -592,8 +599,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
             //send message to robot via bluetooth
-            mapChecker = true;
-            robotChecker = true;
+
+            //commented as we are using auto only now
+            //mapChecker = true;
+            //robotChecker = true;
             mBluetoothService.write(translator.commandUpdateNow().getBytes());
 
         }
@@ -617,8 +626,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
 
-            //send message to robot via bluetooth
-            //Log.d(TAG, "up button onClick");
             mBluetoothService.write(translator.commandMoveForward().getBytes());
         }
     };
@@ -627,7 +634,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
 
-            //send message to robot via bluetooth
             mBluetoothService.write(translator.commandMoveBack().getBytes());
 
         }
@@ -637,7 +643,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
 
-            //send message to robot via bluetooth
             mBluetoothService.write(translator.commandTurnLeft().getBytes());
         }
     };
@@ -646,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
 
-            //send message to robot via bluetooth
             mBluetoothService.write(translator.commandTurnRight().getBytes());
 
         }
@@ -657,6 +661,16 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         public void onClick(View view) {
             Log.d(TAG, "voiceControlButton onClick");
             promptSpeechInput();
+        }
+    };
+
+    Button.OnClickListener resetButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mBluetoothService.write(translator.commandReset().getBytes());
+            maze = new Maze();
+            mazeGridAdapter.updateMaze(maze);
+            mazeGridAdapter.notifyDataSetChanged();
         }
     };
 
@@ -740,6 +754,11 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     @Override
     public void onDoRobotPos(int x, int y, Direction d){
 
+        maze.updateRobot(x,y,d);
+        mazeGridAdapter.updateMaze(maze);
+        mazeGridAdapter.notifyDataSetChanged();
+
+        /* Originally used to manage auto vs manual
         if (updateModeSwitch.isChecked()) {
             // Do auto update
             maze.updateRobot(x,y,d);
@@ -756,11 +775,17 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
                 mazeGridAdapter.notifyDataSetChanged();
             }
         }
+        */
     }
 
     @Override
     public void onDoMapUpdateFull(String mdf1, String mdf2) {
 
+        maze.updateMaze(mdf1,mdf2);
+        mazeGridAdapter.updateMaze(maze);
+        mazeGridAdapter.notifyDataSetChanged();
+
+        /* Originally used to manage auto vs manual
         if (updateModeSwitch.isChecked()) {
             // Do auto update
             maze.updateMaze(mdf1,mdf2);
@@ -777,11 +802,14 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
                 mazeGridAdapter.notifyDataSetChanged();
             }
         }
+        */
 
     }
 
     @Override
-    public void onDoMapUpdatePartial() {
-
+    public void onDoMapUpdatePartial(int x, int y, CellState cs) {
+        maze.updateGrid(x,y,cs);
+        mazeGridAdapter.updateMaze(maze);
+        mazeGridAdapter.notifyDataSetChanged();
     }
 }

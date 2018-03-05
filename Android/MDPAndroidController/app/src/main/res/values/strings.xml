@@ -16,7 +16,7 @@
     <string name="chatReceivedMsgDefaultText">No Message Received</string>
     <string name="chatSendMsgDefaultText">Tap Here to Enter Text</string>
     <string name="chatSendBtn">Send</string>
-    <string name="status">Robot Status</string>
+    <string name="status">Robot Status:</string>
     <string name="defaultStatus">NULL</string>
     <string name="voiceControlBtn">Voice Control</string>
     <string name="voiceInputText">Click button to start</string>
@@ -42,13 +42,15 @@
     <string name="goButtonText">GO!</string>
     <string name="settingsButtonText">Settings</string>
     <string name="robotStartText">Enter robot starting position: </string>
-    <string name="robotRowText">Enter row: </string>
-    <string name="robotColText">Enter column: </string>
+    <string name="robotRowText">Enter row(Y): </string>
+    <string name="robotColText">Enter column(X): </string>
     <string name="robotDirText">Enter Direction: </string>
     <string name="send">Send</string>
     <string name="waypointText">Enter waypoint coordinates: </string>
-    <string name="waypointRowText">Enter row: </string>
-    <string name="waypointColText">Enter column: </string>
+    <string name="waypointRowText">Enter row(Y): </string>
+    <string name="waypointColText">Enter column(X): </string>
     <string name="configStringText">Manage Persistance Config</string>
+    <string name="resetStringText">Reset Arena</string>
+    <string name="resetDescriptionText">Are you sure you want to reset the arena?</string>
 
 </resources>

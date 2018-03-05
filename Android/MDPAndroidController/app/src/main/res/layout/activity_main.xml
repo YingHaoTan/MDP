@@ -79,34 +79,28 @@
 
                 <GridView
                     android:id="@+id/mazeGridView"
-                    android:layout_width="450dp"
+                    android:layout_width="400dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginStart="12dp"
+                    android:layout_below="@+id/settingsButton"
+                    android:layout_centerHorizontal="true"
                     android:numColumns="15" />
 
-                <LinearLayout
-                    android:id="@+id/linearLayout"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/statusHeaderTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/mazeGridView"
-                    android:layout_alignStart="@+id/settingsButton"
-                    android:layout_marginBottom="57dp"
-                    android:orientation="vertical">
+                    android:layout_below="@+id/mazeGridView"
+                    android:textAlignment="center"
+                    android:text="@string/status"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/status"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/robotStatusTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/defaultStatus" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/robotStatusTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/statusHeaderTextView"
+                    android:textAlignment="center"
+                    android:text="@string/defaultStatus" />
 
             </RelativeLayout>
 
@@ -179,6 +173,7 @@
                     android:layout_height="40sp"
                     android:layout_below="@+id/modeHeaderTextView"
                     android:layout_toRightOf="@+id/updateModeTextView"
+                    android:checked="true"
                     android:layout_weight="1" />
 
                 <Button
@@ -187,6 +182,7 @@
                     android:layout_height="40sp"
                     android:layout_below="@+id/modeHeaderTextView"
                     android:layout_toRightOf="@+id/updateModeSwitch"
+                    android:visibility="invisible"
                     android:layout_weight="1"
                     android:text="@string/updateButtonText" />
 

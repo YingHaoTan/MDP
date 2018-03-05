@@ -84,7 +84,7 @@ public class Maze {
         robot_y = -3;
     }
 
-    // to take in MDF files from algo in the future
+    // copied from algo team
     public void updateMaze(String mdf1, String mdf2){
         String mdf1bin = new BigInteger(mdf1, 16).toString(2);
         String mdf2bin = new BigInteger(mdf2, 16).toString(2);
@@ -117,6 +117,7 @@ public class Maze {
 
     /**
      * This method is for easy conversion to the actual arena GUI
+     * Priority on robot first, then waypoint, then arena
      *
      * @param x
      * @param y

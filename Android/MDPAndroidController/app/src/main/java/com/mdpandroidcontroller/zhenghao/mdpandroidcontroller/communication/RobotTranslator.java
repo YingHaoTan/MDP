@@ -75,6 +75,7 @@ public class RobotTranslator {
 		}
 		return message;
 	}
+
 	/**
 	 * Generate Message to update controller about a certain block
 	 * 
@@ -100,6 +101,21 @@ public class RobotTranslator {
 		}
 		return message;
 	}
+
+	/**
+	 * Generate message for sending the MDF file to the android controller
+	 *
+	 * @param mdf1
+	 * @param mdf2
+	 * @return
+	 */
+	public String sendArena(String mdf1 , String mdf2){
+		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_MDF;
+		message += CommConstants.DELIMITER + mdf1 + CommConstants.DELIMITER +mdf2;
+
+		return message;
+	}
+
 	/**
 	 * 
 	 * Decodes a message that was sent from the controller
@@ -155,9 +171,25 @@ public class RobotTranslator {
 				int y = Integer.parseInt(message.substring(6, 8));
 				//set waypoint
 				return;
+			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_UPDATE)){
+				if(message.substring(4,6).equals(CommConstants.UPDATE_AUTO)){
+					//activate auto mode
+				}else if(message.substring(4,6).equals(CommConstants.UPDATE_MANUAL)){
+					if(message.length() == 6){
+						//activate manual mode
+					}else{
+						//send arena info once
+					}
+				}
+				//error handle here
+			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_RESET)){
+
 			}
 		}else if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_CONFIG)){
-			//process config
+			//process config tbc if needed
+			String config = message.substring(2,message.length());
+
+			//do upon receiving message
 		}
 		
 		//error
