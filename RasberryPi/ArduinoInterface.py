@@ -61,10 +61,16 @@ class ArduinoInterface(object):
 			print("Message written successfully")
 		except Exception as e:
 			print("Error: " + e)
+			self.reconnect()
 
 	def end_arduino_connection(self):
 		self.ser.close()
 		print("Arduino connection closed")
+		
+	def reconnect(self):
+		self.end_arduino_connection() 
+		self.start_arduino_connection() 
+		print("Reconnecting..") 
 
-def list_ports():
-	return [comport.device for comport in serial.tools.list_ports.comports()]
+	def list_ports():
+		return [comport.device for comport in serial.tools.list_ports.comports()]

@@ -19,7 +19,7 @@ class BluetoothInterface:
         try:
             self.rpi_socket.bind((self.host, self.port))
             self.rpi_socket.listen(1)
-            uuid = ' '
+            uuid = '9f2c1227-5cc1-4685-b56a-2b7717cd8041'
             advertise_service( server_sock, "MDP-Server",
              service_id = uuid,
              service_classes = [ uuid, SERIAL_PORT_CLASS ],
