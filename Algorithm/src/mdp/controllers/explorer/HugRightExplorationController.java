@@ -49,8 +49,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     @Override
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint, int percentage, double timelimit) {
-        super.explore(mapdim, robot, rcoordinate, ecoordinate, waypoint, percentage, timelimit);
+    public void explore(RobotBase robot, int percentage, double timelimit) {
+        super.explore(robot, percentage, timelimit);
         robot.addRobotActionListener(this);
         sensorsScan();
 
@@ -158,7 +158,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
      * specified direction, does not actually move
      *
      * @params Return new point
-     */
+    */
     private Point nextLocation(Direction direction) {
         Point newPoint = new Point(getMapState().getRobotPoint().x, (getMapState().getRobotPoint().y));
         switch (direction) {
@@ -236,24 +236,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
         // Update internal map state
-        Point robotPoint = getMapState().getRobotPoint();
-        if (mapdirection != null) {
-            leftStartPoint = true;
-            switch (mapdirection) {
-                case UP:
-                    getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y + 1));
-                    break;
-                case DOWN:
-                    getMapState().setRobotPoint(new Point(robotPoint.x, robotPoint.y - 1));
-                    break;
-                case LEFT:
-                    getMapState().setRobotPoint(new Point(robotPoint.x - 1, robotPoint.y));
-                    break;
-                case RIGHT:
-                    getMapState().setRobotPoint(new Point(robotPoint.x + 1, robotPoint.y));
-                    break;
-            }
-        }
 
         sensorsScan();
 

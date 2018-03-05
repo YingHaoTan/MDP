@@ -14,6 +14,7 @@ import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
+import mdp.tcp.ArduinoInstruction;
 
 /**
  * SimulatorRobot is an implementation of RobotBase that provides sensor reading

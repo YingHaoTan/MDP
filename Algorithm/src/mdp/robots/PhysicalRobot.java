@@ -138,7 +138,7 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        //sendCalibrationData();
+        sendCalibrationData();
         
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -263,8 +263,12 @@ public class PhysicalRobot extends RobotBase {
     	}
     	
     	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
-    		if(spec.isInPosition(up, down, left, right))
-    			outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
+    		if(spec.isInPosition(up, down, left, right)){
+                    System.out.println("**********************************");
+                    System.out.println(spec.getCalibrationType());
+                    System.out.println("**********************************");
+                    outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
+                }
     }
 
     /**

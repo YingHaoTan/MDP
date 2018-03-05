@@ -53,16 +53,16 @@ public class CalibrationSpecificationBuilder {
 				for(Direction direction: directions) {
 					switch(direction) {
 						case UP:
-							inPosition &= up == CellState.OBSTACLE;
+							inPosition &= up == CellState.OBSTACLE || up == null;
 							break;
 						case DOWN:
-							inPosition &= down == CellState.OBSTACLE;
+							inPosition &= down == CellState.OBSTACLE || down == null;
 							break;
 						case LEFT:
-							inPosition &= left == CellState.OBSTACLE;
+							inPosition &= left == CellState.OBSTACLE || left == null;
 							break;
 						case RIGHT:
-							inPosition &= right == CellState.OBSTACLE;
+							inPosition &= right == CellState.OBSTACLE || right == null;
 							break;
 						default:
 							break;
