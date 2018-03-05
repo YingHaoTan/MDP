@@ -6,6 +6,7 @@ import socket
 from queue import Queue
 from threading import Thread
 import datetime
+import os
 
 """ Utilises 6 threads and 3 write queues. 
 The 3 read threads will read from all components and pass to the respective queue.
@@ -15,9 +16,11 @@ The write threads will write data from the 3 queues to the components """
 class Main(object):
 
     def __init__(self):
+        os.system("sudo hciconfig hci0 piscan")
         self.arduino = ArduinoInterface(port='COM13',baud_rate=115200)
         self.android = BluetoothInterface()
         self.pc = PCInterface(host='',port='5000')
+      
         pass
 
     def start_connection(self):
