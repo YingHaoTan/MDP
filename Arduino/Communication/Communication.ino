@@ -88,6 +88,7 @@ void loop() {
                   case STOP:
                     //Serial.flush();
                     yetToReceiveAck = false;
+					break;
                 }
                 RingBuffer_erase(&usbBufferIn, 6);
               }
@@ -121,15 +122,6 @@ void loop() {
       }
     }
   }
-  /*
-
-    if(completedMove()){
-  	sendStatusUpdate();
-  	last_sent++;
-    alreadyReceived = false;
-
-    }
-  */
   if ((millis() > timer + timeout) && yetToReceiveAck) {
     resendStatusUpdate();
   }
@@ -151,23 +143,6 @@ void putIncomingUSBMessageToBuffer() {
     }
   }
 
-
-  /*uint8_t tmpBuffer[BUFFER_SIZE] = {0}; //not allocated
-    uint8_t length = 0;
-
-    while (Serial.available()) {
-    tmpBuffer[length] = Serial.read();
-    length++;
-    }
-    for (uint8_t i = 0; i < length; i++) {
-    incomingBuffer[bufferIndex] = tmpBuffer[i];
-    bufferIndex++;
-
-    // If buffer is not enough, go back to the front
-    if (bufferIndex == BUFFER_SIZE) {
-      bufferIndex = 0;
-    }
-    }*/
 }
 
 void resendStatusUpdate() {
