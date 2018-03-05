@@ -29,7 +29,7 @@ void setup() {
 
   delay(2000);
   //Serial.println("Initializations Done");
-  goFORWARD(7);
+//  goFORWARD(7);
 }
 
 void loop() {
@@ -61,6 +61,7 @@ void loop() {
 //  resetMCounters();
 //  
 //}
+
 
 //Another way to implement PID
 void goFORWARD(int noBlock) {
