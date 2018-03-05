@@ -121,7 +121,8 @@ public class XController {
 	public void explore(ExecutionMode mode, int coverage, double timelimit) {
 		RobotBase robot = getActiveRobot(mode);
 		
-		robot.init(mstate.clone());
+		MapState simulationState = mstate.clone();
+                
 		mstate.setMapCellState(CellState.UNEXPLORED);
 
 		Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
@@ -132,10 +133,11 @@ public class XController {
 
 		if(mstate.getWayPoint() != null)
 			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+                
+                robot.init(mstate.clone());
 
 		if (explorer != null)
-			explorer.explore(mstate.getMapSystemDimension(), 
-					robot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coverage, timelimit);
+			explorer.explore(robot, coverage, timelimit);
 	}
 
 	/**

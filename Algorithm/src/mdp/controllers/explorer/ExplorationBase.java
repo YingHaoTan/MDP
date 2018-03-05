@@ -29,14 +29,16 @@ public abstract class ExplorationBase extends MovementBase {
      * Performs exploration with the provided robot and current coordinate of
      * the robot in robot coordinate system
      *
+     * @param mstate
      * @param robot
      * @param start
      */
-    public void explore(Dimension mapdim, RobotBase robot, Point rcoordinate, Point ecoordinate, Point waypoint, int percentage, double timelimit) {
+    public void explore(RobotBase robot, int percentage, double timelimit) {
         this.coveragepercentage = percentage;
         this.timelimit = timelimit;
-        Dimension robotdim = robot.getDimension();
+        
         setRobot(robot);
+        /*
         MapState mstate = new MapState(mapdim, robot.getDimension());
         mstate.setMapCellState(CellState.UNEXPLORED);
         mstate.setEndPoint(ecoordinate);
@@ -45,15 +47,17 @@ public abstract class ExplorationBase extends MovementBase {
 
         if (waypoint != null) {
             mstate.setMapCellState(waypoint, CellState.WAYPOINT);
-        }
+        }*/
 
-        setMapState(mstate);
+        setMapState(robot.getMapState());
 
+        /*
         for (int x = 0; x < robotdim.width; x++) {
             for (int y = 0; y < robotdim.height; y++) {
                 mstate.setMapCellState(new Point(rcoordinate.x + x, rcoordinate.y + y), CellState.NORMAL);
             }
         }
+        */
         this.starttime = System.currentTimeMillis();
     }
 

@@ -69,9 +69,15 @@ public class Program {
         probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
+        /*
         probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
         		.add(Direction.RIGHT)
         		.setCalibrationType(RobotAction.CAL_SIDE)
+        		.build());*/
+        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.add(Direction.UP)
+        		.setCalibrationType(RobotAction.CAL_CORNER)
         		.build());
         probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
         		.add(Direction.RIGHT)

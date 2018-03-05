@@ -63,12 +63,9 @@ class Main(object):
 				
 		
 		while True:
-			print('Gello')
 			while not message_end:
-				try:
-					print('Before blocking')  
-					data = clientsock.recv(1024)  
-					         				
+				try: 
+					data = clientsock.recv(1024)           				
 					for i in range(len(data)):
 						# if new line
 						if(data[i] == 126):
@@ -77,10 +74,7 @@ class Main(object):
 							break
 						received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
-					print('exception')
 					break
-			print('GelloEnd')
-					
 				
 			
 			# sends to Arduino
