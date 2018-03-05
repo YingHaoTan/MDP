@@ -7,6 +7,8 @@
 
 RingBuffer usbBufferIn;
 
+uint8_t last_sent = 0;
+
 void setup() {
   Serial.begin(115200);
   RingBuffer_init(&usbBufferIn);
@@ -117,7 +119,7 @@ void goLEFT(){
     md.setSpeeds(350, -350);
   md.setBrakes(400, 400);
   delay(300);
-  tickCorrection();
+//  tickCorrection();
   resetMCounters();
 }
 
@@ -160,13 +162,13 @@ void PIDControl(int *setSpdR, int *setSpdL){
   }
 }
 
-void tickCorrection(int *rightTicks, int *leftTicks){
-  errorRight = rightTicks - mCounter[0];
-  errorLeft = leftTicks - mCounter[1];
-  while(mCounter[0] < errorRight && mCounter[1] < errorLeft){
-    md.setSpeeds((errorRight/abs(errorRight)*150), (errorLeft/abs(errorLeft)*150));
-  }
-}
+//void tickCorrection(int *rightTicks, int *leftTicks){
+//  int errorRight = rightTicks - mCounter[0];
+//  int errorLeft = leftTicks - mCounter[1];
+//  while(mCounter[0] < errorRight && mCounter[1] < errorLeft){
+//    md.setSpeeds((errorRight/abs(errorRight)*150), (errorLeft/abs(errorLeft)*150));
+//  }
+//}
 
 void calibratePos() {
   calibrateRIGHT();

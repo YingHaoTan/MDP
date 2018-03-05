@@ -49,11 +49,10 @@ struct StreamMessage
 
 #define BUFFER_SIZE                               256
 
-uint8_t last_sent = 0;
 
 
 // timer
 bool yetToReceiveAck = false;
 bool alreadyReceived = false;
 unsigned long timer = millis();
-unsigned long timeout = 500; // 250 milliseconds
+unsigned long timeout = 5000; // 250 milliseconds
