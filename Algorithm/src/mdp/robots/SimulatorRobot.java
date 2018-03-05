@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import mdp.models.CellState;
@@ -24,8 +23,6 @@ import mdp.models.SensorConfiguration;
  */
 public class SimulatorRobot extends RobotBase {
 
-    private Timer timer;
-    private MapState mstate;
     private Queue<NotifyTask> taskqueue;
     private long delay;
 
@@ -40,16 +37,6 @@ public class SimulatorRobot extends RobotBase {
         super(dimension, orientation);
         taskqueue = new LinkedList<>();
         delay = 10;
-    }
-
-    /**
-     * Initializes this SimulatorRobot instance with simulation map data
-     *
-     * @param map
-     */
-    public void init(MapState mstate) {
-        this.timer = new Timer(true);
-        this.mstate = mstate.clone();
     }
 
     /**
@@ -84,6 +71,7 @@ public class SimulatorRobot extends RobotBase {
 
     @Override
     protected void move(Direction mapdirection, RobotAction... actions) {
+    	MapState mstate = this.getMapState();
         Point location = mstate.getRobotPoint();
 
         if (mapdirection == Direction.UP) {
@@ -103,7 +91,7 @@ public class SimulatorRobot extends RobotBase {
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
-            timer.schedule(task, delay);
+            this.getScheduler().schedule(task, delay);
         }
     }
 
@@ -115,91 +103,19 @@ public class SimulatorRobot extends RobotBase {
                 NotifyTask task = new NotifyTask(null, new RobotAction[] {actions.get(i)});
                 taskqueue.offer(task);
                 if (taskqueue.size() == 1) {
-                    timer.schedule(task, delay);
+                    this.getScheduler().schedule(task, delay);
                 }
             }
             else{
                 NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[] {actions.get(i)});
                 taskqueue.offer(task);
                 if (taskqueue.size() == 1) {
-                    timer.schedule(task, delay);
+                    this.getScheduler().schedule(task, delay);
                 }
                 
             }
         }
         
-    }
-
-    /**
-     * Gets sensor direction in terms of map direction
-     *
-     * @param sensor
-     * @return
-     */
-    public Direction getSensorDirection(SensorConfiguration sensor) {
-        Direction orientation = this.getCurrentOrientation();
-        Direction sdirection = sensor.getDirection();
-
-        if (orientation == Direction.DOWN) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.DOWN;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.UP;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.RIGHT;
-            } else {
-                sdirection = Direction.LEFT;
-            }
-        } else if (orientation == Direction.LEFT) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.LEFT;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.RIGHT;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.DOWN;
-            } else {
-                sdirection = Direction.UP;
-            }
-        } else if (orientation == Direction.RIGHT) {
-            if (sdirection == Direction.UP) {
-                sdirection = Direction.RIGHT;
-            } else if (sdirection == Direction.DOWN) {
-                sdirection = Direction.LEFT;
-            } else if (sdirection == Direction.LEFT) {
-                sdirection = Direction.UP;
-            } else {
-                sdirection = Direction.DOWN;
-            }
-        }
-
-        return sdirection;
-    }
-
-    /**
-     * Gets the sensor coordinates
-     *
-     * @param sensor
-     * @return
-     */
-    public Point getSensorCoordinate(SensorConfiguration sensor) {
-        List<Point> points = this.mstate.convertRobotPointToMapPoints(this.mstate.getRobotPoint());
-        Point location = points.get(points.size() / 2);
-
-        Dimension rdim = mstate.getRobotDimension();
-        Direction sdirection = this.getSensorDirection(sensor);
-        Point scoordinate;
-
-        if (sdirection == Direction.UP) {
-            scoordinate = new Point(location.x + sensor.getCoordinate(), location.y + rdim.height / 2);
-        } else if (sdirection == Direction.DOWN) {
-            scoordinate = new Point(location.x - sensor.getCoordinate(), location.y - rdim.height / 2);
-        } else if (sdirection == Direction.LEFT) {
-            scoordinate = new Point(location.x - rdim.width / 2, location.y + sensor.getCoordinate());
-        } else {
-            scoordinate = new Point(location.x + rdim.width / 2, location.y - sensor.getCoordinate());
-        }
-
-        return scoordinate;
     }
 
     /**
@@ -209,6 +125,7 @@ public class SimulatorRobot extends RobotBase {
      * @return
      */
     private int getObstacleDistance(SensorConfiguration sensor) {
+    	MapState mstate = this.getMapState();
         Direction sdirection = this.getSensorDirection(sensor);
         Point scoordinate = this.getSensorCoordinate(sensor);
         Dimension mdim = mstate.getMapSystemDimension();
@@ -270,7 +187,7 @@ public class SimulatorRobot extends RobotBase {
             SimulatorRobot.this.taskqueue.poll();
 
             if (SimulatorRobot.this.taskqueue.size() > 0) {
-                timer.schedule(SimulatorRobot.this.taskqueue.peek(), delay);
+                SimulatorRobot.this.getScheduler().schedule(SimulatorRobot.this.taskqueue.peek(), delay);
             }
         }
 

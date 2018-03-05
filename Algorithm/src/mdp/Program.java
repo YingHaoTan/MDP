@@ -1,13 +1,8 @@
 package mdp;
 
 import java.awt.Dimension;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -24,10 +19,11 @@ import mdp.controllers.fp.astar.WaypointPathSpecification;
 import mdp.files.MapFileHandler;
 import mdp.graphics.MdpWindow;
 import mdp.models.Direction;
+import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
+import mdp.robots.CalibrationSpecificationBuilder;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
-import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoMessage;
 import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.MDPTCPConnector;
@@ -63,9 +59,9 @@ public class Program {
         xcontroller.setSimulatorRobot(srobot);
         
         // PhysicalRobot
-        Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList();
-        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList();
-        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList();
+        Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList<>();
+        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
+        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList<>();
         PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
@@ -73,6 +69,15 @@ public class Program {
         probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
+        probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.setCalibrationType(RobotAction.CAL_SIDE)
+        		.build());
+        probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.add(Direction.UP)
+        		.setCalibrationType(RobotAction.CAL_CORNER)
+        		.build());
         wcontroller.setPhysicalRobot(probot);
         xcontroller.setPhysicalRobot(probot);
         

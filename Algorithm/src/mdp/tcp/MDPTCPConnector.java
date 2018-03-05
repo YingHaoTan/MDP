@@ -14,7 +14,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mdp.models.RobotAction;
@@ -40,7 +39,7 @@ public class MDPTCPConnector {
     Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
-    public MDPTCPConnector(Queue incomingArduinoQueue, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
+    public MDPTCPConnector(Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         try {
             this.clientSocket = new Socket("", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
@@ -93,7 +92,7 @@ public class MDPTCPConnector {
 
         Queue<ArduinoUpdate> incomingArduinoQueue;
 
-        public MDPTCPReceiver(Socket connectedSocket, Queue incomingArduinoQueue) {
+        public MDPTCPReceiver(Socket connectedSocket, Queue<ArduinoUpdate> incomingArduinoQueue) {
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.connectedSocket = connectedSocket;
 
@@ -148,6 +147,8 @@ public class MDPTCPConnector {
                                     setResendStop(true);
                                 }
                                 break;
+							default:
+								break;
                         }
                     }
                 }
@@ -169,7 +170,7 @@ public class MDPTCPConnector {
         Queue<ArduinoMessage> outgoingArduinoQueue;
         Queue<StatusMessage> outgoingAndroidQueue;
 
-        public MDPTCPSender(Socket connectedSocket, Queue outgoingArduinoQueue, Queue outgoingAndroidQueue) {
+        public MDPTCPSender(Socket connectedSocket, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
             this.connectedSocket = connectedSocket;
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;
@@ -194,7 +195,7 @@ public class MDPTCPConnector {
                 
                 /*ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.STOP, true);
                 outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
-                List<RobotAction> actions = new ArrayList();
+                List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.START);
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);

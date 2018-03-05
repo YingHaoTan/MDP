@@ -5,8 +5,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 import mdp.models.Direction;
+import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 
@@ -20,6 +22,8 @@ public abstract class RobotBase {
     private Dimension dimension;
     private Direction initialorientation;
     private Direction orientation;
+    private Timer scheduler;
+    private MapState mstate;
     private List<SensorConfiguration> sensors;
     private List<CalibrationSpecification> cspecs;
     private List<RobotActionListener> listeners;
@@ -28,9 +32,18 @@ public abstract class RobotBase {
         this.dimension = dimension;
         this.initialorientation = orientation;
         this.orientation = orientation;
+        this.scheduler = new Timer();
         this.sensors = new ArrayList<>();
         this.cspecs = new ArrayList<>();
         this.listeners = new ArrayList<>();
+    }
+    
+    /**
+     * Initializes this robot with the MapState
+     * @param mstate
+     */
+    public void init(MapState mstate) {
+    	this.mstate = mstate;
     }
 
     /**
@@ -49,6 +62,79 @@ public abstract class RobotBase {
      */
     public List<SensorConfiguration> getSensors() {
         return new ArrayList<>(this.sensors);
+    }
+    
+    /**
+     * Gets sensor direction in terms of map direction
+     *
+     * @param sensor
+     * @return
+     */
+    public Direction getSensorDirection(SensorConfiguration sensor) {
+        Direction orientation = this.getCurrentOrientation();
+        Direction sdirection = sensor.getDirection();
+
+        if (orientation == Direction.DOWN) {
+            if (sdirection == Direction.UP) {
+                sdirection = Direction.DOWN;
+            } else if (sdirection == Direction.DOWN) {
+                sdirection = Direction.UP;
+            } else if (sdirection == Direction.LEFT) {
+                sdirection = Direction.RIGHT;
+            } else {
+                sdirection = Direction.LEFT;
+            }
+        } else if (orientation == Direction.LEFT) {
+            if (sdirection == Direction.UP) {
+                sdirection = Direction.LEFT;
+            } else if (sdirection == Direction.DOWN) {
+                sdirection = Direction.RIGHT;
+            } else if (sdirection == Direction.LEFT) {
+                sdirection = Direction.DOWN;
+            } else {
+                sdirection = Direction.UP;
+            }
+        } else if (orientation == Direction.RIGHT) {
+            if (sdirection == Direction.UP) {
+                sdirection = Direction.RIGHT;
+            } else if (sdirection == Direction.DOWN) {
+                sdirection = Direction.LEFT;
+            } else if (sdirection == Direction.LEFT) {
+                sdirection = Direction.UP;
+            } else {
+                sdirection = Direction.DOWN;
+            }
+        }
+
+        return sdirection;
+    }
+
+    /**
+     * Gets the sensor coordinates
+     *
+     * @param sensor
+     * @return
+     */
+    public Point getSensorCoordinate(SensorConfiguration sensor) {
+    	MapState mstate = this.getMapState();
+        List<Point> points = mstate.convertRobotPointToMapPoints(mstate.getRobotPoint());
+        Point location = points.get(points.size() / 2);
+
+        Dimension rdim = mstate.getRobotDimension();
+        Direction sdirection = this.getSensorDirection(sensor);
+        Point scoordinate;
+
+        if (sdirection == Direction.UP) {
+            scoordinate = new Point(location.x + sensor.getCoordinate(), location.y + rdim.height / 2);
+        } else if (sdirection == Direction.DOWN) {
+            scoordinate = new Point(location.x - sensor.getCoordinate(), location.y - rdim.height / 2);
+        } else if (sdirection == Direction.LEFT) {
+            scoordinate = new Point(location.x - rdim.width / 2, location.y + sensor.getCoordinate());
+        } else {
+            scoordinate = new Point(location.x + rdim.width / 2, location.y - sensor.getCoordinate());
+        }
+
+        return scoordinate;
     }
     
     /**
@@ -75,6 +161,22 @@ public abstract class RobotBase {
      */
     public Direction getCurrentOrientation() {
         return this.orientation;
+    }
+    
+    /**
+     * Gets the scheduler
+     * @return
+     */
+    public Timer getScheduler() {
+    	return this.scheduler;
+    }
+    
+    /**
+     * Gets the MapState
+     * @return
+     */
+    public MapState getMapState() {
+    	return this.mstate;
     }
 
     /**
@@ -302,24 +404,6 @@ public abstract class RobotBase {
      * @return
      */
     public abstract Map<SensorConfiguration, Integer> getSensorReading();
-
-    /**
-     * Gets the direction of sensor with reference to the grid, e.g. the sensor
-     * facing left when the robot is facing right becomes the sensor facing
-     * upwards
-     *
-     * @param sensor
-     * @returns relative direction
-     */
-    public abstract Direction getSensorDirection(SensorConfiguration sensor);
-
-    /**
-     * Gets map coordinates of sensor
-     *
-     * @param sensor
-     * @return
-     */
-    public abstract Point getSensorCoordinate(SensorConfiguration sensor);
 
     /**
      * Moves the robot by performing the actions in order

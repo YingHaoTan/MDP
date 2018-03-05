@@ -367,44 +367,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 	private void execute() {
 		JButton executionbtn = inputpane.getExecutionButton();
 		boolean explore = executionbtn.getText().equals(ExecutionState.EXPLORE.toString());
-/*
-		if (explore)
-			explore();
-		else
-			fastestpath();
-
-		inputpane.disable();
-	}
-
-	private void explore() {
-		ExecutionMode mode = inputpane.getExecutionModeInput().getSelectedValue();
-		MapState mstate = map.getMapState();
-
-
-		if (mode == ExecutionMode.SIMULATION){
-			srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
-			srobot.init(mstate);
-		}
-                
-                if (mode == ExecutionMode.PHYSICAL){
-                    probot.init(mstate);
-                }
-
-		mstate.setMapCellState(CellState.UNEXPLORED);
-
-		Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
-		exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
-
-		for (Point p : exploredpoints)
-			mstate.setMapCellState(p, CellState.NORMAL);
-
-		if(mstate.getWayPoint() != null)
-			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-
-		map.repaint();
-
-		if (explorer != null){
-			int coveragepercentage = inputpane.getCoveragePercentage();*/
+		
 		srobot.setDelay((long)(inputpane.getDelaySeconds()*1000));
 		
 		if (explore) {

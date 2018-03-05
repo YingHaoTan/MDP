@@ -119,11 +119,9 @@ public class XController {
 	 * @param timelimit Time limit
 	 */
 	public void explore(ExecutionMode mode, int coverage, double timelimit) {
-		if (mode == ExecutionMode.SIMULATION)
-			srobot.init(mstate);
-                if (mode == ExecutionMode.PHYSICAL)
-                    probot.init(mstate);
-
+		RobotBase robot = getActiveRobot(mode);
+		
+		robot.init(mstate.clone());
 		mstate.setMapCellState(CellState.UNEXPLORED);
 
 		Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
@@ -137,7 +135,7 @@ public class XController {
 
 		if (explorer != null)
 			explorer.explore(mstate.getMapSystemDimension(), 
-					getActiveRobot(mode), mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coverage, timelimit);
+					robot, mstate.getRobotPoint(), mstate.getEndPoint(), mstate.getWayPoint(), coverage, timelimit);
 	}
 
 	/**

@@ -125,6 +125,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     case RIGHT:
                         return Direction.LEFT;
                 }
+			default:
+				break;
         }
         return null;
     }
