@@ -4,7 +4,7 @@
 #include "Settings.h"
 #include "communication.h"
 #include "RingBuffer.h"
-
+#include <math.h>
 RingBuffer usbBufferIn;
 
 uint8_t last_sent = 0;
@@ -30,6 +30,7 @@ void setup() {
   delay(2000);
   //Serial.println("Initializations Done");
   //  goFORWARD(7);
+  goFORWARDObst(10,0);
 }
 
 void loop() {
@@ -76,8 +77,8 @@ void goFORWARD(int noBlock) {
       }
     }
   }
-  resetMCounters();
   md.setBrakes(400, 400);
+  resetMCounters();
 }
 
 
@@ -218,45 +219,106 @@ void calibrateFRONT() {
 //------------Functions for checklists------------//
 void goFORWARDObst(int blocks, int diag) {
   for (int count = 0; count < blocks; count++) {
-    scanFORWARD(&irFrontReading(0));
-    if (pData[0] > (0 + diag) && pData[0] <= (10 + diag)) {
+    scanFORWARD(&irFrontReadings[0]);
+    
+    if (irFrontReadings[1] > (0 + diag) && irFrontReadings[1] <= (10 + diag)) {
       if (diag) {
         //insert rotate 45 degree function below
 
-
-
         //insert move forward 
-
+        goFORWARDCM(irFrontReadings[0]);
         //turn 45 back
 
         //turn 45 down
 
         //move forward by some cm
-
+        goFORWARDCM(irFrontReadings[0]);
+        
         //turn 45 back
         
         count += 5;
       } else {
+        Serial.println("In else");
         goLEFT();
-        goFORWARD(2);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
         goRIGHT();
-        goFORWARD(4);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
         goRIGHT();
-        goFORWARD(2);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
+        goFORWARD(1);
+        delay(500);
         goLEFT();
         count+=4;
-      }
-      
+      } 
+    } else {
+        goFORWARD(1);
     }
+    delay(500);
   }
-  goFORWARD(1);
 }
 
+void goFORWARDCM(int lengthCM){
+  int tptcm = 1183;
+  int lenMove = 1183 * sqrt(2 * lengthCM *lengthCM) / 10;
+  int kP = 100;
+  int kI = 0;
+  int kD = 8;
+  int error = 0;
+  int errorRate = 0;
+  int adjustment = 0;
+  int totalErrors = 0;
+  int lastError = 0;
+  int lastTicks[2] = {0, 0};
+  int setSpd1 = 200;              //Right motor
+  int setSpd2 = 202;              //Left motor
+  long lastTime = millis();
+
+  md.setSpeeds(setSpd1, setSpd2);
+  delay(50);
+
+  while (mCounter[0] < lenMove && mCounter[1] < lenMove) {
+    if (millis() - lastTime > 100) {
+      lastTime = millis();
+      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      lastTicks[0] = mCounter[0];
+      lastTicks[1] = mCounter[1];
+      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
+      lastError = error;                                                              //Reassign the previous error as current error
+      totalErrors += error;                                                           //Add up total number of errors (for Ki)
+      if (abs(error) > 0) {                                                           //if error exists
+        adjustment = kP * error + kI * totalErrors + kD * errorRate;
+        adjustment /= 100;
+        setSpd1 += adjustment;
+        setSpd2 -= adjustment;
+        md.setSpeeds(setSpd1, setSpd2);
+      }
+    }
+  }
+  
+  md.setBrakes(400, 400);
+  resetMCounters();
+  
+}
 
 //------------Functions for IR Sensors------------//
 void scanFORWARD(int *pData) {
-  pData[0] = ir1.distance(); //Middle
-  pData[1] = ir2.distance(); // Left
+  pData[0] = ir1.distance(); //Left
+  pData[1] = ir2.distance(); // Middle
   pData[2] = ir3.distance(); //Right
   //Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << endl;
 }
@@ -292,13 +354,13 @@ void resetMCounters() {
 //ISR for Motor 1 Encoders
 ISR(PCINT2_vect) {
   flag[0] = 1;
-  mEncoder(0, 1250);
+  mEncoder(0, 1183);
 }
 
 //ISR for Motor 2 Encoders
 ISR(PCINT0_vect) {
   flag[1] = 1;
-  mEncoder(1, 1250);
+  mEncoder(1, 1183);
 }
 
 //Standard function to enable interrupts on any pins

@@ -218,7 +218,7 @@ void calibrateFRONT() {
 //------------Functions for checklists------------//
 void goFORWARDObst(int blocks, int diag) {
   for (int count = 0; count < blocks; count++) {
-    scanFORWARD(&irFrontReading(0));
+    scanFORWARD(&irForwardReading[0]);
     if (pData[0] > (0 + diag) && pData[0] <= (10 + diag)) {
       if (diag) {
         //insert rotate 45 degree function below
@@ -246,11 +246,13 @@ void goFORWARDObst(int blocks, int diag) {
         goLEFT();
         count+=4;
       }
-      
     }
   }
-  goFORWARD(1);
+  else{
+    goFORWARD(1);
+  }
 }
+
 
 
 //------------Functions for IR Sensors------------//
