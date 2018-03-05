@@ -14,7 +14,6 @@ import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
-import mdp.tcp.ArduinoInstruction;
 
 /**
  * SimulatorRobot is an implementation of RobotBase that provides sensor reading
@@ -23,7 +22,7 @@ import mdp.tcp.ArduinoInstruction;
  * @author Ying Hao
  */
 public class SimulatorRobot extends RobotBase {
-
+	private MapState simulationMapState;
     private Queue<NotifyTask> taskqueue;
     private long delay;
 
@@ -57,6 +56,22 @@ public class SimulatorRobot extends RobotBase {
     public void setDelay(long delay) {
         this.delay = delay;
     }
+    
+    /**
+     * Gets the simulation map state
+     * @return
+     */
+    public MapState getSimulationMapState() {
+    	return simulationMapState;
+    }
+    
+    /**
+     * Sets the simulation map state
+     * @param mstate
+     */
+    public void setSimulationMapState(MapState mstate) {
+    	this.simulationMapState = mstate;
+    }
 
     @Override
     public Map<SensorConfiguration, Integer> getSensorReading() {
@@ -71,7 +86,7 @@ public class SimulatorRobot extends RobotBase {
     }
 
     @Override
-    protected void move(Direction mapdirection, RobotAction... actions) {
+    protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
     	MapState mstate = this.getMapState();
         Point location = mstate.getRobotPoint();
 
@@ -95,6 +110,11 @@ public class SimulatorRobot extends RobotBase {
             this.getScheduler().schedule(task, delay);
         }
     }
+    
+    @Override
+	protected void dispatchCalibration(RobotAction action) {
+		System.out.println("Calibration Data: " + action);
+	}
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
@@ -126,7 +146,7 @@ public class SimulatorRobot extends RobotBase {
      * @return
      */
     private int getObstacleDistance(SensorConfiguration sensor) {
-    	MapState mstate = this.getMapState();
+    	MapState mstate = this.getSimulationMapState();
         Direction sdirection = this.getSensorDirection(sensor);
         Point scoordinate = this.getSensorCoordinate(sensor);
         Dimension mdim = mstate.getMapSystemDimension();

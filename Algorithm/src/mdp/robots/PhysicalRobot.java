@@ -16,7 +16,6 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
@@ -95,7 +94,7 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void move(Direction mapdirection, RobotAction... actions) {
+    protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
         for (RobotAction action : actions) {
             // How do I know from here whether I have obstacleInFront or not.. I'm putting this as false from here
             // 1) The MapState containing the scanned obstacles is inside ExplorationBase.java
@@ -138,14 +137,18 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        sendCalibrationData();
-        
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
         if (taskqueue.size() == 1) {
             this.getScheduler().schedule(task, timerDelay);
         }
     }
+    
+    @Override
+	protected void dispatchCalibration(RobotAction action) {
+		ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
+		outgoingArduinoQueue.add(arduinoInstruction);
+	}
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
@@ -222,53 +225,6 @@ public class PhysicalRobot extends RobotBase {
 					break;
             }
         }
-    }
-    
-    private void sendCalibrationData() {
-    	MapState mstate = this.getMapState();
-    	Point rlocation = mstate.getRobotPoint();
-    	CellState up, down, left, right;
-    	
-    	switch(getCurrentOrientation()) {
-    		case UP:
-    			up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
-    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
-    			left = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
-    			right = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
-				break;
-			case DOWN:
-				up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
-    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
-    			left = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
-    			right = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
-				break;
-			case LEFT:
-				up = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
-    			down = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
-    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
-    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
-				break;
-			case RIGHT:
-				up = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
-    			down = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
-    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
-    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
-				break;
-			default:
-				up = CellState.NORMAL;
-    			down = CellState.NORMAL;
-    			left = CellState.NORMAL;
-    			right = CellState.NORMAL;
-				break;
-    	}
-    	
-    	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
-    		if(spec.isInPosition(up, down, left, right)){
-                    System.out.println("**********************************");
-                    System.out.println(spec.getCalibrationType());
-                    System.out.println("**********************************");
-                    outgoingArduinoQueue.add(new ArduinoInstruction(spec.getCalibrationType(), false));
-                }
     }
 
     /**

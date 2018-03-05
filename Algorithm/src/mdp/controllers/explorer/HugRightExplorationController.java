@@ -5,7 +5,6 @@
  */
 package mdp.controllers.explorer;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     int neighbourCounter;
     int aboutTurn;
     boolean justTurned;
-    boolean leftStartPoint;
     States currentState;
 
     public HugRightExplorationController(FastestPathBase fastestPath) {
@@ -62,7 +60,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         neighbourCounter = 0;
         aboutTurn = 0;
         justTurned = false;
-        leftStartPoint = false;
 
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
@@ -246,7 +243,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         if (currentState == States.BOUNDARY) {
-            if (leftStartPoint && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 20) {
+            if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 20) {
                 currentState = States.EXPLORATION;
             } else {
                 for (RobotAction action : actionPriority) {

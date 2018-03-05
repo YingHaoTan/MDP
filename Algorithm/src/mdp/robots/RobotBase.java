@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
@@ -369,6 +370,20 @@ public abstract class RobotBase {
             move(orientation, action);
         }
     }
+    
+    /**
+     * Moves the robot by performing the actions in order
+     *
+     * @mapdirection
+     * @param actions
+     */
+    protected void move(Direction mapdirection, RobotAction... actions) {
+    	dispatchMovement(mapdirection, actions);
+    	
+    	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
+    		if(evaluateCalibration(spec))
+    			dispatchCalibration(spec.getCalibrationType());
+    }
 
     /*
     *  Things to do when you stop the robot
@@ -381,6 +396,47 @@ public abstract class RobotBase {
     public void reset() {
         orientation = initialorientation;
     }
+    
+    private boolean evaluateCalibration(CalibrationSpecification spec) {
+    	MapState mstate = this.getMapState();
+    	Point rlocation = mstate.getRobotPoint();
+    	CellState up, down, left, right;
+    	
+    	switch(getCurrentOrientation()) {
+    		case UP:
+    			up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			left = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			right = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+				break;
+			case DOWN:
+				up = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			down = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			left = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			right = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+				break;
+			case LEFT:
+				up = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			down = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+				break;
+			case RIGHT:
+				up = mstate.getRobotCellState(new Point(rlocation.x + 1, rlocation.y));
+    			down = mstate.getRobotCellState(new Point(rlocation.x - 1, rlocation.y));
+    			left = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y + 1));
+    			right = mstate.getRobotCellState(new Point(rlocation.x, rlocation.y - 1));
+				break;
+			default:
+				up = CellState.NORMAL;
+    			down = CellState.NORMAL;
+    			left = CellState.NORMAL;
+    			right = CellState.NORMAL;
+				break;
+    	}
+    	
+    	return spec.isInPosition(up, down, left, right);
+    }
 
     /**
      * Notifies all RobotActionListener instances registered to this Robot
@@ -390,9 +446,8 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void notify(Direction mapdirection, RobotAction[] actions) {
-        for (RobotActionListener listener : new ArrayList<>(listeners)) {
+        for (RobotActionListener listener : new ArrayList<>(listeners))
             listener.onRobotActionCompleted(mapdirection, actions);
-        }
     }
 
     /**
@@ -404,17 +459,22 @@ public abstract class RobotBase {
      */
     public abstract Map<SensorConfiguration, Integer> getSensorReading();
 
-    /**
-     * Moves the robot by performing the actions in order
-     *
-     * @mapdirection
-     * @param actions
-     */
-    protected abstract void move(Direction mapdirection, RobotAction... actions);
-
     
     /**
      * Have to set orientation inside here...
      */
     protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations);
+    
+    /**
+     * Dispatches a sequence of movements
+     * @param direction
+     * @param actions
+     */
+    protected abstract void dispatchMovement(Direction direction, RobotAction...actions);
+    
+    /**
+     * Dispatches a calibration hint
+     * @param action
+     */
+    protected abstract void dispatchCalibration(RobotAction action);
 }
