@@ -1,10 +1,12 @@
-#include <Streaming.h>
-#include <SharpIR.h>
-#include <DualVNH5019MotorShield.h>
-#include "Settings.h"
-#include "communication.h"
-#include "RingBuffer.h"
-#include <math.h>
+# 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino"
+# 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino"
+# 2 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 3 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 4 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 5 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 6 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 7 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
+# 8 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino" 2
 RingBuffer usbBufferIn;
 
 uint8_t last_sent = 0;
@@ -16,16 +18,16 @@ void setup() {
   md.init();
 
   //Initialise Motor Encoder Pins, digitalWrite high to enable PullUp Resistors
-  pinMode(m1EncA, INPUT);
-  pinMode(m1EncB, INPUT);
-  pinMode(m2EncA, INPUT);
-  pinMode(m2EncB, INPUT);
+  pinMode(3 /*Microcontroller pin 5, PORTD, PCINT2_vect, PCINT19*/, 0x0);
+  pinMode(5 /*Microcontroller pin 11, PORTD,PCINT2_vect, PCINT21*/, 0x0);
+  pinMode(13 /*Microcontroller pin 17, PORTB, PCINT0_vect, PCINT3*/, 0x0);
+  pinMode(11 /*Microcontroller pin 19, PORTB, PCINT0_vect, PCINT5*/, 0x0);
 
   //Innitializes the Motor Encoders for Interrupts
-  pciSetup(m1EncA);
-  pciSetup(m1EncB);
-  pciSetup(m2EncA);
-  pciSetup(m2EncB);
+  pciSetup(3 /*Microcontroller pin 5, PORTD, PCINT2_vect, PCINT19*/);
+  pciSetup(5 /*Microcontroller pin 11, PORTD,PCINT2_vect, PCINT21*/);
+  pciSetup(13 /*Microcontroller pin 17, PORTB, PCINT0_vect, PCINT3*/);
+  pciSetup(11 /*Microcontroller pin 19, PORTB, PCINT0_vect, PCINT5*/);
 
   delay(2000);
   //Serial.println("Initializations Done");
@@ -66,8 +68,8 @@ void goFORWARD(int noBlock) {
   int totalErrors = 0;
   int lastError = 0;
   int lastTicks[2] = {0, 0};
-  int setSpd1 = 300;              //Right motor
-  int setSpd2 = 306;              //Left motor
+  int setSpd1 = 300; //Right motor
+  int setSpd2 = 306; //Left motor
   long lastTime = millis();
   resetMCounters();
   md.setSpeeds(setSpd1, setSpd2);
@@ -76,14 +78,14 @@ void goFORWARD(int noBlock) {
   while (mRev[0] < noBlock && mRev[1] < noBlock) {
     if (millis() - lastTime > 100) {
       lastTime = millis();
-      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
-      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      Serial.println("----"); //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]); //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
       lastTicks[1] = mCounter[1];
-      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
-      lastError = error;                                                              //Reassign the previous error as current error
-      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
-      if (abs(error) > 0) {                                                           //if error exists
+      errorRate = error - lastError; //Counting change in error (for Kd)
+      lastError = error; //Reassign the previous error as current error
+      totalErrors += 2; //Add up total number of errors (for Ki)
+      if (((error)>0?(error):-(error)) > 0) { //if error exists
         adjustment = kP * error - kI * totalErrors + kD * errorRate;
         adjustment /= 100;
         setSpd1 += adjustment;
@@ -112,8 +114,8 @@ void goRIGHT(int angle) {
   int totalErrors = 0;
   int lastError = 0;
   int lastTicks[2] = {0, 0};
-  int setSpd1 = -200;              //Right motor
-  int setSpd2 = 206;              //Left motor
+  int setSpd1 = -200; //Right motor
+  int setSpd2 = 206; //Left motor
   long lastTime = millis();
   resetMCounters();
   md.setSpeeds(setSpd1, setSpd2);
@@ -122,14 +124,14 @@ void goRIGHT(int angle) {
   while (mCounter[0] < ticks && mCounter[1] < ticks) {
     if (millis() - lastTime > 50) {
       lastTime = millis();
-      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
-      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      Serial.println("----"); //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]); //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
       lastTicks[1] = mCounter[1];
-      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
-      lastError = error;                                                              //Reassign the previous error as current error
-      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
-      if (abs(error) > 0) {                                                           //if error exists
+      errorRate = error - lastError; //Counting change in error (for Kd)
+      lastError = error; //Reassign the previous error as current error
+      totalErrors += 2; //Add up total number of errors (for Ki)
+      if (((error)>0?(error):-(error)) > 0) { //if error exists
         adjustment = kP * error - kI * totalErrors + kD * errorRate;
         adjustment /= 100;
         setSpd1 += -adjustment;
@@ -155,8 +157,8 @@ void goLEFT(int angle) {
   int totalErrors = 0;
   int lastError = 0;
   int lastTicks[2] = {0, 0};
-  int setSpd1 = 200;              //Right motor
-  int setSpd2 = -206;              //Left motor
+  int setSpd1 = 200; //Right motor
+  int setSpd2 = -206; //Left motor
   long lastTime = millis();
   resetMCounters();
   md.setSpeeds(setSpd1, setSpd2);
@@ -165,14 +167,14 @@ void goLEFT(int angle) {
   while (mCounter[0] < ticks && mCounter[1] < ticks) {
     if (millis() - lastTime > 50) {
       lastTime = millis();
-      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
-      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      Serial.println("----"); //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]); //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
       lastTicks[1] = mCounter[1];
-      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
-      lastError = error;                                                              //Reassign the previous error as current error
-      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
-      if (abs(error) > 0) {                                                           //if error exists
+      errorRate = error - lastError; //Counting change in error (for Kd)
+      lastError = error; //Reassign the previous error as current error
+      totalErrors += 2; //Add up total number of errors (for Ki)
+      if (((error)>0?(error):-(error)) > 0) { //if error exists
         adjustment = kP * error - kI * totalErrors + kD * errorRate;
         adjustment /= 100;
         setSpd1 += adjustment;
@@ -198,7 +200,7 @@ void PIDControl(int *setSpdR, int *setSpdL) {
   int lastError;
   int lastTicks[2];
 
-  error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+  error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]); //0 = right motor, 1 = left motor, lesser tick time mean faster
   lastTicks[0] = mCounter[0];
   lastTicks[1] = mCounter[1];
   errorRate = error - lastError;
@@ -207,7 +209,7 @@ void PIDControl(int *setSpdR, int *setSpdL) {
 
   if (error > 5) {
     //adjustment = ((abs(error)*kP/10) + (errorRate*kD/10) + (totalErrors*kI/10))/2;
-    adjustment = ((abs(error) * kP / 10) + (errorRate * kD / 10)) / 2;
+    adjustment = ((((error)>0?(error):-(error)) * kP / 10) + (errorRate * kD / 10)) / 2;
     *setSpdR += adjustment;
     *setSpdL -= adjustment;
 
@@ -217,7 +219,7 @@ void PIDControl(int *setSpdR, int *setSpdL) {
 
   else if (error < -5) {
     //adjustment = ((abs(error)*kP/10) + (errorRate*kD/10) + (totalErrors*kI/10))/2;
-    adjustment = ((abs(error) * kP / 10) + (errorRate * kD / 10)) / 2;
+    adjustment = ((((error)>0?(error):-(error)) * kP / 10) + (errorRate * kD / 10)) / 2;
     *setSpdR -= adjustment;
     *setSpdL += adjustment;
 
@@ -256,18 +258,18 @@ void calibrateRIGHT() {
     int turnTicks = 0;
     resetMCounters();
 
-    if ((abs(irRightReadings[0] - irRightReadings[1]) > 0)) {
+    if ((((irRightReadings[0] - irRightReadings[1])>0?(irRightReadings[0] - irRightReadings[1]):-(irRightReadings[0] - irRightReadings[1])) > 0)) {
       //Serial.println("Calibrating Right");
       turnTicks = (irRightReadings[0] - irRightReadings[1]) * 20;
       if (turnTicks > 0) {
         //Serial << "Moving right abit of ticks: " << turnTicks << endl;
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        while (mCounter[0] < ((turnTicks)>0?(turnTicks):-(turnTicks)) && mCounter[1] < ((turnTicks)>0?(turnTicks):-(turnTicks))) {
           md.setSpeeds(-300, 300);
         }
       }
       else {
         //Serial << "Moving left abit of ticks: " << turnTicks << endl;
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        while (mCounter[0] < ((turnTicks)>0?(turnTicks):-(turnTicks)) && mCounter[1] < ((turnTicks)>0?(turnTicks):-(turnTicks))) {
           md.setSpeeds(300, -300);
         }
       }
@@ -294,12 +296,12 @@ void calibrateFRONT() {
       turnTicks = (irFrontReadings[1] - 9) * 30;
       //Increase speed if further from block, reverse if less
       if (turnTicks > 0) {
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        while (mCounter[0] < ((turnTicks)>0?(turnTicks):-(turnTicks)) && mCounter[1] < ((turnTicks)>0?(turnTicks):-(turnTicks))) {
           md.setSpeeds(300, 300);
         }
       }
       else {
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        while (mCounter[0] < ((turnTicks)>0?(turnTicks):-(turnTicks)) && mCounter[1] < ((turnTicks)>0?(turnTicks):-(turnTicks))) {
           md.setSpeeds(-300, -300);
         }
       }
@@ -319,7 +321,7 @@ void calibrateFRONT() {
 void goFORWARDObst(int blocks, int diag) {
   for (int count = 0; count < blocks; count++) {
     scanFORWARD(&irFrontReadings[0]);
-    
+
     if (irFrontReadings[1] > (0 + diag) && irFrontReadings[1] <= (10 + diag)) {
       if (diag) {
         //insert rotate 45 degree function below
@@ -330,10 +332,10 @@ void goFORWARDObst(int blocks, int diag) {
         goRIGHT(90);
         //move forward by some cm
         goFORWARDCM(irFrontReadings[0]);
-        
+
         //turn 45 back
         goLEFT(45);
-        
+
         count += 5;
       } else {
         Serial.println("In else");
@@ -361,7 +363,7 @@ void goFORWARDObst(int blocks, int diag) {
         delay(500);
         goLEFT(90);
         count+=4;
-      } 
+      }
     } else {
         goFORWARD(1);
     }
@@ -381,8 +383,8 @@ void goFORWARDCM(int lengthCM){
   int totalErrors = 0;
   int lastError = 0;
   int lastTicks[2] = {0, 0};
-  int setSpd1 = 200;              //Right motor
-  int setSpd2 = 202;              //Left motor
+  int setSpd1 = 200; //Right motor
+  int setSpd2 = 202; //Left motor
   long lastTime = millis();
 
   md.setSpeeds(setSpd1, setSpd2);
@@ -391,14 +393,14 @@ void goFORWARDCM(int lengthCM){
   while (mCounter[0] < lenMove && mCounter[1] < lenMove) {
     if (millis() - lastTime > 100) {
       lastTime = millis();
-      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
-      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      Serial.println("----"); //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]); //0 = right motor, 1 = left motor, lesser tick time mean faster
       lastTicks[0] = mCounter[0];
       lastTicks[1] = mCounter[1];
-      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
-      lastError = error;                                                              //Reassign the previous error as current error
-      totalErrors += error;                                                           //Add up total number of errors (for Ki)
-      if (abs(error) > 0) {                                                           //if error exists
+      errorRate = error - lastError; //Counting change in error (for Kd)
+      lastError = error; //Reassign the previous error as current error
+      totalErrors += error; //Add up total number of errors (for Ki)
+      if (((error)>0?(error):-(error)) > 0) { //if error exists
         adjustment = kP * error + kI * totalErrors + kD * errorRate;
         adjustment /= 100;
         setSpd1 += adjustment;
@@ -407,10 +409,10 @@ void goFORWARDCM(int lengthCM){
       }
     }
   }
-  
+
   md.setBrakes(400, 400);
   resetMCounters();
-  
+
 }
 
 
@@ -441,17 +443,27 @@ void mEncoder(int motor, int setTick){
   //encState[motor] = digitalRead(encA[motor]);
   mCounter[motor]++;
   /*
+
   int direction = 0;
+
   if(encState[motor] != encLastState[motor]){          //Was there a change in state?
+
     if(digitalRead(encB[motor]) != encState[motor]){    //If EncA state is different from EncB
+
       direction = 1;                              //Then it's going forward so ++ ticks
+
     }
+
     else{
+
       direction = -1;                               //Else it is going in reverse so -- ticks
+
     }
+
   }
+
   */
-    
+# 455 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino"
   //encLastState[motor] = encState[motor];
   //Serial << "Inside mEncoder() for Motor: " << motor << " Ticks: " << mCounter[motor] << " " << mRev[motor] << " Direction " << direction << endl;
   if(((mCounter[motor] % setTick) == 0 && (mCounter[motor]!=0))){
@@ -467,22 +479,22 @@ void resetMCounters() {
 }
 
 //ISR for Motor 1 Encoders
-ISR(PCINT2_vect) {
+extern "C" void __vector_5 /* Pin Change Interrupt Request 1 */ (void) __attribute__ ((signal,used, externally_visible)) ; void __vector_5 /* Pin Change Interrupt Request 1 */ (void) {
   flag[0] = 1;
   mEncoder(0, 1183);
 }
 
 //ISR for Motor 2 Encoders
-ISR(PCINT0_vect) {
+extern "C" void __vector_3 /* Pin Change Interrupt Request 0 */ (void) __attribute__ ((signal,used, externally_visible)) ; void __vector_3 /* Pin Change Interrupt Request 0 */ (void) {
   flag[1] = 1;
   mEncoder(1, 1183);
 }
 
 //Standard function to enable interrupts on any pins
 void pciSetup(byte pin) {
-  *digitalPinToPCMSK(pin) |= bit (digitalPinToPCMSKbit(pin));  // enable pin
-  PCIFR  |= bit (digitalPinToPCICRbit(pin)); // clear any outstanding interrupt
-  PCICR  |= bit (digitalPinToPCICRbit(pin)); // enable interrupt for the group
+  *(((pin) <= 7) ? (&(*(volatile uint8_t *)(0x6D))) : (((pin) <= 13) ? (&(*(volatile uint8_t *)(0x6B))) : (((pin) <= 21) ? (&(*(volatile uint8_t *)(0x6C))) : ((uint8_t *)0)))) |= (1UL << ((((pin) <= 7) ? (pin) : (((pin) <= 13) ? ((pin) - 8) : ((pin) - 14))))); // enable pin
+  (*(volatile uint8_t *)((0x1B) + 0x20)) |= (1UL << ((((pin) <= 7) ? 2 : (((pin) <= 13) ? 0 : 1)))); // clear any outstanding interrupt
+  (*(volatile uint8_t *)(0x68)) |= (1UL << ((((pin) <= 7) ? 2 : (((pin) <= 13) ? 0 : 1)))); // enable interrupt for the group
 }
 
 
@@ -503,7 +515,7 @@ void commWithRPI() {
           messageType = tmpInBuffer;
         }
 
-        if (messageType == ARDUINO_INSTRUCTION) {
+        if (messageType == 0x02) {
           if (5 < usbBufferIn.count) {
             if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 5) == true && tmpInBuffer == '!') {
 
@@ -518,7 +530,7 @@ void commWithRPI() {
               alreadyReceived = true;
               yetToReceiveAck = false;
               switch (instructMsg.action) {
-                case TURN_LEFT:
+                case 0x03:
                   goLEFT(90);
                   delay(1000);
                   calCounter++;
@@ -526,7 +538,7 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
-                case TURN_RIGHT:
+                case 0x04:
                   goRIGHT(90);
                   delay(1000);
                   calCounter++;
@@ -534,7 +546,7 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
-                case FORWARD:
+                case 0x05:
                   goFORWARD(1);
                   delay(1000);
                   calCounter++;
@@ -542,7 +554,7 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
-                case CAL_CORNER:
+                case 0x08:
                   calibrateRIGHT();
                   goRIGHT(90);
                   calibrateFRONT();
@@ -555,7 +567,7 @@ void commWithRPI() {
                   alreadyReceived = false;
                   break;
 
-                case CAL_SIDE:
+                case 0x09:
                   scanRIGHT(&irRightReadings[0]);
                   if(calCounter == 6 || (irRightReadings[0]!=irRightReadings[1])){
                     calibrateRIGHT();
@@ -566,19 +578,19 @@ void commWithRPI() {
                   incrementID();
                   break;
 
-                case SCAN:
-                  sendStatusUpdate(); 
+                case 0x02:
+                  sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
                   break;
 
-                case START:
+                case 0x01:
                   calibrateRIGHT();
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
                   break;
-                case STOP:
+                case 0x07:
                   yetToReceiveAck = false;
                   break;
               }
@@ -589,7 +601,7 @@ void commWithRPI() {
               RingBuffer_pop( & usbBufferIn);
             }
           }
-        } else if (messageType == ARDUINO_STREAM) {
+        } else if (messageType == 0x03) {
           StreamMessage streamMsg;
           uint8_t payloadSize = 0;
           // may not matter
@@ -629,16 +641,16 @@ void toBlocks(){
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = minVal((irFrontReadings[0] - offset1) / 10);
-  statusPayload.front2 = minVal((irFrontReadings[1] - offset2) / 10);
-  statusPayload.front3 = minVal((irFrontReadings[2] - offset3) / 10);
-  statusPayload.right1 = minVal((irRightReadings[0] - offset4) / 10);
-  statusPayload.right2 = minVal((irRightReadings[1] - offset6) / 10);
-  statusPayload.left1 = minVal((irLeftReading - offset5) / 10);
+  statusPayload.front1 = minVal((irFrontReadings[0] - -4 /*Middle forward IR*/) / 10);
+  statusPayload.front2 = minVal((irFrontReadings[1] - -2 /*Left forward IR*/) / 10);
+  statusPayload.front3 = minVal((irFrontReadings[2] - -2 /*Right forward IR*/) / 10);
+  statusPayload.right1 = minVal((irRightReadings[0] - -2 /*Front right IR. The only long range IR.*/) / 10);
+  statusPayload.right2 = minVal((irRightReadings[1] - -2 /*Back right IR*/) / 10);
+  statusPayload.left1 = minVal((irLeftReading - 1 /*Front left IR*/) / 10);
   statusPayload.reached = 1;
 
   Message msg;
-  msg.type = ARDUINO_UPDATE;
+  msg.type = 0x01;
   memcpy(&msg.payload, &statusPayload, 8);
 
   uint8_t tmpOutBuffer[64] = {0};
@@ -647,16 +659,25 @@ void toBlocks(){
   tmpOutBuffer[10] = '!';
 
   /*
-  Serial << "----------" << endl;
-  Serial << "frontLEFT: " << tmpOutBuffer[3] << endl;
-  Serial << "frontMID: " << tmpOutBuffer[4] << endl;
-  Serial << "frontRIGHT: " << tmpOutBuffer[5] << endl;
-  Serial << "rightFRONT: " << tmpOutBuffer[6] << endl;
-  Serial << "rightBACK: " << tmpOutBuffer[7] << endl;
-  Serial << "left: " << tmpOutBuffer[8] << endl;
-  Serial << "----------" << endl;
-  */
 
+  Serial << "----------" << endl;
+
+  Serial << "frontLEFT: " << tmpOutBuffer[3] << endl;
+
+  Serial << "frontMID: " << tmpOutBuffer[4] << endl;
+
+  Serial << "frontRIGHT: " << tmpOutBuffer[5] << endl;
+
+  Serial << "rightFRONT: " << tmpOutBuffer[6] << endl;
+
+  Serial << "rightBACK: " << tmpOutBuffer[7] << endl;
+
+  Serial << "left: " << tmpOutBuffer[8] << endl;
+
+  Serial << "----------" << endl;
+
+  */
+# 660 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino"
   Serial.print((int)tmpOutBuffer[3]);
   Serial.print((int)tmpOutBuffer[4]);
   Serial.println((int)tmpOutBuffer[5]);
@@ -669,7 +690,7 @@ void stringCommands() {
   int commands[] = {5};
   static int x;
   switch (commands[x]){
-    case 1: 
+    case 1:
             Serial.println("Moving forward");
             goFORWARD(1);
             break;
@@ -697,11 +718,11 @@ void stringCommands() {
             //scanRIGHT(&irRightReadings[0]);
             toBlocks();
             break;
-            
+
     case 6:
             Serial.println("Accelerated movement");
             break;
-            
+
     case 7:
             Serial.println("Going backwards");
             md.setSpeeds(-300, -300);
@@ -712,11 +733,11 @@ void stringCommands() {
   }
 
   delay(200);
-  
+
   if(x <= sizeof(commands)/sizeof(int)){
     x++;
   }
-  
+
 }
 
 void putIncomingUSBMessageToBuffer() {
@@ -749,19 +770,41 @@ uint8_t minVal(uint8_t val) {
 }
 
 void sendStatusUpdate() {
+  delay(1000);
   scanFORWARD(&irFrontReadings[0]);
   scanLEFT();
   scanRIGHT(&irRightReadings[0]);
 
+  delay(200);
+
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = minVal((irFrontReadings[0] - offset1) / 10);
-  statusPayload.front2 = minVal((irFrontReadings[1] - offset2) / 10);
-  statusPayload.front3 = minVal((irFrontReadings[2] - offset3) / 10);
-  statusPayload.right1 = minVal((irRightReadings[0] - offset4) / 10);
-  statusPayload.right2 = minVal((irRightReadings[1] - offset6) / 10);
-  statusPayload.left1 = minVal((irLeftReading - offset5) / 10);
+
+
+  statusPayload.front1 = minVal((irFrontReadings[0] - -4 /*Middle forward IR*/) / 10);
+  statusPayload.front2 = minVal((irFrontReadings[1] - -2 /*Left forward IR*/) / 10);
+  statusPayload.front3 = minVal((irFrontReadings[2] - -2 /*Right forward IR*/) / 10);
+  statusPayload.right1 = minVal((irRightReadings[0] - -2 /*Front right IR. The only long range IR.*/) / 10);
+  statusPayload.right2 = minVal((irRightReadings[1] - -2 /*Back right IR*/) / 10);
+  statusPayload.left1 = minVal((irLeftReading - 1 /*Front left IR*/) / 10);
+
+  /*
+
+  statusPayload.front1 = 1;
+
+  statusPayload.front2 = 2;
+
+  statusPayload.front3 = 3;
+
+  statusPayload.right1 = 4;
+
+  statusPayload.right2 = 5;
+
+  statusPayload.left1 = 6;
+
+  */
+# 780 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\060318Robot01.ino"
   statusPayload.reached = 1;
 
   //Serial << irFrontReadings[1] << " " << irFrontReadings[0] << " " << irFrontReadings[2] << " " << irRightReadings[0] << " " << irRightReadings[1] << " " << irLeftReading << endl;
@@ -770,7 +813,7 @@ void sendStatusUpdate() {
 
   // Crafts message to send
   Message msg;
-  msg.type = ARDUINO_UPDATE;
+  msg.type = 0x01;
   memcpy(&msg.payload, &statusPayload, 8);
 
   uint8_t tmpOutBuffer[64] = {0};
@@ -778,7 +821,11 @@ void sendStatusUpdate() {
   memcpy(&tmpOutBuffer[1], &msg, 9);
   tmpOutBuffer[10] = '!';
 
+  // Need to test
+
   Serial<<'~'<<(int)tmpOutBuffer[1]<<(int)tmpOutBuffer[2]<<(int)tmpOutBuffer[3]<<(int)tmpOutBuffer[4]<<(int)tmpOutBuffer[5]<<(int)tmpOutBuffer[6]<<(int)tmpOutBuffer[7]<<(int)tmpOutBuffer[8]<<(int)tmpOutBuffer[9]<<'!'<<endl;
+
+  //Serial.write((uint8_t *)tmpOutBuffer, sizeof(tmpOutBuffer));
   Serial.flush();
 
   //start_timer()
@@ -797,4 +844,132 @@ void decrementID() {
   else {
     last_sent = last_sent - 1;
   }
+}
+# 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\RingBuffer.ino"
+void RingBuffer_init(RingBuffer *_this)
+{
+    /*****
+
+      The following clears:
+
+        -> buf
+
+        -> head
+
+        -> tail
+
+        -> count
+
+      and sets head = tail
+
+    ***/
+# 11 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\060318Robot01\\RingBuffer.ino"
+    memset (_this, 0, sizeof (*_this));
+}
+
+unsigned int RingBuffer_modulo_inc(const unsigned int value, const unsigned int modulus)
+{
+    unsigned int my_value = value + 1;
+    if (my_value >= modulus)
+    {
+      my_value = 0;
+    }
+    return (my_value);
+}
+
+unsigned int RingBuffer_modulo_dec(const unsigned int value, const unsigned int modulus)
+{
+    unsigned int my_value = (0==value) ? (modulus - 1) : (value - 1);
+    return (my_value);
+}
+
+uint8_t RingBuffer_empty(RingBuffer *_this)
+{
+    return (0==_this->count);
+}
+
+void RingBuffer_flush(RingBuffer *_this, uint8_t clearBuffer)
+{
+  _this->count = 0;
+  _this->head = 0;
+  _this->tail = 0;
+  if (clearBuffer)
+  {
+    memset (_this->buf, 0, sizeof (_this->buf));
+  }
+}
+
+bool RingBuffer_full(RingBuffer *_this)
+{
+    return (_this->count>=512);
+}
+
+uint8_t RingBuffer_pop(RingBuffer *_this)
+{
+    uint8_t c;
+    if (_this->count>0)
+    {
+      c = _this->buf[_this->tail];
+      _this->buf[_this->tail] = 0xfe;
+      _this->tail = RingBuffer_modulo_inc (_this->tail, 512);
+      --_this->count;
+      return c;
+    }
+    return 0;
+}
+
+bool RingBuffer_get(RingBuffer *_this, uint8_t *buffer, uint16_t index)
+{
+    if (_this->count>0 && buffer){
+       *buffer = _this->buf[(_this->tail+index) % 512];
+       return true;
+    }
+    else{
+      *buffer = 0;
+      return false;
+    }
+}
+
+void RingBuffer_push(RingBuffer *_this, uint8_t value)
+{
+    if (_this->count < 512)
+    {
+      _this->buf[_this->head] = value;
+      _this->head = RingBuffer_modulo_inc (_this->head, 512);
+      ++_this->count;
+    }
+    else
+    {
+      _this->buf[_this->head] = value;
+      _this->head = RingBuffer_modulo_inc (_this->head, 512);
+      _this->tail = RingBuffer_modulo_inc (_this->tail, 512);
+    }
+}
+
+bool RingBuffer_erase(RingBuffer *_this, uint16_t range)
+{
+    if (range <= _this->count)
+    {
+        for(uint16_t i = 0; i < range; i++)
+            RingBuffer_pop(_this);
+
+//        _this->tail = (_this->tail + range) % RINGBUFFER_SIZE;
+//        _this->count -= range;
+      return true;
+    }
+    else
+      return false;
+}
+
+bool RingBuffer_find(RingBuffer *_this, uint8_t value)
+{
+    if (_this)
+    {
+        for (uint16_t i = 0; i < _this->count; i++)
+        {
+            if (_this->buf[(_this->tail + i) % 512] == value)
+                return true;
+        }
+    }
+    return false;
 }
