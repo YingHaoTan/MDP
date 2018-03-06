@@ -43,11 +43,11 @@ public class MDPTCPConnector {
     List<Consumer<AndroidInstruction>> androidInstructionListeners;
     Semaphore outgoingSemaphore;
     Queue<ArduinoMessage> outgoingArduinoQueue;
-    Queue<StatusMessage> outgoingAndroidQueue;
+    Queue<AndroidUpdate> outgoingAndroidQueue;
 
-    public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
+    public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<AndroidUpdate> outgoingAndroidQueue) {
         try {
-            this.clientSocket = new Socket("localhost", 5000);
+            this.clientSocket = new Socket("192.168.6.6", 5000);
             this.arduinoUpdateListeners = new ArrayList<>();
             this.androidInstructionListeners = new ArrayList<>();
             this.outgoingSemaphore = new Semaphore(0);
@@ -116,7 +116,6 @@ public class MDPTCPConnector {
         @Override
         public void run() {
             BufferedReader inFromServer = null;
-            AndroidCommandsTranslator androidTranslator = new AndroidCommandsTranslator();
             
             try {
                 inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -147,7 +146,6 @@ public class MDPTCPConnector {
                              */
                             case ANDROID_INSTRUCTION:
                                 AndroidInstruction fromAndroid = new AndroidInstruction(incoming);
-                                androidTranslator.decodeMessage(fromAndroid.getMessage());
                                 // set interrupt variable to true, exploration and fastest path stops giving instruction to Arduino,
                                 // only bluetooth gives instructions to Arduino
                                 for(Consumer<AndroidInstruction> consumer: androidInstructionListeners)
@@ -246,8 +244,9 @@ public class MDPTCPConnector {
 	                    
 	                    if (!outgoingAndroidQueue.isEmpty()) {
 	                        // sends whatever format u like
+	                    	AndroidUpdate update = outgoingAndroidQueue.remove();
+	                    	outToServer.writeBytes(new String(update.toBytes()) + "~");
 	                    	
-	                    	incrementID();
 	                    	processed++;
 	                    }
 	                    
@@ -256,6 +255,8 @@ public class MDPTCPConnector {
 	                    	outgoingSemaphore.acquire(processed - 1);
                 	}
                 	else {
+                		
+                		
                 		outgoingSemaphore.release();
                 	}
                     

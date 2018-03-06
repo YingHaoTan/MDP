@@ -37,6 +37,7 @@ public class PhysicalRobot extends RobotBase {
     private Queue<Command> commandqueue;
     private Semaphore outgoingSemaphore;
     private volatile boolean initializing;
+    private boolean autoupdate;
     // Just to store robot supposed position
 
     public PhysicalRobot(Dimension dimension, Direction orientation, List<Consumer<ArduinoUpdate>> arduinoUpdateListenerList, Queue<ArduinoMessage> outgoingArduinoQueue, Semaphore outgoingSemaphore) {
@@ -70,6 +71,22 @@ public class PhysicalRobot extends RobotBase {
         
         // Block until initialization completes
         while(initializing);
+    }
+    
+    /**
+     * Sets auto update flag
+     * @param autoupdate
+     */
+    public void setAutoUpdate(boolean autoupdate) {
+    	this.autoupdate = autoupdate;
+    }
+    
+    /**
+     * Checks if this physical robot is auto updating
+     * @return
+     */
+    public boolean isAutoUpdate() {
+    	return autoupdate;
     }
 
     @Override
