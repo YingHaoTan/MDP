@@ -42,7 +42,7 @@ public class MDPTCPConnector {
 
     public MDPTCPConnector(Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         try {
-            this.clientSocket = new Socket("192.168.6.6", 5000);
+            this.clientSocket = new Socket("", 5000);
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;
@@ -207,10 +207,12 @@ public class MDPTCPConnector {
 
                 DataOutputStream outToServer = new DataOutputStream(connectedSocket.getOutputStream());
 
-                ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
+                ArduinoInstruction ins;
                 while(true){
+                    ins = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
                     outToServer.writeBytes(new String(ins.toBytes()) + "~");
                     Thread.sleep(1000);
+                    
                 }
                 
                /* ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
