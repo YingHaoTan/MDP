@@ -11,8 +11,8 @@ class Main(object):
 
 	def __init__(self):
 		print('Opening bluetooth connection')
-		#self.android = BluetoothInterface.BluetoothInterface()
-		#self.android.connect()
+		self.android = BluetoothInterface.BluetoothInterface()
+		self.android.connect()
 		pass
 
  
@@ -180,19 +180,19 @@ class Main(object):
 					to_connect = port
 			
 
-			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
+			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
 			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
 			
 			
 
 
-			#read_android_thread = Thread(target=self.read_android, args=([to_pc_queue]))
-			#write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
+			read_android_thread = Thread(target=self.read_android, args=([to_pc_queue]))
+			write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
 
 			t1.start()
-			t2.start()
-			#read_android_thread.start()
-			#write_android_thread.start()
+			#t2.start()
+			read_android_thread.start()
+			write_android_thread.start()
 			
 			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, '', 1))
 

@@ -5,8 +5,12 @@
  */
 package mdp.tcp;
 
+import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.CommConstants;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * RobotTranslator translates messages between the robot and controller for the robot itself
@@ -17,15 +21,21 @@ import mdp.models.CommConstants;
  */
 public class AndroidCommandsTranslator {
 	//variables and constructors TBC
-        
+
 	/**
 	 * Generate message to update controller that robot is moving
 	 *
 	 * @return
 	 */
 	public String robotMoving(){
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_MOVING;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_STATUS);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.ROBOT_MOVING);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -34,8 +44,14 @@ public class AndroidCommandsTranslator {
 	 * @return
 	 */
 	public String robotTurning(){
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_TURNING;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_STATUS);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.ROBOT_TURNING);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -44,8 +60,14 @@ public class AndroidCommandsTranslator {
 	 * @return
 	 */
 	public String robotStopped(){
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT + CommConstants.ROBOT_STOPPED;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_STATUS);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.ROBOT_STOPPED);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -53,34 +75,45 @@ public class AndroidCommandsTranslator {
 	 * 
 	 * @param x
 	 * @param y
-	 * @param direction
+	 * @param d
 	 * @return
 	 */
-	public String robotStatus(int x, int y, Direction direction) {
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_ROBOT;
-		
+	public String robotPosition(int x, int y, Direction d) {
+		String sx = "";
+		String sy = "";
+		String sd = "";
+
 		if(x < 10)
-			message += 0;
-		message += x;
+			sx = "0";
+		sx += x;
+
 		if(y < 10)
-			message+=0;
-		message+= y;
-		
-		switch(direction){
+			sy="0";
+		sy+= y;
+
+		switch(d){
 			case UP:
-				message += CommConstants.ROBOT_DIRECTION_UP;
+				sd = CommConstants.COMMON_UP;
 				break;
 			case DOWN:
-				message += CommConstants.ROBOT_DIRECTION_DOWN;
+				sd = CommConstants.COMMON_DOWN;
 				break;
 			case LEFT:
-				message += CommConstants.ROBOT_DIRECTION_LEFT;
+				sd = CommConstants.COMMON_LEFT;
 				break;
 			case RIGHT:
-				message += CommConstants.ROBOT_DIRECTION_RIGHT;
+				sd = CommConstants.COMMON_RIGHT;
 				break;
 		}
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_POSITION);
+			jsonObject.put(CommConstants.JSONNAME_COORDINATE , (sx+sy));
+			jsonObject.put(CommConstants.JSONNAME_ORIENTATION , sd);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -91,22 +124,33 @@ public class AndroidCommandsTranslator {
 	 * @param isBlocked
 	 * @return
 	 */
-	public String mapStatus(int x , int y, boolean isBlocked) {
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_MAP;
-		
+	public String gridStatus(int x , int y, boolean isBlocked) {
+		String sx = "";
+		String sy = "";
+		String option = "";
+
 		if(x < 10)
-			message += 0;
-		message += x;
+			sx = "0";
+		sx += x;
+
 		if(y < 10)
-			message+=0;
-		message+= y;
+			sy="0";
+		sy+= y;
 		
 		if(isBlocked) {
-			message += CommConstants.MAP_TYPE_BLOCK;
+			option = CommConstants.GRID_OBSTACLE;
 		}else {
-			message += CommConstants.MAP_TYPE_CLEAR;
+			option = CommConstants.GRID_CLEAR;
 		}
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_GRID);
+			jsonObject.put(CommConstants.JSONNAME_COORDINATE , (sx+sy));
+			jsonObject.put(CommConstants.JSONNAME_OPTION , option);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -117,10 +161,15 @@ public class AndroidCommandsTranslator {
 	 * @return
 	 */
 	public String sendArena(String mdf1 , String mdf2){
-		String message = CommConstants.MESSAGE_TYPE_STATUS + CommConstants.STATUS_TYPE_MDF;
-		message += CommConstants.DELIMITER + mdf1 + CommConstants.DELIMITER +mdf2;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.ROBOT_MESSAGE_MAP);
+			jsonObject.put(CommConstants.JSONNAME_MDF1 , mdf1);
+			jsonObject.put(CommConstants.JSONNAME_MDF2 , mdf2);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -130,78 +179,85 @@ public class AndroidCommandsTranslator {
 	 * @param message
 	 */
 	public void decodeMessage(String message) {
-		if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_COMMAND)) {
-			if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_EXPLORE)) {
-				//do explore
-				return;
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_FASTESTPATH)) {
+		try{
+			JSONObject jsonObj = new JSONObject(message);
+
+			String messageType = jsonObj.getString(CommConstants.JSONNAME_TYPE);
+			if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_EXPLORE)){
+				// do explore
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_FASTESTPATH)){
 				//do fastest path
-				return;
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_MOVE)) {
-				switch(message.substring(4,6)) {
-					case CommConstants.COMMAND_MOVE_FORWARD:
-						//move forward
-						break;
-					case CommConstants.COMMAND_MOVE_BACK:
-						//move back
-						break;
-					case CommConstants.COMMAND_MOVE_LEFT_TURN:
-						//turn left
-						break;
-					case CommConstants.COMMAND_MOVE_RIGHT_TURN:
-						//turn right
-						break;
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_STARTPOSITION)){
+				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
+				String orientation = jsonObj.getString(CommConstants.JSONNAME_ORIENTATION);
+				int x = getXFromString(coordinate);
+				int y = getYFromString(coordinate);
+				Direction d = getDirFromString(orientation);
+				// do update robot location with x,y,d
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_WAYPOINT)){
+				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
+				int x = getXFromString(coordinate);
+				int y = getYFromString(coordinate);
+				//do update waypoint with x,y
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_MOVE)){
+				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
+				if(option.equals(CommConstants.MOVE_FORWARD)){
+					// do move forward
+				}else if(option.equals(CommConstants.MOVE_RIGHTTURN)){
+					// do right turn
+				}else if(option.equals(CommConstants.MOVE_LEFTTURN)){
+					// do left turn
+				}else if(option.equals(CommConstants.MOVE_BACKWARD)){
+					// do move backward
 				}
-				return;
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_ROBOT_POS)){
-				int x = Integer.parseInt(message.substring(4, 6));
-				int y = Integer.parseInt(message.substring(6, 8));
-				Direction d;
-				String temp = message.substring(8, 10);
-				if(temp.equals(CommConstants.ROBOT_POS_UP)){
-					d = Direction.UP;
-				}else if (temp.equals(CommConstants.ROBOT_POS_DOWN)){
-					d = Direction.DOWN;
-				}else if(temp.equals(CommConstants.ROBOT_POS_LEFT)){
-					d = Direction.LEFT;
-				}else if(temp.equals(CommConstants.ROBOT_POS_RIGHT)){
-					d = Direction.RIGHT;
-				}else{
-					//error
-					return;
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_RESET)){
+				// do reset map
+			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_UPDATE)){
+				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
+				if(option.equals(CommConstants.UPDATE_AUTO)){
+					// do set to auto update mode
+				}else if(option.equals(CommConstants.UPDATE_MANUAL)){
+					// do set to  manual update mode
+				}else if(option.equals(CommConstants.UPDATE_NOW)){
+					// do update android arena
 				}
-
-				//set robot start pos
-                                System.out.println("x:" + x);
-                                System.out.println("y:" + y);
-                                System.out.println("direction:" + d);
-                                return;
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_WAYPOINT)) {
-				int x = Integer.parseInt(message.substring(4, 6));
-				int y = Integer.parseInt(message.substring(6, 8));
-				//set waypoint
-				return;
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_UPDATE)){
-				if(message.substring(4,6).equals(CommConstants.UPDATE_AUTO)){
-					//activate auto mode
-				}else if(message.substring(4,6).equals(CommConstants.UPDATE_MANUAL)){
-					if(message.length() == 6){
-						//activate manual mode
-					}else{
-						//send arena info once
-					}
-				}
-				//error handle here
-			}else if(message.substring(2,4).equals(CommConstants.COMMAND_TYPE_RESET)){
-
 			}
-		}else if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_CONFIG)){
-			//process config tbc if needed
-			String config = message.substring(2,message.length());
-
-			//do upon receiving message
+		}catch (JSONException e){
+			e.printStackTrace();
 		}
-		
-		//error
 	}
+
+	private int getXFromString(String coordinate){
+		return Integer.parseInt(coordinate.substring(0,2));
+	}
+
+	private int getYFromString(String coordinate){
+		return Integer.parseInt(coordinate.substring(2,4));
+	}
+
+	private Direction getDirFromString(String orientation){
+		Direction dir = Direction.UP;
+
+		if (orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.DOWN;
+		}else if(orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.LEFT;
+		}else if(orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.RIGHT;
+		}
+
+		return dir;
+	}
+
+	private CellState getCSFromString(String cell){
+		CellState cs = CellState.UNEXPLORED;
+		if(cell.equals(CommConstants.GRID_CLEAR)){
+			cs = CellState.NORMAL;
+		}else if(cell.equals(CommConstants.GRID_OBSTACLE)){
+			cs = CellState.OBSTACLE;
+		}
+		return cs;
+	}
+
+
 }
