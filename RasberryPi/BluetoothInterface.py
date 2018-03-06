@@ -1,6 +1,6 @@
 # to implement without the library look up http://blog.kevindoran.co/bluetooth-programming-with-python-3/
-import bluetooth
-
+from bluetooth import *
+import os
 
 # SERVER SIDE
 class BluetoothInterface:
@@ -8,37 +8,35 @@ class BluetoothInterface:
     def __init__(self):
         # after getting bluetooth address, now must implement to transfer data.
         # implement server sidsse
-        self.rpi_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+        os.system("sudo hciconfig hci0 piscan")
+        self.rpi_sock = BluetoothSocket(RFCOMM)
         # assign hostmac address for bluetooth adapters if needed as may have multiple adapters
-        self.port = self.rpi_socket.getsockname()[1] 
+        #self.port = self.rpi_sock.getsockname()[1] 
+        self.port = 4
         self.host = ''
-
-
 
     def connect(self):
         try:
-            self.rpi_socket.bind((self.host, self.port))
-            self.rpi_socket.listen(1)
-            uuid = '9f2c1227-5cc1-4685-b56a-2b7717cd8041'
-            advertise_service( server_sock, "MDP-Server",
+            self.rpi_sock.bind((self.host, self.port))
+            self.rpi_sock.listen(1)
+            uuid = '00001101-0000-1000-8000-00805F9B34FB'
+            advertise_service(self.rpi_sock, "MDP6-Server",
              service_id = uuid,
              service_classes = [ uuid, SERIAL_PORT_CLASS ],
              profiles = [ SERIAL_PORT_PROFILE ],
-            # protocols = [ OBEX_UUID ]
              ) 
             print("Waiting for connection on RFCOMM channel %d" % self.port) 
             
-            self.android_sock, self.android_address = self.rpi_socket.accept()
-            if (self.android_address == '08:60:6E:AD:33:FC'):
-                print("Accepted Connection from socket: " + self.android_sock + " Address: " + self.android_address)
+            self.android_sock, self.android_address = self.rpi_sock.accept()
+            if (self.android_address[0] == '08:60:6E:AD:33:FC'):
+                print("Accepted Connection from socket: " + str(self.android_sock) + " Address: " + str(self.android_address))
                 return 1
             else:
                 print("Connection to Nexus 7 failed")
                 return 0
-        except:
-            print("Bluetooth Connection Error")
-            self.android_sock.close()
-            self.rpi_sock.close()
+        except Exception as e:
+            print("Bluetooth Connection Error:", e)
+
             return 0
 
 
@@ -64,4 +62,9 @@ class BluetoothInterface:
             self.android_sock.send(msg)
         except:
             print("BT Send error")
-                    
+
+
+if __name__ == "__main__":
+    start = BluetoothInterface()
+    start.connect()
+        

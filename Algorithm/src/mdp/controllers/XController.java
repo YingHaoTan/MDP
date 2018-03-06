@@ -8,6 +8,7 @@ import mdp.controllers.explorer.ExplorationBase;
 import mdp.controllers.fp.FastestPathBase;
 import mdp.graphics.ExecutionMode;
 import mdp.models.CellState;
+import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.RobotBase;
@@ -27,6 +28,7 @@ public class XController {
 	private FastestPathBase planner;
 	private MdpWindowController wcontroller;
 
+        
 	public XController(MapState mstate) {
 		this.mstate = mstate;
 	}
@@ -156,13 +158,19 @@ public class XController {
 	 * @param waypoint
 	 * @param coordinate
 	 */
-	public void initialize(Point coordinate, Point waypoint) {
+	public void initialize(Point coordinate, Point waypoint, Direction orientation) {
 		mstate.setStartPoint(coordinate);
+                mstate.setRobotPoint(coordinate);
 		mstate.setMapCellState(waypoint, CellState.WAYPOINT);
 		mstate.reset();
+                
+                if(srobot != null)
+                    srobot.setCurrentOrientation(orientation);
+                if(probot != null)
+                    probot.setCurrentOrientation(orientation);
 		
 		if(wcontroller != null)
-			wcontroller.requestSynchronization();
+                    wcontroller.requestSynchronization();
 	}
 	
 	/**

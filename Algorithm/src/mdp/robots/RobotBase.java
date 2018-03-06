@@ -183,7 +183,7 @@ public abstract class RobotBase {
      * Sets the current orientation of this robot instance
      *
      */
-    private void setCurrentOrientation(Direction direction) {
+    public void setCurrentOrientation(Direction direction) {
         this.orientation = direction;
     }
 

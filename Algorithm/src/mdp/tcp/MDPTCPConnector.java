@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mdp.controllers.XController;
 import mdp.models.RobotAction;
 
 /**
@@ -89,18 +90,19 @@ public class MDPTCPConnector {
     public class MDPTCPReceiver extends Thread {
 
         Socket connectedSocket;
-
         Queue<ArduinoUpdate> incomingArduinoQueue;
+        XController xcon;
 
         public MDPTCPReceiver(Socket connectedSocket, Queue<ArduinoUpdate> incomingArduinoQueue) {
             this.incomingArduinoQueue = incomingArduinoQueue;
             this.connectedSocket = connectedSocket;
-
+            //this.xcon = xcon
         }
 
         @Override
         public void run() {
             BufferedReader inFromServer = null;
+            AndroidCommandsTranslator androidTranslator = new AndroidCommandsTranslator(xcon);
             try {
                 inFromServer = new BufferedReader(new InputStreamReader(connectedSocket.getInputStream()));
                 while (true) {
@@ -116,6 +118,8 @@ public class MDPTCPConnector {
                                 break;
                             }
                         }
+                        
+                        
                         byte[] incoming = incomingStr.getBytes();
                         StatusMessage.StatusMessageType messageType = StatusMessage.checkMessageType(incoming);
 
@@ -126,6 +130,8 @@ public class MDPTCPConnector {
                         break;
                              */
                             case ANDROID_INSTRUCTION:
+                                AndroidInstruction fromAndroid = new AndroidInstruction(incoming);
+                                androidTranslator.decodeMessage(fromAndroid.getMessage());
                                 // set interrupt variable to true, exploration and fastest path stops giving instruction to Arduino,
                                 // only bluetooth gives instructions to Arduino
                                 break;

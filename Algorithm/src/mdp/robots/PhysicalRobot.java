@@ -138,7 +138,7 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
         
-        sendCalibrationData();
+        //sendCalibrationData();
         
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
