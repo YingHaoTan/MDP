@@ -57,8 +57,13 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandExplore() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_EXPLORE;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_EXPLORE);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 	
 	/**
@@ -67,8 +72,13 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandFastestPath() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_FASTESTPATH;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_FASTESTPATH);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -77,8 +87,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandMoveForward() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_MOVE + CommConstants.COMMAND_MOVE_FORWARD;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_MOVE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.MOVE_FORWARD);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 	
 	/**
@@ -87,8 +103,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandTurnRight() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_MOVE + CommConstants.COMMAND_MOVE_RIGHT_TURN;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_MOVE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.MOVE_RIGHTTURN);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 	
 	/**
@@ -97,8 +119,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandTurnLeft() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_MOVE + CommConstants.COMMAND_MOVE_LEFT_TURN;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_MOVE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.MOVE_LEFTTURN);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 	
 	/**
@@ -108,8 +136,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandMoveBack() {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_MOVE + CommConstants.COMMAND_MOVE_BACK;
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_MOVE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.MOVE_BACKWARD);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -121,31 +155,42 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandRobotStartPos(int x, int y, Direction d){
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_ROBOT_POS;
+		String sx = "";
+		String sy = "";
+		String sd = "";
 
 		if(x < 10)
-			message += 0;
-		message += x;
+			sx = "0";
+		sx += x;
+
 		if(y < 10)
-			message+=0;
-		message+= y;
+			sy="0";
+		sy+= y;
 
 		switch(d){
 			case UP:
-				message += CommConstants.ROBOT_POS_UP;
+				sd = CommConstants.COMMON_UP;
 				break;
 			case DOWN:
-				message += CommConstants.ROBOT_POS_DOWN;
+				sd = CommConstants.COMMON_DOWN;
 				break;
 			case LEFT:
-				message += CommConstants.ROBOT_POS_LEFT;
+				sd = CommConstants.COMMON_LEFT;
 				break;
 			case RIGHT:
-				message += CommConstants.ROBOT_POS_RIGHT;
+				sd = CommConstants.COMMON_RIGHT;
 				break;
 		}
 
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_STARTPOSITION);
+			jsonObject.put(CommConstants.JSONNAME_COORDINATE , (sx+sy));
+			jsonObject.put(CommConstants.JSONNAME_ORIENTATION , sd);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -156,16 +201,26 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandWayPoint(int x, int y) {
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_WAYPOINT;
-		
+		String sx = "";
+		String sy = "";
+		String sd = "";
+
 		if(x < 10)
-			message += 0;
-		message += x;
+			sx = "0";
+		sx += x;
+
 		if(y < 10)
-			message+=0;
-		message+= y;
-		
-		return message;
+			sy="0";
+		sy+= y;
+
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_WAYPOINT);
+			jsonObject.put(CommConstants.JSONNAME_COORDINATE , (sx+sy));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -174,9 +229,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandUpdateAuto(){
-		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_AUTO;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_UPDATE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.UPDATE_AUTO);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -185,9 +245,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandUpdateManual(){
-		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_MANUAL;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_UPDATE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.UPDATE_MANUAL);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -196,9 +261,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandUpdateNow(){
-		String message = CommConstants.COMMAND_TYPE_UPDATE + CommConstants.UPDATE_MANUAL + CommConstants.MANUAL_UPDATE_NOW;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_UPDATE);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , CommConstants.UPDATE_NOW);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -207,9 +277,13 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String commandReset(){
-		String message = CommConstants.MESSAGE_TYPE_COMMAND + CommConstants.COMMAND_TYPE_RESET;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONTROLLER_MESSAGE_RESET);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 
 	/**
@@ -220,9 +294,14 @@ public class ControllerTranslator {
 	 * @return
 	 */
 	public String generateConfigString(String config){
-		String message = CommConstants.MESSAGE_TYPE_CONFIG + config;
-
-		return message;
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put(CommConstants.JSONNAME_TYPE , CommConstants.CONFIG_STRING);
+			jsonObject.put(CommConstants.JSONNAME_OPTION , config);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonObject.toString();
 	}
 	
 	/**
@@ -231,74 +310,77 @@ public class ControllerTranslator {
 	 * @param message
 	 */
 	public void decodeMessage(String message) {
-		int x;
-		int y;
-		Direction d;
-		boolean isBlocked;
-		if(message.substring(0,2).equals(CommConstants.MESSAGE_TYPE_STATUS)) {
-			if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_ROBOT)) {
-				if(message.substring(4,6).equals(CommConstants.ROBOT_MOVING)){
-					//do moving actions
-					mParentActivity.onDoMove();
-					return;
-				}else if(message.substring(4,6).equals(CommConstants.ROBOT_TURNING)){
-					//do turning actions
-					mParentActivity.onDoTurn();
-					return;
-				}else if(message.substring(4,6).equals(CommConstants.ROBOT_STOPPED)){
-					//do stopping actions
-					mParentActivity.onDoStop();
-					return;
-				}else{
-					try{
-						x = Integer.parseInt(message.substring(4, 6));
-						y = Integer.parseInt(message.substring(6, 8));
-						//find direction of robot from message.substring(8,10)
-						String temp = message.substring(8, 10);
-						if(temp.equals(CommConstants.ROBOT_DIRECTION_UP)){
-							d = Direction.UP;
-						}else if (temp.equals(CommConstants.ROBOT_DIRECTION_DOWN)){
-							d = Direction.DOWN;
-						}else if(temp.equals(CommConstants.ROBOT_DIRECTION_LEFT)){
-							d = Direction.LEFT;
-						}else if(temp.equals(CommConstants.ROBOT_DIRECTION_RIGHT)){
-							d = Direction.RIGHT;
-						}else{
-							//error
-							return;
-						}
-						//update robot position on map
-						mParentActivity.onDoRobotPos(x,y,d);
-						return;
-					}catch (NumberFormatException exception){
-						//handle error
-					}
-				}
-			}else if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_MAP)) {
-				try{
-					x = Integer.parseInt(message.substring(4, 6));
-					y = Integer.parseInt(message.substring(6, 8));
-					//update map
-					if(message.substring(8, 10).equals(CommConstants.MAP_TYPE_BLOCK)){
-						mParentActivity.onDoMapUpdatePartial(x,y,CellState.OBSTACLE);
-					}else{
-						mParentActivity.onDoMapUpdatePartial(x,y,CellState.NORMAL);
-					}
-					return;
-				}catch(NumberFormatException exception){
-					//handle error
-				}
-			}else if(message.substring(2, 4).equals(CommConstants.STATUS_TYPE_MDF)){
-				String arr[] = message.split(CommConstants.DELIMITER);
-				String mdf1 = arr[1];
-				String mdf2 = arr[2];
-				mParentActivity.onDoMapUpdateFull(mdf1 , mdf2);
-			}
-		}
-		// proceed to read input for amd for now
-		readFromAMD(message);
 
-		// print error here if required
+		try{
+			JSONObject jsonObj = new JSONObject(message);
+
+			String messageType = jsonObj.getString(CommConstants.JSONNAME_TYPE);
+			if(messageType.equals(CommConstants.ROBOT_MESSAGE_STATUS)){
+				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
+				if(option.equals(CommConstants.ROBOT_MOVING)){
+					mParentActivity.onDoMove();
+				}else if(option.equals(CommConstants.ROBOT_TURNING)){
+					mParentActivity.onDoTurn();
+				}else if(option.equals(CommConstants.ROBOT_STOPPED)){
+					mParentActivity.onDoStop();
+				}
+			}else if(messageType.equals(CommConstants.ROBOT_MESSAGE_POSITION)){
+				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
+				String orientation = jsonObj.getString(CommConstants.JSONNAME_ORIENTATION);
+				int x = getXFromString(coordinate);
+				int y = getYFromString(coordinate);
+				Direction d = getDirFromString(orientation);
+				mParentActivity.onDoRobotPos(x,y,d);
+			}else if(messageType.equals(CommConstants.ROBOT_MESSAGE_GRID)){
+				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
+				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
+				int x = getXFromString(coordinate);
+				int y = getYFromString(coordinate);
+				CellState cs = getCSFromString(option);
+				mParentActivity.onDoMapUpdatePartial(x,y,cs);
+			}else if(messageType.equals(CommConstants.ROBOT_MESSAGE_MAP)){
+				String mdf1 = jsonObj.getString(CommConstants.JSONNAME_MDF1);
+				String mdf2 = jsonObj.getString(CommConstants.JSONNAME_MDF2);
+				mParentActivity.onDoMapUpdateFull(mdf1,mdf2);
+			}
+
+		}catch (JSONException e) {
+			e.printStackTrace();
+		}
+		// message error if manage to reach here
+
+	}
+
+	private int getXFromString(String coordinate){
+		return Integer.parseInt(coordinate.substring(0,2));
+	}
+
+	private int getYFromString(String coordinate){
+		return Integer.parseInt(coordinate.substring(2,4));
+	}
+
+	private Direction getDirFromString(String orientation){
+		Direction dir = Direction.UP;
+
+		if (orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.DOWN;
+		}else if(orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.LEFT;
+		}else if(orientation.equals(CommConstants.COMMON_UP)){
+			dir = Direction.RIGHT;
+		}
+
+		return dir;
+	}
+
+	private CellState getCSFromString(String cell){
+		CellState cs = CellState.UNEXPLORED;
+		if(cell.equals(CommConstants.GRID_CLEAR)){
+			cs = CellState.NORMAL;
+		}else if(cell.equals(CommConstants.GRID_OBSTACLE)){
+			cs = CellState.OBSTACLE;
+		}
+		return cs;
 	}
 
 	/**
