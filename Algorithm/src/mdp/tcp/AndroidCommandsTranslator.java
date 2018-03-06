@@ -5,9 +5,14 @@
  */
 package mdp.tcp;
 
+import mdp.controllers.XController;
+import mdp.graphics.ExecutionMode;
 import mdp.models.CellState;
 import mdp.models.Direction;
+import mdp.models.RobotAction;
 import mdp.models.CommConstants;
+
+import java.awt.Point;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -178,40 +183,44 @@ public class AndroidCommandsTranslator {
 	 * to decode message at the algo side when received from android
 	 * @param message
 	 */
-	public void decodeMessage(String message) {
+	public void decodeMessage(XController controller, String message) {
 		try{
 			JSONObject jsonObj = new JSONObject(message);
 
 			String messageType = jsonObj.getString(CommConstants.JSONNAME_TYPE);
 			if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_EXPLORE)){
 				// do explore
+				controller.explore(ExecutionMode.PHYSICAL, 100, -1);
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_FASTESTPATH)){
 				//do fastest path
+				controller.fastestpath(ExecutionMode.PHYSICAL);
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_STARTPOSITION)){
 				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
 				String orientation = jsonObj.getString(CommConstants.JSONNAME_ORIENTATION);
 				int x = getXFromString(coordinate);
 				int y = getYFromString(coordinate);
 				Direction d = getDirFromString(orientation);
-				// do update robot location with x,y,d
+				
+				controller.initialize(new Point(x, y), controller.getMapState().getWayPoint(), d);
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_WAYPOINT)){
 				String coordinate = jsonObj.getString(CommConstants.JSONNAME_COORDINATE);
 				int x = getXFromString(coordinate);
 				int y = getYFromString(coordinate);
-				//do update waypoint with x,y
+				
+				controller.initialize(controller.getMapState().getStartPoint(), new Point(x, y), controller.getActiveRobot(ExecutionMode.PHYSICAL).getCurrentOrientation());
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_MOVE)){
 				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
 				if(option.equals(CommConstants.MOVE_FORWARD)){
-					// do move forward
+					controller.getActiveRobot(ExecutionMode.PHYSICAL).move(RobotAction.FORWARD);
 				}else if(option.equals(CommConstants.MOVE_RIGHTTURN)){
-					// do right turn
+					controller.getActiveRobot(ExecutionMode.PHYSICAL).move(RobotAction.TURN_RIGHT);
 				}else if(option.equals(CommConstants.MOVE_LEFTTURN)){
-					// do left turn
+					controller.getActiveRobot(ExecutionMode.PHYSICAL).move(RobotAction.TURN_LEFT);
 				}else if(option.equals(CommConstants.MOVE_BACKWARD)){
 					// do move backward
 				}
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_RESET)){
-				// do reset map
+				controller.getMapState().reset();
 			}else if(messageType.equals(CommConstants.CONTROLLER_MESSAGE_UPDATE)){
 				String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
 				if(option.equals(CommConstants.UPDATE_AUTO)){

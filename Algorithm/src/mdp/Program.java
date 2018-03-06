@@ -24,6 +24,7 @@ import mdp.models.SensorConfiguration;
 import mdp.robots.CalibrationSpecificationBuilder;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
+import mdp.tcp.AndroidUpdate;
 import mdp.tcp.ArduinoMessage;
 import mdp.tcp.MDPTCPConnector;
 import mdp.tcp.StatusMessage;
@@ -38,7 +39,7 @@ public class Program {
         }
         
         Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
-        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList<>();
+        Queue<AndroidUpdate> outgoingAndroidQueue = new LinkedList<>();
         MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
         mdpTCPConnector.startThreads();
 
