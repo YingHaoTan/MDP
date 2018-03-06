@@ -13,9 +13,9 @@ public class AndroidInstruction extends StatusMessage{
 
     private String message = "";
     public AndroidInstruction(byte[] received) {
-        
         super(StatusMessage.StatusMessageType.ANDROID_INSTRUCTION);
         // received[0] contains the message type, in this case ANDROID_INSTRUCTION
+        
         for(int i = 1; i<received.length; i++){
             this.message += (char)received[i];
         }

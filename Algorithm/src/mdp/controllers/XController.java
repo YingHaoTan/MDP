@@ -214,6 +214,7 @@ public class XController {
 	
 	private void handleAndroidInstruction(AndroidInstruction instruction) {
 		// Handle android instruction
+		System.out.println("Android instruction received: " + instruction.getMessage());
 	}
 	
 	@SuppressWarnings("unused")
