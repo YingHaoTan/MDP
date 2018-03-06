@@ -1,3 +1,56 @@
 <resources>
     <string name="app_name">MDPAndroidController</string>
+    <string name="connectionBtnDefaultText">Connect</string>
+    <string name="connectionBtnDisconnectText">Disconnect</string>
+    <string name="connectionStringDefaultText">No device connected</string>
+    <string name="title_activity_device_select">DeviceSelectActivity</string>
+    <string name="known_devices">Known devices: </string>
+    <string name="nearby_devices">Nearby devices: </string>
+    <string name="scan_devices">Scan Device</string>
+    <string name="scanning_devices">Scanning</string>
+    <string name="no_device">No Devices</string>
+    <string name="no_device_address">NIL</string>
+    <string name="chatBtn">Chat</string>
+    <string name="chatReceivedMsg">Received Message</string>
+    <string name="chatSendMsg">Send Message</string>
+    <string name="chatReceivedMsgDefaultText">No Message Received</string>
+    <string name="chatSendMsgDefaultText">Tap Here to Enter Text</string>
+    <string name="chatSendBtn">Send</string>
+    <string name="status">Robot Status:</string>
+    <string name="defaultStatus">NULL</string>
+    <string name="voiceControlBtn">Voice Control</string>
+    <string name="voiceInputText">Click button to start</string>
+    <string name="voiceInputTextFailed">Please say again...</string>
+    <string name="alternativeControl">Alternative Control Mode:</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+
+    <!-- Strings for robot status-->
+    <string name="statusMoving">Moving</string>
+    <string name="statusStop">Stopped</string>
+    <string name="statusTurn">Turning</string>
+
+    <!-- added by Ernest-->
+    <string name="executionModeText">Execution Mode:</string>
+    <string name="modeHeaderText">Updating Mode:</string>
+    <string name="autoModeText">Auto</string>
+    <string name="manualModeText">Manual</string>
+    <string name="updateButtonText">Update</string>
+    <string name="explorationButtonText">Explore</string>
+    <string name="fastestButtonText">Fastest</string>
+    <string name="manualControlButtonText">Command</string>
+    <string name="goButtonText">GO!</string>
+    <string name="settingsButtonText">Settings</string>
+    <string name="robotStartText">Enter robot starting position: </string>
+    <string name="robotRowText">Enter row(Y): </string>
+    <string name="robotColText">Enter column(X): </string>
+    <string name="robotDirText">Enter Direction: </string>
+    <string name="send">Send</string>
+    <string name="waypointText">Enter waypoint coordinates: </string>
+    <string name="waypointRowText">Enter row(Y): </string>
+    <string name="waypointColText">Enter column(X): </string>
+    <string name="configStringText">Manage Persistance Config</string>
+    <string name="resetStringText">Reset Arena</string>
+    <string name="resetDescriptionText">Are you sure you want to reset the arena?</string>
+
 </resources>

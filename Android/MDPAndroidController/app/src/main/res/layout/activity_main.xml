@@ -1,18 +1,297 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
+        android:id="@+id/mainActivityLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/connection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+                <Button
+                    android:id="@+id/connectionBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/connectionBtnDefaultText"
+                    android:layout_weight="1.3"/>
+
+                <TextView
+                    android:id="@+id/connectionStr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
+                    android:gravity="center"
+                    android:text="@string/connectionStringDefaultText"
+                    android:textSize="20sp"
+                    android:layout_weight="4"/>
+
+                <Button
+                    android:id="@+id/chatBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="0.7"
+                    android:gravity="center"
+                    android:text="@string/chatBtn" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/arena"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="18"
+                android:background="@drawable/layout_border"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/settingsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/settingsButtonText" />
+
+                <GridView
+                    android:id="@+id/mazeGridView"
+                    android:layout_width="400dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/settingsButton"
+                    android:layout_centerHorizontal="true"
+                    android:numColumns="15" />
+
+                <TextView
+                    android:id="@+id/statusHeaderTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mazeGridView"
+                    android:textAlignment="center"
+                    android:text="@string/status"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/robotStatusTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/statusHeaderTextView"
+                    android:textAlignment="center"
+                    android:text="@string/defaultStatus" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/control"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/layout_border"
+                android:orientation="horizontal"
+                android:layout_weight="2">
+
+                <TextView
+                    android:id="@+id/executionModeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:text="@string/executionModeText" />
+
+                <ToggleButton
+                    android:id="@+id/explorationButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:textOff="@string/explorationButtonText"
+                    android:textOn="@string/explorationButtonText" />
+
+                <ToggleButton
+                    android:id="@+id/fastestPathButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:layout_toRightOf="@+id/explorationButton"
+                    android:layout_weight="1"
+                    android:checked="false"
+                    android:textOff="@string/fastestButtonText"
+                    android:textOn="@string/fastestButtonText" />
+
+                <ToggleButton
+                    android:id="@+id/manualControlButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/executionModeTextView"
+                    android:layout_toRightOf="@+id/fastestPathButton"
+                    android:layout_weight="1"
+                    android:checked="false"
+                    android:textOff="@string/manualControlButtonText"
+                    android:textOn="@string/manualControlButtonText" />
+
+                <TextView
+                    android:id="@+id/modeHeaderTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/explorationButton"
+                    android:layout_marginLeft="2dp"
+                    android:text="@string/modeHeaderText" />
+
+                <TextView
+                    android:id="@+id/updateModeTextView"
+                    android:layout_width="70sp"
+                    android:layout_height="40sp"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:gravity="center"
+                    android:text="@string/autoModeText" />
+
+                <Switch
+                    android:id="@+id/updateModeSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:layout_toRightOf="@+id/updateModeTextView"
+                    android:checked="true"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/updateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:layout_toRightOf="@+id/updateModeSwitch"
+                    android:visibility="invisible"
+                    android:layout_weight="1"
+                    android:text="@string/updateButtonText" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/controlTable"
+                    android:layout_marginEnd="14dp"
+                    android:layout_toStartOf="@+id/goTable"
+                    android:text="@string/alternativeControl" />
+
+                <Button
+                    android:id="@+id/voiceControlButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40sp"
+                    android:layout_alignStart="@+id/textView"
+                    android:layout_below="@+id/textView"
+                    android:text="@string/voiceControlBtn" />
+
+                <TextView
+                    android:id="@+id/voiceControlResult"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/voiceControlButton"
+                    android:layout_below="@+id/voiceControlButton"
+                    android:text="@string/voiceInputText" />
+
+                <TableLayout
+                    android:id="@+id/goTable"
+                    android:layout_width="140sp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/layout_border">
+
+                    <Button
+                        android:id="@+id/goButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="140sp"
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/goButtonText" />
+
+                </TableLayout>
+
+                <TableLayout
+                    android:id="@+id/controlTable"
+                    android:layout_width="140sp"
+                    android:layout_height="140sp"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/layout_border"
+                    android:visibility="gone">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="30sp"
+                        android:paddingRight="30sp">
+
+                        <Button
+                            android:id="@+id/upButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="UP" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="5sp"
+                        android:paddingRight="5sp">
+
+                        <Button
+                            android:id="@+id/leftButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="LEFT" />
+
+                        <Button
+                            android:id="@+id/rightButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="RIGHT" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="30sp"
+                        android:paddingRight="30sp">
+
+                        <Button
+                            android:id="@+id/downButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="DOWN" />
+
+                    </TableRow>
+                </TableLayout>
+            </RelativeLayout>
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
+</LinearLayout>
