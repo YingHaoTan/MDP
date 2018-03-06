@@ -25,7 +25,6 @@ import mdp.robots.CalibrationSpecificationBuilder;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
 import mdp.tcp.ArduinoMessage;
-import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.MDPTCPConnector;
 import mdp.tcp.StatusMessage;
 
@@ -47,6 +46,18 @@ public class Program {
         ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
         
+        wcontroller.setMapLoader(filehandler);
+        wcontroller.setMapSaver(filehandler);
+        
+        wcontroller.setFastestPathPlanner(fastestpath);
+        wcontroller.setExplorer(explorer);
+        
+        wcontroller.setXController(xcontroller);
+        
+        xcontroller.setFastestPathPlanner(fastestpath);
+        xcontroller.setExplorer(explorer);
+        xcontroller.setWindowController(wcontroller);
+        
         // SimulatorRobot
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
         srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
@@ -56,11 +67,22 @@ public class Program {
         srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
         srobot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));      
         
-        // PhysicalRobot
-        Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList<>();
+        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.add(Direction.UP)
+        		.setCalibrationType(RobotAction.CAL_CORNER)
+        		.build());
+        
+        wcontroller.setSimulatorRobot(srobot);
+        xcontroller.setSimulatorRobot(srobot);
+        
         Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
         Queue<StatusMessage> outgoingAndroidQueue = new LinkedList<>();
-        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
+        mdpTCPConnector.startThreads();
+        
+        // PhysicalRobot
+        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, mdpTCPConnector.getOutgoingSemaphore());
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
@@ -77,37 +99,14 @@ public class Program {
         		.add(Direction.RIGHT)
         		.setCalibrationType(RobotAction.CAL_SIDE)
         		.build());*/
-        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
-        		.add(Direction.RIGHT)
-        		.add(Direction.UP)
-        		.setCalibrationType(RobotAction.CAL_CORNER)
-        		.build());
         probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
         		.add(Direction.RIGHT)
         		.add(Direction.UP)
         		.setCalibrationType(RobotAction.CAL_CORNER)
         		.build());
         
-        wcontroller.setSimulatorRobot(srobot);
-        xcontroller.setSimulatorRobot(srobot);
         wcontroller.setPhysicalRobot(probot);
         xcontroller.setPhysicalRobot(probot);
-        
-        wcontroller.setMapLoader(filehandler);
-        wcontroller.setMapSaver(filehandler);
-        
-        wcontroller.setFastestPathPlanner(fastestpath);
-        wcontroller.setExplorer(explorer);
-        
-        wcontroller.setXController(xcontroller);
-        
-        xcontroller.setFastestPathPlanner(fastestpath);
-        xcontroller.setExplorer(explorer);
-        xcontroller.setWindowController(wcontroller);
-              
-        
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
-        mdpTCPConnector.startThreads();
     }
 
 }

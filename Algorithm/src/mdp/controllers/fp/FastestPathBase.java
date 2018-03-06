@@ -99,9 +99,8 @@ public abstract class FastestPathBase implements RobotActionListener {
      */
     private void complete() {
         robot.removeRobotActionListener(this);
-        for (FastestPathCompletedListener listener : listeners) {
+        for (FastestPathCompletedListener listener : listeners)
             listener.onFastestPathCompleted();
-        }
     }
 
     /**

@@ -14,6 +14,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mdp.models.RobotAction;
@@ -24,7 +26,8 @@ import mdp.models.RobotAction;
  */
 public class MDPTCPConnector {
 
-    private byte lastSent;
+	private volatile byte nextExpectedID;
+    private volatile byte currentID;
     private boolean yetToReceiveAck;
     private Socket clientSocket;
     
@@ -35,31 +38,46 @@ public class MDPTCPConnector {
     private boolean stopFlag = false;
     
     //SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
-    Queue<ArduinoUpdate> incomingArduinoQueue;
+    List<Consumer<ArduinoUpdate>> arduinoUpdateListeners;
+    Semaphore outgoingSemaphore;
     Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
-    public MDPTCPConnector(Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
+    public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         try {
             this.clientSocket = new Socket("192.168.6.6", 5000);
-            this.incomingArduinoQueue = incomingArduinoQueue;
+            this.arduinoUpdateListeners = new ArrayList<Consumer<ArduinoUpdate>>();
+            this.outgoingSemaphore = new Semaphore(0);
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;
+            
+            System.out.println("Connection established!");
         } catch (IOException ex) {
             Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+    }
+    
+    public List<Consumer<ArduinoUpdate>> getArduinoUpdateListenerList() {
+    	return this.arduinoUpdateListeners;
+    }
+    
+    public Semaphore getOutgoingSemaphore() {
+    	return this.outgoingSemaphore;
     }
 
     public void startThreads() {
-        MDPTCPReceiver receiver = new MDPTCPReceiver(clientSocket, incomingArduinoQueue);
-        MDPTCPSender sender = new MDPTCPSender(clientSocket, outgoingArduinoQueue, outgoingAndroidQueue);
+        MDPTCPReceiver receiver = new MDPTCPReceiver();
+        MDPTCPSender sender = new MDPTCPSender();
         receiver.start();
         sender.start();
     }
 
-    private synchronized void incrementID(byte lastSent) {
-        this.lastSent = (byte) ((byte) (lastSent + 1) % 126);
+    private synchronized void incrementID() {
+        currentID = (byte) ((byte) (currentID + 1) % 126);
+    }
+    
+    private synchronized void incrementNextExpectedID() {
+    	nextExpectedID = (byte) ((byte) (nextExpectedID + 1) % 126);
     }
     
     private void setResendStop(boolean value){
@@ -87,23 +105,14 @@ public class MDPTCPConnector {
     }
 
     public class MDPTCPReceiver extends Thread {
-
-        Socket connectedSocket;
-
-        Queue<ArduinoUpdate> incomingArduinoQueue;
-
-        public MDPTCPReceiver(Socket connectedSocket, Queue<ArduinoUpdate> incomingArduinoQueue) {
-            this.incomingArduinoQueue = incomingArduinoQueue;
-            this.connectedSocket = connectedSocket;
-
-        }
-
+    	
         @Override
         public void run() {
             BufferedReader inFromServer = null;
             try {
-                inFromServer = new BufferedReader(new InputStreamReader(connectedSocket.getInputStream()));
+                inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while (true) {
+                	Thread.yield();
                     // If I receive something from Raspberry Pi
                     if (inFromServer.ready()) {
                         // Need to read until '~'
@@ -132,16 +141,13 @@ public class MDPTCPConnector {
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
                                 System.out.println("Receiving: " + arduinoUpdate.getId());
-                                System.out.println("Last sent is" + lastSent);
-                                if (arduinoUpdate.getId() == lastSent && !getSentStop()) {
+                                System.out.println("Expected ID: " + nextExpectedID);
+                                if (arduinoUpdate.getId() == nextExpectedID && !getSentStop()) {
                                     yetToReceiveAck = false;
-                                    incrementID(lastSent);
-                                    incomingArduinoQueue.add(arduinoUpdate);
-                                    //System.out.println("size from mdp receiver=" + incomingArduinoQueue.size());
-                                    // Sends Android map updates, maybe put this in PhysicalRobot.move()
-                                    // outgoingAndroidQueue.add();
-                                    // Sends Android map updates, maybe put this in PhysicalRobot.move()
-                                    // outgoingAndroidQueue.add();
+                                    incrementNextExpectedID();
+                                    
+                                    for(Consumer<ArduinoUpdate> consumer: arduinoUpdateListeners)
+                                    	consumer.accept(arduinoUpdate);
                                 }
                                 else if(getSentStop()){
                                     setResendStop(true);
@@ -166,68 +172,78 @@ public class MDPTCPConnector {
 
     public class MDPTCPSender extends Thread {
 
-        Socket connectedSocket;
-        Queue<ArduinoMessage> outgoingArduinoQueue;
-        Queue<StatusMessage> outgoingAndroidQueue;
-
-        public MDPTCPSender(Socket connectedSocket, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
-            this.connectedSocket = connectedSocket;
-            this.outgoingArduinoQueue = outgoingArduinoQueue;
-            this.outgoingAndroidQueue = outgoingAndroidQueue;
-
-        }
-
         @Override
         public void run() {
+        	DataOutputStream outToServer = null;
+        	
             try {
 
                 /*byte[] test = {0x01,0x01};
                 System.out.println(StatusMessage.checkMessageType(test));
                  */
                 ArduinoMessage lastSentArduinoMessage = null;
-                long timer = System.currentTimeMillis();
+                //long timer = System.currentTimeMillis();
 
                 // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
-                long timeout = 2000;
+                //long timeout = 2000;
 
-                DataOutputStream outToServer = new DataOutputStream(connectedSocket.getOutputStream());
+                outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
                 
                /* ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
-                outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
+                outToServer.writeBytes(new String(ins.toBytes()) + "~");
                 List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.START);
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);
-                
                 
                 /*ArduinoStream strm = new ArduinoStream(0, actions);
                 outToServer.writeBytes(new String(strm.toBytes()) + "~");
                 */
                 
                 while (true) {
-                    Thread.sleep((long) 0.1);
-                    if (!outgoingArduinoQueue.isEmpty()) {
-                        // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
-                        lastSentArduinoMessage = outgoingArduinoQueue.remove();
-                        lastSentArduinoMessage.setID(lastSent);
-                        System.out.println("Sending: " + lastSent + " " + lastSentArduinoMessage.getMessageAction());
-                        
-                        outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
-                        yetToReceiveAck = true;
-                        timer = System.currentTimeMillis();
-                        
-                        if(lastSentArduinoMessage.getMessageAction() == RobotAction.STOP){
-                            setSentStop(true);
-
-                        } 
-                        else{
-                            setSentStop(false);
-                        }
-                    }
-                    if (!outgoingAndroidQueue.isEmpty()) {
-                        // sends whatever format u like
-                    }
+                	int processed = 0;
+                	
+                	Thread.yield();
+                	outgoingSemaphore.acquire();
+                	
+                	if(currentID == nextExpectedID) {
+	                    if (!outgoingArduinoQueue.isEmpty()) {
+	                        // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
+	                    	lastSentArduinoMessage = outgoingArduinoQueue.remove();
+	                        lastSentArduinoMessage.setID(currentID);
+	                        System.out.println("Sending: " + currentID + " " + lastSentArduinoMessage.getMessageAction());
+	                        
+	                        outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
+	                        yetToReceiveAck = true;
+	                        //timer = System.currentTimeMillis();
+	                        
+	                        if(lastSentArduinoMessage.getMessageAction() == RobotAction.STOP){
+	                            setSentStop(true);
+	                        } 
+	                        else{
+	                            setSentStop(false);
+	                        }
+	                        
+	                        incrementID();
+	                        processed++;
+	                    }
+	                    
+	                    if (!outgoingAndroidQueue.isEmpty()) {
+	                        // sends whatever format u like
+	                    	
+	                    	incrementID();
+	                    	processed++;
+	                    }
+	                    
+	                    // Acquire additional permits if we process more than 1 message in this loop
+	                    if(processed > 1)
+	                    	outgoingSemaphore.acquire(processed - 1);
+                	}
+                	else {
+                		outgoingSemaphore.release();
+                	}
+                    
                     /*
                     if (yetToReceiveAck && System.currentTimeMillis() > timer + timeout) {
                         if ((lastSentArduinoMessage != null) && (lastSentArduinoMessage.getMessageAction() != RobotAction.STOP)) {
@@ -250,7 +266,13 @@ public class MDPTCPConnector {
             } catch (IOException ex) {
                 Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InterruptedException ex) {
-                Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
+            	Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
+			} finally {
+                try {
+                	outToServer.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(MDPTCPReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         

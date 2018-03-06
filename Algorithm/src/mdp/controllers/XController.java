@@ -121,25 +121,27 @@ public class XController {
 	public void explore(ExecutionMode mode, int coverage, double timelimit) {
 		RobotBase robot = getActiveRobot(mode);
 		
-		MapState simulationState = mstate.clone();
-                
-		mstate.setMapCellState(CellState.UNEXPLORED);
-
-		Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
-		exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
-
-		for (Point p : exploredpoints)
-			mstate.setMapCellState(p, CellState.NORMAL);
-
-		if(mstate.getWayPoint() != null)
-			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
-                
-        robot.init(mstate.clone());
-        if(mode == ExecutionMode.SIMULATION)
-        	srobot.setSimulationMapState(simulationState);
-
-		if (explorer != null)
-			explorer.explore(robot, coverage, timelimit);
+		if(robot != null) {
+			MapState simulationState = mstate.clone();
+	                
+			mstate.setMapCellState(CellState.UNEXPLORED);
+	
+			Set<Point> exploredpoints = new HashSet<>(mstate.convertRobotPointToMapPoints(mstate.getRobotPoint()));
+			exploredpoints.addAll(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
+	
+			for (Point p : exploredpoints)
+				mstate.setMapCellState(p, CellState.NORMAL);
+	
+			if(mstate.getWayPoint() != null)
+				mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+	                
+	        robot.init(mstate.clone());
+	        if(mode == ExecutionMode.SIMULATION)
+	        	srobot.setSimulationMapState(simulationState);
+	
+			if (explorer != null)
+				explorer.explore(robot, coverage, timelimit);
+		}
 	}
 
 	/**
@@ -149,7 +151,7 @@ public class XController {
 	 */
 	public void fastestpath(ExecutionMode mode) {
 		RobotBase robot = getActiveRobot(mode);
-		if(planner != null)
+		if(robot != null && planner != null)
 			planner.move(mstate, robot, mstate.getEndPoint(), true);
 	}
 	
