@@ -151,11 +151,14 @@ class Main(object):
 		ANDROID_INSTRUCTION = (5).to_bytes(1, byteorder='big')
 		
 		while(True):
+			
 			data = self.android.read()
-			to_send = ANDROID_INSTRUCTION + data
-			to_send = to_send.decode("ascii")+'~'
-			to_pc_queue.put(to_send)
-			print(to_send)
+			if data is not None:
+				to_send = ANDROID_INSTRUCTION + data
+				to_send = to_send.decode("ascii")+'~'
+				to_pc_queue.put(to_send)
+				print(to_send)
+			time.sleep(0.001)
 
 
 	def write_android(self, to_android_queue):
@@ -164,6 +167,7 @@ class Main(object):
 				data = to_android_queue.get()
 				self.android.write(b''.join(data))
 				print('Sent to Android')
+			time.sleep(0.001)
 
 	def threads_create(self):
 		try: 		
@@ -189,7 +193,7 @@ class Main(object):
 					to_connect = port
 			
 
-			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
+			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
 			
 			
 
@@ -198,14 +202,13 @@ class Main(object):
 			write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
 
 			t1.start()
-			#t2.start()
+			t2.start()
 			read_android_thread.start()
 			write_android_thread.start()
 			
 			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, '', 1))
 
-	
-			
+
 
 			#t3.start()
 	

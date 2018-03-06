@@ -157,17 +157,18 @@ public class MDPTCPConnector {
                                 System.out.println("Expected ID: " + nextExpectedID);
                                 if (arduinoUpdate.getId() == nextExpectedID && !getSentStop()) {
                                     yetToReceiveAck = false;
-                                    incrementNextExpectedID();
                                     
                                     for(Consumer<ArduinoUpdate> consumer: arduinoUpdateListeners)
                                     	consumer.accept(arduinoUpdate);
+                                    
+                                    incrementNextExpectedID();
                                 }
                                 else if(getSentStop()){
                                     setResendStop(true);
                                 }
                                 break;
-							default:
-								break;
+                            default:
+				break;
                         }
                     }
                 }

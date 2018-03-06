@@ -28,6 +28,8 @@ class BluetoothInterface:
             print("Waiting for connection on RFCOMM channel %d" % self.port) 
             
             self.android_sock, self.android_address = self.rpi_sock.accept()
+            self.android_sock.setblocking(False)
+            self.android_sock.settimeout(0.0)
             if (self.android_address[0] == '08:60:6E:AD:33:FC'):
                 print("Accepted Connection from socket: " + str(self.android_sock) + " Address: " + str(self.android_address))
                 return 1
@@ -54,14 +56,14 @@ class BluetoothInterface:
             data = self.android_sock.recv(1024)
             return data
         except:
-            print("BT Read error")
+            pass
 
     #write to android socket
     def write(self, msg):
         try:
             self.android_sock.sendall(msg)
         except:
-            print("BT Send error")
+            pass
 
 
 if __name__ == "__main__":
