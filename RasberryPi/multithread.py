@@ -39,7 +39,7 @@ class Main(object):
 			time.sleep(0.001)
 			
 
-	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_pc_queue, host='', port=5000):
+	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_pc_queue, to_android_queue, host='', port=5000):
 		serversock = socket.socket()	#create a new socket object
 		serversock.bind((host, port))	#bind socket
 		serversock.setblocking(False)
@@ -54,6 +54,7 @@ class Main(object):
 
 		ARDUINO_INSTRUCTION = (2).to_bytes(1, byteorder='big')
 		ARDUINO_STREAM = (3).to_bytes(1, byteorder='big')
+		ANDROID_UPDATE = (6).to_bytes(1, byteorder='big')
 		
 		while True:
 			try:
@@ -69,34 +70,39 @@ class Main(object):
 		while True:
 			while not message_end:
 				try: 
-					data = clientsock.recv(1024)           				
+					data = clientsock.recv(1024)        				
 					for i in range(len(data)):
 						# if new line
-						if(data[i] == 126):
+						if(data[i] == 126 ):
 							message_end = True
 							print("Received from TCP: " + str(datetime.datetime.now()))
-							break
-						received.append(data[i].to_bytes(1, byteorder='big'))
+							# sends to Arduino
+							# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
+							if message_end and len(received) > 0:
+								if(received[0] == ARDUINO_INSTRUCTION):
+									print("Sends to Arduino: " + str(datetime.datetime.now()))
+									print(received)
+									to_arduino_queue.put(received)
+									
+								elif (received[0] == ARDUINO_STREAM):
+									print('Received Arduino stream :' + str(len(received)))
+									print(received)
+									to_arduino_queue.put(received)
+
+								elif (received[0] == ANDROID_UPDATE):
+									print('Received ANDROID_UPDATE from PC' + str(len(received)))
+									print(received)
+									to_android_queue.put(received[1:])
+
+								message_end = False
+								received = []
+						else:
+							received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
 					break
 				
 			
-			# sends to Arduino
-			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
-			if message_end and len(received) > 0:
-				if(received[0] == ARDUINO_INSTRUCTION):
-					print("Sends to Arduino: " + str(datetime.datetime.now()))
-					print(received)
-					to_arduino_queue.put(received)
-					
-				elif (received[0] == ARDUINO_STREAM):
-					print('Received Arduino stream :' + str(len(received)))
-					print(received)
-					to_arduino_queue.put(received)
-
-				message_end = False
-				received = []
-
+			
 			
 			
 			# sends to bluetooth
@@ -146,7 +152,6 @@ class Main(object):
 		
 		while(True):
 			data = self.android.read()
-			
 			to_send = ANDROID_INSTRUCTION + data
 			to_send = to_send.decode("ascii")+'~'
 			to_pc_queue.put(to_send)
@@ -154,7 +159,11 @@ class Main(object):
 
 
 	def write_android(self, to_android_queue):
-		pass
+		while True:
+			if(not to_android_queue.empty()):
+				data = to_android_queue.get()
+				self.android.write(b''.join(data))
+				print('Sent to Android')
 
 	def threads_create(self):
 		try: 		
@@ -171,7 +180,7 @@ class Main(object):
 			
 			##think theres problem with the queue passed in. I think it should also pcqueue.
 			##t1 need all the queue since it is at the center of the communication.
-			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_pc_queue, '', 5000))
+			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_pc_queue, to_android_queue,'', 5000))
 
 			serial_ports = ArduinoInterface.list_ports()
 			for port in serial_ports:
@@ -181,7 +190,6 @@ class Main(object):
 			
 
 			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
-			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
 			
 			
 

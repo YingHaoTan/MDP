@@ -59,7 +59,7 @@ class BluetoothInterface:
     #write to android socket
     def write(self, msg):
         try:
-            self.android_sock.send(msg)
+            self.android_sock.sendall(msg)
         except:
             print("BT Send error")
 
