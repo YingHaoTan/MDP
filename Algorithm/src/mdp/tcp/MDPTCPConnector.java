@@ -140,9 +140,18 @@ public class MDPTCPConnector {
                                 System.out.println("Receiving: " + arduinoUpdate.getId());
                                 System.out.println("Last sent is" + lastSent);
                                 if (arduinoUpdate.getId() == lastSent && !getSentStop()) {
+                                    
+                                    System.out.println("front1:" + arduinoUpdate.getFront1());
+                                    System.out.println("front2:" + arduinoUpdate.getFront2());
+                                    System.out.println("front3:" + arduinoUpdate.getFront3());
+                                    System.out.println("right1:" + arduinoUpdate.getRight1());
+                                    System.out.println("right2:" + arduinoUpdate.getRight2());
+                                    System.out.println("left1:" + arduinoUpdate.getLeft1());
+                                    
+                                    
                                     yetToReceiveAck = false;
                                     incrementID(lastSent);
-                                    incomingArduinoQueue.add(arduinoUpdate);
+                                    //incomingArduinoQueue.add(arduinoUpdate);
                                     //System.out.println("size from mdp receiver=" + incomingArduinoQueue.size());
                                     // Sends Android map updates, maybe put this in PhysicalRobot.move()
                                     // outgoingAndroidQueue.add();
@@ -198,19 +207,24 @@ public class MDPTCPConnector {
 
                 DataOutputStream outToServer = new DataOutputStream(connectedSocket.getOutputStream());
 
+                ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.SCAN, true);
+                while(true){
+                    outToServer.writeBytes(new String(ins.toBytes()) + "~");
+                    Thread.sleep(1000);
+                }
                 
                /* ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
                 outToServer.writeBytes(new String(ins.toBytes()) + "~");*/
-                List<RobotAction> actions = new ArrayList<>();
+                /*List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.START);
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);
-                
+                */
                 
                 /*ArduinoStream strm = new ArduinoStream(0, actions);
                 outToServer.writeBytes(new String(strm.toBytes()) + "~");
                 */
-                
+                /*
                 while (true) {
                     Thread.sleep((long) 0.1);
                     if (!outgoingArduinoQueue.isEmpty()) {
@@ -233,7 +247,7 @@ public class MDPTCPConnector {
                     }
                     if (!outgoingAndroidQueue.isEmpty()) {
                         // sends whatever format u like
-                    }
+                    }*/
                     /*
                     if (yetToReceiveAck && System.currentTimeMillis() > timer + timeout) {
                         if ((lastSentArduinoMessage != null) && (lastSentArduinoMessage.getMessageAction() != RobotAction.STOP)) {
@@ -250,7 +264,7 @@ public class MDPTCPConnector {
                         timer = System.currentTimeMillis();
                         setResendStop(false);
                     }*/
-                }
+                //}
             } catch (SocketException ex) {
                 Logger.getLogger(MDPTCPSender.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
