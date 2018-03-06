@@ -25,7 +25,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.MazeGridAdapter;
-import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothClass;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
@@ -58,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
-    private BluetoothClass mBluetoothClass = null;
     private ControlMessageHandler mHandler =
             ControlMessageHandler.getInstance().withParentActivity(this);
 
@@ -395,18 +393,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         Log.d(TAG, "connectDevice: connecting device " + device.getName());
         mBluetoothService.connect(device);
-    }
-
-    private void connectDeviceNew(String address) {
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        Log.d(TAG, "connectDevice: connecting device " + device.getName());
-        try {
-            mBluetoothClass.ConnectToDevice(device);
-        } catch (InterruptedException e) {
-            Log.d(TAG, "connectDeviceNew: connecting device interrupted ex");
-            e.printStackTrace();
-        }
-
     }
 
     private void updateConnectionUI(String deviceName, String deviceAddress) {

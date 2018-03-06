@@ -112,6 +112,18 @@ public class BluetoothService {
     }
 
     /**
+     * For testing
+     * @return
+     */
+    public BluetoothAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public void setmAdapter(BluetoothAdapter mAdapter) {
+        this.mAdapter = mAdapter;
+    }
+
+    /**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()
      */
@@ -289,7 +301,7 @@ public class BluetoothService {
      * like a server-side client. It runs until a connection is accepted
      * (or until cancelled).
      */
-    private class AcceptThread extends Thread {
+    public class AcceptThread extends Thread {
         // The local server socket
         private final BluetoothServerSocket mmServerSocket;
 
@@ -393,7 +405,7 @@ public class BluetoothService {
      * with a device. It runs straight through; the connection either
      * succeeds or fails.
      */
-    private class ConnectThread extends Thread {
+    public class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private BluetoothDevice mmDevice;
         private String mSocketType;
@@ -467,7 +479,7 @@ public class BluetoothService {
      * This thread runs during a connection with a remote device.
      * It handles all incoming and outgoing transmissions.
      */
-    private class ConnectedThread extends Thread {
+    public class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
