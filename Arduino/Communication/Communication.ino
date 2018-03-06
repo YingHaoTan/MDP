@@ -30,9 +30,9 @@ void loop() {
     putIncomingUSBMessageToBuffer();
     int traversalIndex = 0;
     uint8_t tmpInBuffer = 0;
-    
+
     if (usbBufferIn.count >= 6) {
-      
+
       if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 0) == true && tmpInBuffer == '~') {
         uint8_t messageType = 0;
         if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 1) == true) {
@@ -41,15 +41,15 @@ void loop() {
         if (messageType == ARDUINO_INSTRUCTION) {
           if (5 < usbBufferIn.count) {
             if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 5) == true && tmpInBuffer == '!') {
-              
+
               InstructionMessage instructMsg;
-              
+
               RingBuffer_get(&usbBufferIn, &instructMsg.id , 2);
               RingBuffer_get(&usbBufferIn, &instructMsg.action, 3);
               RingBuffer_get(&usbBufferIn, &instructMsg.obstacleInFront, 4);
-          
+
               if (last_sent == instructMsg.id && alreadyReceived == false) {
-                
+
                 alreadyReceived = true;
                 yetToReceiveAck = false;
                 switch (instructMsg.action) {
@@ -88,35 +88,35 @@ void loop() {
                   case STOP:
                     //Serial.flush();
                     yetToReceiveAck = false;
-					break;
+                    break;
                 }
                 RingBuffer_erase(&usbBufferIn, 6);
               }
-              
+
             } else {
               RingBuffer_pop(&usbBufferIn);
             }
           }
-        } else if(messageType == ARDUINO_STREAM){
-            StreamMessage streamMsg;
-            uint8_t payloadSize = 0;
-            // may not matter
-            RingBuffer_get(&usbBufferIn, &streamMsg.id, 2);
-            RingBuffer_get(&usbBufferIn, &payloadSize, 3);
+        } else if (messageType == ARDUINO_STREAM) {
+          StreamMessage streamMsg;
+          uint8_t payloadSize = 0;
+          // may not matter
+          RingBuffer_get(&usbBufferIn, &streamMsg.id, 2);
+          RingBuffer_get(&usbBufferIn, &payloadSize, 3);
 
-            uint8_t tmpPayload[payloadSize] = {0};
+          uint8_t tmpPayload[payloadSize] = {0};
 
-            //Serial.write(payloadSize);
-            for(int i = 0; i < payloadSize; i++){
-              RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4+i);
-            }
-            memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
-
-            // you have all your actions inside streamMsg.streamActions;   
-
-            RingBuffer_erase(&usbBufferIn, 5 + payloadSize);
-                       
+          //Serial.write(payloadSize);
+          for (int i = 0; i < payloadSize; i++) {
+            RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
           }
+          memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
+
+          // you have all your actions inside streamMsg.streamActions;
+
+          RingBuffer_erase(&usbBufferIn, 5 + payloadSize);
+
+        }
       } else {
         RingBuffer_pop(&usbBufferIn);
       }
@@ -176,8 +176,20 @@ void sendStatusUpdate() {
   tmpOutBuffer[sizeof(msg) + 1] = '!';
 
   // Need to test
-  Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
+  //Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
   //Serial.flush();
+
+  Serial.print('~');
+  Serial.print((int)tmpOutBuffer[1]);
+  Serial.print((int)tmpOutBuffer[2]);
+  Serial.print((int)tmpOutBuffer[3]);
+  Serial.print((int)tmpOutBuffer[4]);
+  Serial.print((int)tmpOutBuffer[5]);
+  Serial.print((int)tmpOutBuffer[6]);
+  Serial.print((int)tmpOutBuffer[7]);
+  Serial.print((int)tmpOutBuffer[8]);
+  Serial.print((int)tmpOutBuffer[9]);
+  Serial.print('!');
 
   //start_timer()
   timer = millis();
@@ -185,12 +197,12 @@ void sendStatusUpdate() {
 }
 
 void incrementID() {
-  last_sent = (last_sent + 1) % 126;
+  last_sent = (last_sent + 1) % 10;
 }
 
 void decrementID() {
   if (last_sent == 0) {
-    last_sent = 125;
+    last_sent = 9;
   }
   else {
     last_sent = last_sent - 1;

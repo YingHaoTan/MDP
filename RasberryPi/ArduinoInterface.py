@@ -35,7 +35,7 @@ class ArduinoInterface(object):
 		if(self.ser.inWaiting()):
 			inByte = self.ser.read()
 			#print("DAFUG:")
-			print(inByte)
+			#print(inByte)
 			#print(inByte)
 			if(inByte == bytes('~', 'ascii')):
 				toReturn = []
