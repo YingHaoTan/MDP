@@ -35,20 +35,21 @@ class ArduinoInterface(object):
 		if(self.ser.inWaiting()):
 			inByte = self.ser.read()
 			#print("DAFUG:")
-			
+			print(inByte)
 			#print(inByte)
 			if(inByte == bytes('~', 'ascii')):
 				toReturn = []
 				counter = 0
 				while True:
 					nextByte = self.ser.read()
+					print(nextByte)
 					counter+=1	
-					#print(nextByte)
+					
 					if(nextByte == bytes('!', 'ascii') and counter == 10):
 						#print(toReturn)
 						return toReturn
 					else:
-						toReturn.append(nextByte)
+						toReturn.append(nextByte.decode('ascii'))
 		return None
 		
 	# Write message to Arduino

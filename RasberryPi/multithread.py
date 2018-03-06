@@ -31,9 +31,10 @@ class Main(object):
 			if temp is not None:
 				string_to_send_tcp = ""
 				print("Receives from Arduino:")
-				print(temp)
+				
 				for i in range(len(temp)):
-					string_to_send_tcp += temp[i].decode("ascii")			
+					string_to_send_tcp += temp[i]	
+				string_to_send_tcp[0] = (int(string_to_send_tcp[0])).to_bytes(1, byteorder='big').decode('ascii')
 				from_arduino_queue.put(string_to_send_tcp)
 			
 			time.sleep(0.001)

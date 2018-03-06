@@ -80,11 +80,11 @@ public class MDPTCPConnector {
     }
 
     private synchronized void incrementID() {
-        currentID = (byte) ((byte) (currentID + 1) % 126);
+        currentID = (byte) ((byte) (currentID + 1) % 10);
     }
     
     private synchronized void incrementNextExpectedID() {
-    	nextExpectedID = (byte) ((byte) (nextExpectedID + 1) % 126);
+    	nextExpectedID = (byte) ((byte) (nextExpectedID + 1) % 10);
     }
     
     private void setResendStop(boolean value){

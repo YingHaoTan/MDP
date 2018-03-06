@@ -23,14 +23,14 @@ public class ArduinoUpdate extends StatusMessage{
     public ArduinoUpdate(byte[] received) {
         super(StatusMessageType.ARDUINO_UPDATE);
         // received[0] contains the message type, in this case ARDUINO_UPDATE
-        id = received[1];
-        front1 = received[2];
-        front2 = received[3];
-        front3 = received[4];
-        right1 = received[5];
-        right2 = received[6];
-        left1 = received[7];
-        reached = received[8];
+        id = (byte) Character.getNumericValue(received[1]);
+        front1 = (byte) Character.getNumericValue(received[2]);
+        front2 = (byte) Character.getNumericValue(received[3]);
+        front3 = (byte) Character.getNumericValue(received[4]);
+        right1 = (byte) Character.getNumericValue(received[5]);
+        right2 = (byte) Character.getNumericValue(received[6]);
+        left1 = (byte) Character.getNumericValue(received[7]);
+        reached = (byte) Character.getNumericValue(received[8]);
     }
 
     @Override
