@@ -2,16 +2,23 @@ package mdp.controllers;
 
 import java.awt.Point;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
+import java.util.function.Consumer;
 
 import mdp.controllers.explorer.ExplorationBase;
 import mdp.controllers.fp.FastestPathBase;
 import mdp.graphics.ExecutionMode;
 import mdp.models.CellState;
+import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.RobotBase;
 import mdp.robots.SimulatorRobot;
+import mdp.tcp.AndroidInstruction;
+import mdp.tcp.StatusMessage;
 
 /**
  * XController is the main controller responsible for routing controls between different 
@@ -26,9 +33,15 @@ public class XController {
 	private ExplorationBase explorer;
 	private FastestPathBase planner;
 	private MdpWindowController wcontroller;
+	private Queue<StatusMessage> outgoingAndroidQueue;
+	private Semaphore outgoingSemaphore;
 
-	public XController(MapState mstate) {
+	public XController(MapState mstate, List<Consumer<AndroidInstruction>> androidInstructionListenerList, Queue<StatusMessage> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
 		this.mstate = mstate;
+		this.outgoingAndroidQueue = outgoingAndroidQueue;
+		this.outgoingSemaphore = outgoingSemaphore;
+		
+		androidInstructionListenerList.add(this::handleAndroidInstruction);
 	}
 	
 	/**
@@ -160,13 +173,19 @@ public class XController {
 	 * @param waypoint
 	 * @param coordinate
 	 */
-	public void initialize(Point coordinate, Point waypoint) {
+	public void initialize(Point coordinate, Point waypoint, Direction orientation) {
 		mstate.setStartPoint(coordinate);
+                mstate.setRobotPoint(coordinate);
 		mstate.setMapCellState(waypoint, CellState.WAYPOINT);
 		mstate.reset();
+                
+                if(srobot != null)
+                    srobot.setCurrentOrientation(orientation);
+                if(probot != null)
+                    probot.setCurrentOrientation(orientation);
 		
 		if(wcontroller != null)
-			wcontroller.requestSynchronization();
+                    wcontroller.requestSynchronization();
 	}
 	
 	/**
@@ -191,6 +210,16 @@ public class XController {
 		
 		if(mstate.getWayPoint() != null)
 			mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
+	}
+	
+	private void handleAndroidInstruction(AndroidInstruction instruction) {
+		// Handle android instruction
+	}
+	
+	@SuppressWarnings("unused")
+	private void sendAndroidStatusMessage(StatusMessage message) {
+		outgoingAndroidQueue.offer(message);
+		outgoingSemaphore.release();
 	}
 
 }

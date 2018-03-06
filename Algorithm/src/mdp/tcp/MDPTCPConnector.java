@@ -18,6 +18,7 @@ import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import mdp.controllers.XController;
 import mdp.models.RobotAction;
 
 /**
@@ -39,14 +40,16 @@ public class MDPTCPConnector {
     
     //SynchronousQueue<ArduinoUpdate> incomingArduinoQueue;
     List<Consumer<ArduinoUpdate>> arduinoUpdateListeners;
+    List<Consumer<AndroidInstruction>> androidInstructionListeners;
     Semaphore outgoingSemaphore;
     Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<StatusMessage> outgoingAndroidQueue;
 
     public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
         try {
-            this.clientSocket = new Socket("192.168.6.6", 5000);
-            this.arduinoUpdateListeners = new ArrayList<Consumer<ArduinoUpdate>>();
+            this.clientSocket = new Socket("localhost", 5000);
+            this.arduinoUpdateListeners = new ArrayList<>();
+            this.androidInstructionListeners = new ArrayList<>();
             this.outgoingSemaphore = new Semaphore(0);
             this.outgoingArduinoQueue = outgoingArduinoQueue;
             this.outgoingAndroidQueue = outgoingAndroidQueue;
@@ -59,6 +62,10 @@ public class MDPTCPConnector {
     
     public List<Consumer<ArduinoUpdate>> getArduinoUpdateListenerList() {
     	return this.arduinoUpdateListeners;
+    }
+    
+    public List<Consumer<AndroidInstruction>> getAndroidInstructionListenerList() {
+    	return this.androidInstructionListeners;
     }
     
     public Semaphore getOutgoingSemaphore() {
@@ -109,6 +116,8 @@ public class MDPTCPConnector {
         @Override
         public void run() {
             BufferedReader inFromServer = null;
+            AndroidCommandsTranslator androidTranslator = new AndroidCommandsTranslator();
+            
             try {
                 inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 while (true) {
@@ -125,6 +134,8 @@ public class MDPTCPConnector {
                                 break;
                             }
                         }
+                        
+                        
                         byte[] incoming = incomingStr.getBytes();
                         StatusMessage.StatusMessageType messageType = StatusMessage.checkMessageType(incoming);
 
@@ -135,8 +146,12 @@ public class MDPTCPConnector {
                         break;
                              */
                             case ANDROID_INSTRUCTION:
+                                AndroidInstruction fromAndroid = new AndroidInstruction(incoming);
+                                androidTranslator.decodeMessage(fromAndroid.getMessage());
                                 // set interrupt variable to true, exploration and fastest path stops giving instruction to Arduino,
                                 // only bluetooth gives instructions to Arduino
+                                for(Consumer<AndroidInstruction> consumer: androidInstructionListeners)
+                                	consumer.accept(fromAndroid);
                                 break;
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);

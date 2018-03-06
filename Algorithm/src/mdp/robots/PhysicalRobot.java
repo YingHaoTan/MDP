@@ -196,34 +196,5 @@ public class PhysicalRobot extends RobotBase {
     		return this.completedactions == actions.size();
     	}
     }
-    
-    /*
-    /**
-     * NotifyTask is a TimerTask that notifies registered RobotActionListener on
-     * a specific robot action sequence completion
-     *
-     * @author Ying Hao
-     
-    private class NotifyTask extends TimerTask {
-
-        private Direction mapdirection;
-        private RobotAction[] actions;
-
-        public NotifyTask(Direction mapdirection, RobotAction[] actions) {
-            this.mapdirection = mapdirection;
-            this.actions = actions;
-        }
-
-        @Override
-        public void run() {
-            PhysicalRobot.this.notify(mapdirection, actions);
-            PhysicalRobot.this.taskqueue.poll();
-
-            if (PhysicalRobot.this.taskqueue.size() > 0) {
-                PhysicalRobot.this.getScheduler().schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
-            }
-        }
-
-    }*/
 
 }
