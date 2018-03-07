@@ -67,6 +67,8 @@ public class MazeGridAdapter extends BaseAdapter {
             temp.setBackgroundResource(R.drawable.cell_robot);
         }else if(state == CellState.ROBOT_HEAD){
             temp.setBackgroundResource(R.drawable.cell_robot_head);
+        }else if(state == CellState.GOAL){
+            temp.setBackgroundResource(R.drawable.cell_goal);
         }else{
             temp.setBackgroundResource(R.drawable.cell_unexplored);
         }
