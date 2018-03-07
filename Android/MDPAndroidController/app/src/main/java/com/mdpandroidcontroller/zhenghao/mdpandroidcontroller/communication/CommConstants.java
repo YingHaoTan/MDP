@@ -57,10 +57,10 @@ public class CommConstants {
 		public static final String STATUS_TYPE_MDF		= "MD";
 
 	public static final String MESSAGE_TYPE_CONFIG	= "CF";
-	//to add more configuration patterns in the future
-	*/
 
 	public static final String DELIMITER = "~";
+	//to add more configuration patterns in the future
+	*/
 
 	//constant to change message format to json
 
@@ -68,7 +68,6 @@ public class CommConstants {
 	public static final String JSONNAME_TYPE		= "messagetype";
 	public static final String JSONNAME_COORDINATE	= "coordinate";
 	public static final String JSONNAME_ORIENTATION	= "orientation";
-	//public static final String JSONNAME_ACTION	= "action";
 	public static final String JSONNAME_OPTION		= "option";
 	public static final String JSONNAME_MDF1		= "mdf1";
 	public static final String JSONNAME_MDF2		= "mdf2";
@@ -88,14 +87,14 @@ public class CommConstants {
 	public static final String UPDATE_MANUAL	= "manual";
 	public static final String UPDATE_NOW		= "now";
 
-	public static final String ROBOT_MOVING = "moving";
-	public static final String ROBOT_TURNING = "turning";
-	public static final String ROBOT_STOPPED = "stopped";
+	public static final String ROBOT_MOVING 	= "moving";
+	public static final String ROBOT_TURNING 	= "turning";
+	public static final String ROBOT_STOPPED 	= "stopped";
 
 	public static final String GRID_OBSTACLE 	= "obs";
 	public static final String GRID_CLEAR 		= "clear";
 
-	public static final String CONFIG_STRING = "config";
+	public static final String CONFIG_STRING 	= "config";
 
 	// message type from controller
 	public static final String CONTROLLER_MESSAGE_EXPLORE		= "explore";

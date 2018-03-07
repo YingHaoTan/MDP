@@ -8,6 +8,10 @@ public class AndroidUpdate extends StatusMessage {
 		super(StatusMessageType.ANDROID_UPDATE);
 		this.message = msg;
 	}
+	
+	public String getMessage() {
+		return message;
+	}
 
 	@Override
 	public byte[] toBytes() {

@@ -27,7 +27,6 @@ import mdp.robots.SimulatorRobot;
 import mdp.tcp.AndroidUpdate;
 import mdp.tcp.ArduinoMessage;
 import mdp.tcp.MDPTCPConnector;
-import mdp.tcp.StatusMessage;
 
 public class Program {
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
@@ -37,17 +36,12 @@ public class Program {
                 break;
             }
         }
-        
-        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
-        Queue<AndroidUpdate> outgoingAndroidQueue = new LinkedList<>();
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
-        mdpTCPConnector.startThreads();
 
         Dimension rdim = new Dimension(3, 3);
         
         MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", new Dimension(15, 20), new Dimension(3, 3));
         MdpWindowController wcontroller = new MdpWindowController(window);
-        XController xcontroller = new XController(window.getMap().getMapState(), mdpTCPConnector.getAndroidInstructionListenerList(), outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
+        XController xcontroller = new XController(window.getMap().getMapState());
         MapFileHandler filehandler = new MapFileHandler();
         ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
@@ -82,8 +76,15 @@ public class Program {
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
         
+        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
+        Queue<AndroidUpdate> outgoingAndroidQueue = new LinkedList<>();
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
+        mdpTCPConnector.startThreads();
+        
+        xcontroller.initializeCommunication(mdpTCPConnector.getAndroidInstructionListenerList(), outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
+        
         // PhysicalRobot
-        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, mdpTCPConnector.getOutgoingSemaphore());
+        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
         probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
         probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));

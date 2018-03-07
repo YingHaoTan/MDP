@@ -119,14 +119,11 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
   totalErrors += 2;                                                           //Add up total number of errors (for Ki)
   if (error != 0) {                                                           //if error exists
     adjustment = ((kP * error) - (kI * totalErrors) + (kD * errorRate))/100;
-    if(dr == 1){
-      *setSpdR += -adjustment;
-      *setSpdL -= adjustment;
+    if(dr == 1  || dr == -1){
+      *setSpdR += -adjustment*dr;
+      *setSpdL -= adjustment*dr;
     }
-    else if(dr == -1){
-      *setSpdR += adjustment;
-      *setSpdL -= -adjustment;
-    }
+
     else{
       *setSpdR += adjustment;
       *setSpdL -= adjustment;
@@ -333,20 +330,20 @@ void goFORWARDCM(int lengthCM){
 
 //------------Functions for IR Sensors------------//
 void scanFORWARD(int *pData) {
-  pData[0] = ir1.distance(); //Left
-  pData[1] = ir2.distance(); // Middle
-  pData[2] = ir3.distance(); //Right
+  pData[0] = lfwdIrVal.distance(); //Left
+  pData[1] = mfwdIrVal.distance(); // Middle
+  pData[2] = rfwdIrVal.distance(); //Right
   //Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << endl;
 }
 
 void scanRIGHT(int *pData) {
-  pData[0] = ir4.distance(); //Right Front
-  pData[1] = ir6.distance(); //Right Back
+  pData[0] = frgtIrVal.distance(); //Right Front
+  pData[1] = brgtIrVal.distance(); //Right Back
   //Serial << "RIGHT: ->^ Right(Short): " << pData[0] << " ->v Right(Long): " << pData[1] << endl;
 }
 
 void scanLEFT() {
-  irLeftReading = ir5.distance();
+  irLeftReading = flftIrVal.distance();
   //Serial << "LEFT: <-^ Left(Long): " << irLeftReading << endl;
 }
 
@@ -370,28 +367,28 @@ void mEncoder(int motor, int setTick){
     
   //encLastState[motor] = encState[motor];
   //Serial << "Inside mEncoder() for Motor: " << motor << " Ticks: " << mCounter[motor] << " " << mRev[motor] << " Direction " << direction << endl;
-  if(((mCounter[motor] % setTick) == 0 && (mCounter[motor]!=0))){
-    mRev[motor]++;
-  }
+  //if(((mCounter[motor] % setTick) == 0 && (mCounter[motor]!=0))){
+    //mRev[motor]++;
+  //}
 }
 
 void resetMCounters() {
   mCounter[0] = 0;
   mCounter[1] = 0;
-  mRev[0] = 0;
-  mRev[1] = 0;
+  //mRev[0] = 0;
+  //mRev[1] = 0;
 }
 
 //ISR for Motor 1 Encoders
 ISR(PCINT2_vect) {
-  flag[0] = 1;
-  mEncoder(0, 1183);
+  //flag[0] = 1;
+  mEncoder(0, 2248);
 }
 
 //ISR for Motor 2 Encoders
 ISR(PCINT0_vect) {
-  flag[1] = 1;
-  mEncoder(1, 1183);
+  //flag[1] = 1;
+  mEncoder(1, 2248);
 }
 
 //Standard function to enable interrupts on any pins
@@ -564,10 +561,9 @@ void stringCommands() {
 
     case 5:
             Serial.println("Doing Full Scan");
-            //scanFORWARD(&irFrontReadings[0]);
-            //scanLEFT();
-            //scanRIGHT(&irRightReadings[0]);
-            toBlocks();
+            scanFORWARD(&irFrontReadings[0]);
+            scanLEFT();
+            scanRIGHT(&irRightReadings[0]);
             break;
             
     case 6:
@@ -628,12 +624,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = minVal((irFrontReadings[0] - offset1) / 10);
-  statusPayload.front2 = minVal((irFrontReadings[1] - offset2) / 10);
-  statusPayload.front3 = minVal((irFrontReadings[2] - offset3) / 10);
-  statusPayload.right1 = minVal((irRightReadings[0] - offset4) / 10);
-  statusPayload.right2 = minVal((irRightReadings[1] - offset6) / 10);
-  statusPayload.left1 = minVal((irLeftReading - offset5) / 10);
+  statusPayload.front1 = minVal((irFrontReadings[0] - lfwdIrOS) / 10);
+  statusPayload.front2 = minVal((irFrontReadings[1] - mfwdIrOS) / 10);
+  statusPayload.front3 = minVal((irFrontReadings[2] - rfwdIrOS) / 10);
+  statusPayload.right1 = minVal((irRightReadings[0] - frgtIrOS) / 10);
+  statusPayload.right2 = minVal((irRightReadings[1] - brgtIrOS) / 10);
+  statusPayload.left1 = minVal((irLeftReading - flftIrOS) / 10);
   statusPayload.reached = 1;
 
   //Serial << irFrontReadings[1] << " " << irFrontReadings[0] << " " << irFrontReadings[2] << " " << irRightReadings[0] << " " << irRightReadings[1] << " " << irLeftReading << endl;
