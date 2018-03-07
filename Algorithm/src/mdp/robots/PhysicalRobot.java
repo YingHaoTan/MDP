@@ -19,6 +19,8 @@ import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
+import mdp.tcp.AndroidCommandsTranslator;
+import mdp.tcp.AndroidUpdate;
 import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
 
@@ -33,18 +35,22 @@ import mdp.tcp.ArduinoStream;
 public class PhysicalRobot extends RobotBase {
 
     private Queue<ArduinoMessage> outgoingArduinoQueue;
+    private Queue<AndroidUpdate> outgoingAndroidQueue;
     private Map<SensorConfiguration, Integer> readings = new HashMap<>();
     private Queue<Command> commandqueue;
     private Semaphore outgoingSemaphore;
+    private AndroidCommandsTranslator androidTranslator;
     private volatile boolean initializing;
-    private boolean autoupdate;
-    // Just to store robot supposed position
+    private volatile boolean autoupdate;
 
-    public PhysicalRobot(Dimension dimension, Direction orientation, List<Consumer<ArduinoUpdate>> arduinoUpdateListenerList, Queue<ArduinoMessage> outgoingArduinoQueue, Semaphore outgoingSemaphore) {
+    public PhysicalRobot(Dimension dimension, Direction orientation, List<Consumer<ArduinoUpdate>> arduinoUpdateListenerList, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<AndroidUpdate> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
         super(dimension, orientation);
         this.commandqueue = new LinkedList<>();
         this.outgoingArduinoQueue = outgoingArduinoQueue;
+        this.outgoingAndroidQueue = outgoingAndroidQueue;
         this.outgoingSemaphore = outgoingSemaphore;
+        this.androidTranslator = new AndroidCommandsTranslator();
+        this.autoupdate = true;
         
         arduinoUpdateListenerList.add(this::handleArduinoUpdate);
     }
@@ -95,6 +101,13 @@ public class PhysicalRobot extends RobotBase {
     		commandqueue.add(new Command(mapdirection, Arrays.asList(actions)));
     	}
     	
+    	if(autoupdate) {
+        	if(mapdirection == null)
+        		sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotTurning()));
+        	else
+        		sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotMoving()));
+        }
+    	
         for (RobotAction action : actions)
         	sendArduinoMessage(new ArduinoInstruction(action, false));
 
@@ -131,6 +144,11 @@ public class PhysicalRobot extends RobotBase {
     private synchronized void sendArduinoMessage(ArduinoMessage message) {
     	outgoingArduinoQueue.offer(message);
     	outgoingSemaphore.release();
+    }
+    
+    private void sendAndroidUpdate(AndroidUpdate message) {
+        outgoingAndroidQueue.offer(message);
+        outgoingSemaphore.release();
     }
 
     private void setArduinoSensorReadings(ArduinoUpdate arduinoUpdate) {
@@ -193,14 +211,25 @@ public class PhysicalRobot extends RobotBase {
     	}
     	else {
     		Command command = commandqueue.peek();
-    		command.completedactions++;
     		
-    		if(command.isComplete()) {
-    			synchronized(commandqueue) {
-    				commandqueue.poll();
-    			}
-    			
-    			this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
+    		if(command != null) {
+	    		command.completedactions++;
+	    		
+	    		if(command.isComplete()) {
+	    			synchronized(commandqueue) {
+	    				commandqueue.poll();
+	    			}
+	    			
+	    			this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
+	    			
+	    			if(autoupdate) {
+	    				MapState mstate = getMapState();
+	    				Point rpoint = mstate.getRobotPoint();
+	    				
+	    				sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotStopped()));
+	    				sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
+	    			}
+	    		}
     		}
     	}
     }

@@ -82,17 +82,17 @@ class Main(object):
 							if message_end and len(received) > 0:
 								if(received[0] == ARDUINO_INSTRUCTION):
 									print("Sends to Arduino: " + str(datetime.datetime.now()))
-									print(received)
+									#print(received)
 									to_arduino_queue.put(received)
 									
 								elif (received[0] == ARDUINO_STREAM):
 									print('Received Arduino stream :' + str(len(received)))
-									print(received)
+									#print(received)
 									to_arduino_queue.put(received)
 
 								elif (received[0] == ANDROID_UPDATE):
-									print('Received ANDROID_UPDATE from PC' + str(len(received)))
-									print(received)
+									print('Received ANDROID_UPDATE from PC' + str(datetime.datetime.now()))
+									#print(received)
 									to_android_queue.put(received[1:])
 
 								message_end = False
@@ -166,9 +166,12 @@ class Main(object):
 		while True:
 			if(not to_android_queue.empty()):
 				data = to_android_queue.get()
+				data.append(bytes('\n', 'ascii'))
 				self.android.write(b''.join(data))
-				print('Sent to Android')
+				print(b''.join(data))
+				print('Sent to Android'   + str(datetime.datetime.now()))
 			time.sleep(0.001)
+
 
 	def threads_create(self):
 		try: 		
