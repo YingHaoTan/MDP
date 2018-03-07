@@ -274,6 +274,9 @@ public class XController {
         if (mstate.getWayPoint() != null) {
             mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
         }
+        
+        // can i put explorer.reset() here? to reset the sensor filter? 
+        // or i can just put the reset into the MovementBase.setMapState, because you will call that everytime you press explore
     }
     
     private void onSensorScanCompleted() {
