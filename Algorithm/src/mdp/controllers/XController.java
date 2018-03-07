@@ -45,10 +45,12 @@ public class XController {
     private Semaphore outgoingSemaphore;
     private AndroidCommandsTranslator androidTranslator;
     private boolean autoupdate;
+    private boolean communication;
 
     public XController(MapState mstate) {
         this.mstate = mstate;
         this.autoupdate = true;
+        this.communication = false;
     }
     
     /**
@@ -58,6 +60,7 @@ public class XController {
      * @param outgoingSemaphore
      */
     public void initializeCommunication(List<Consumer<AndroidInstruction>> androidInstructionListenerList, Queue<AndroidUpdate> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
+		this.communication = true;
     	this.outgoingAndroidQueue = outgoingAndroidQueue;
         this.outgoingSemaphore = outgoingSemaphore;
         this.androidTranslator = new AndroidCommandsTranslator();
@@ -274,7 +277,7 @@ public class XController {
     }
     
     private void onSensorScanCompleted() {
-    	if(autoupdate)
+    	if(communication)
     		sendAndroidUpdate(new AndroidUpdate(androidTranslator.sendArena(mstate.toString(MapDescriptorFormat.MDF1), mstate.toString(MapDescriptorFormat.MDF2))));
     }
 
@@ -316,7 +319,7 @@ public class XController {
                 // do move backward
             }
         } else if (messageType.equals(CommConstants.CONTROLLER_MESSAGE_RESET)) {
-            SwingUtilities.invokeLater(() -> getMapState().reset());
+            SwingUtilities.invokeLater(() -> reset(getMapState()));
         } else if (messageType.equals(CommConstants.CONTROLLER_MESSAGE_UPDATE)) {
             String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
             if (option.equals(CommConstants.UPDATE_AUTO)) {
@@ -356,8 +359,10 @@ public class XController {
     }
 
     private void sendAndroidUpdate(AndroidUpdate message) {
-        outgoingAndroidQueue.offer(message);
-        outgoingSemaphore.release();
+    	if(autoupdate) {
+	        outgoingAndroidQueue.offer(message);
+	        outgoingSemaphore.release();
+    	}
     }
 
 }

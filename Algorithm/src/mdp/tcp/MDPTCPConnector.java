@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -45,19 +46,15 @@ public class MDPTCPConnector {
     Queue<ArduinoMessage> outgoingArduinoQueue;
     Queue<AndroidUpdate> outgoingAndroidQueue;
 
-    public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<AndroidUpdate> outgoingAndroidQueue) {
-        try {
-            this.clientSocket = new Socket("192.168.6.6", 5000);
-            this.arduinoUpdateListeners = new ArrayList<>();
-            this.androidInstructionListeners = new ArrayList<>();
-            this.outgoingSemaphore = new Semaphore(0);
-            this.outgoingArduinoQueue = outgoingArduinoQueue;
-            this.outgoingAndroidQueue = outgoingAndroidQueue;
-            
-            System.out.println("Connection established!");
-        } catch (IOException ex) {
-            Logger.getLogger(MDPTCPConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<AndroidUpdate> outgoingAndroidQueue) throws UnknownHostException, IOException {
+        this.clientSocket = new Socket("192.168.6.6", 5000);
+        this.arduinoUpdateListeners = new ArrayList<>();
+        this.androidInstructionListeners = new ArrayList<>();
+        this.outgoingSemaphore = new Semaphore(0);
+        this.outgoingArduinoQueue = outgoingArduinoQueue;
+        this.outgoingAndroidQueue = outgoingAndroidQueue;
+        
+        System.out.println("Connection established!");
     }
     
     public List<Consumer<ArduinoUpdate>> getArduinoUpdateListenerList() {
@@ -247,9 +244,9 @@ public class MDPTCPConnector {
                         } 
                         else{
                             setSentStop(false);
+                            incrementID();
                         }
                         
-                        incrementID();
                         processed++;
                     }
                     

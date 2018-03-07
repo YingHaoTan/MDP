@@ -127,7 +127,11 @@ public class PhysicalRobot extends RobotBase {
     
     @Override
 	protected void dispatchCalibration(RobotAction action) {
-            sendArduinoMessage(new ArduinoInstruction(action, false));
+    	synchronized(commandqueue) {
+    		commandqueue.add(new Command(null, Arrays.asList(action)));
+    	}
+    	
+        sendArduinoMessage(new ArduinoInstruction(action, false));
 	}
 
     @Override
@@ -220,7 +224,8 @@ public class PhysicalRobot extends RobotBase {
 	    				commandqueue.poll();
 	    			}
 	    			
-	    			this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
+	    			if(command.actions.size() != 1 || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE))
+	    				this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
 	    			
 	    			if(autoupdate) {
 	    				MapState mstate = getMapState();
