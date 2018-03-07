@@ -98,7 +98,7 @@ public class PhysicalRobot extends RobotBase {
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
     	synchronized(commandqueue) {
-    		commandqueue.add(new Command(mapdirection, Arrays.asList(actions)));
+    		commandqueue.add(new Command(Arrays.asList(mapdirection), Arrays.asList(actions), false));
     	}
     	
     	if(autoupdate) {
@@ -127,12 +127,19 @@ public class PhysicalRobot extends RobotBase {
     
     @Override
 	protected void dispatchCalibration(RobotAction action) {
-            sendArduinoMessage(new ArduinoInstruction(action, false));
+    	synchronized(commandqueue) {
+    		commandqueue.add(new Command(null, Arrays.asList(action), false));
+    	}
+    	
+        sendArduinoMessage(new ArduinoInstruction(action, false));
 	}
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        // Crafts message
+    	synchronized(commandqueue) {
+    		commandqueue.add(new Command(orientations, actions, false));
+    	}
+    	
     	sendArduinoMessage(new ArduinoStream(actions));
     }
 
@@ -220,7 +227,23 @@ public class PhysicalRobot extends RobotBase {
 	    				commandqueue.poll();
 	    			}
 	    			
-	    			this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
+	    			if(command.actions.size() != 1 || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)) {
+	    				if(command.stream) {
+	    					int orientationIndex = 0;
+	    					
+	    					for(int i = 0; i < command.actions.size(); i++) {
+	    						RobotAction action = command.actions.get(i);
+	    						
+	    						if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT)
+	    							this.notify(null, action);
+	    						else
+	    							this.notify(command.mapdirections.get(orientationIndex++), action);
+	    					}
+	    				}
+	    				else {
+	    					this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
+	    				}
+	    			}
 	    			
 	    			if(autoupdate) {
 	    				MapState mstate = getMapState();
@@ -235,14 +258,16 @@ public class PhysicalRobot extends RobotBase {
     }
     
     private class Command {
-    	private final Direction mapdirection;
+    	private final List<Direction> mapdirections;
     	private final List<RobotAction> actions;
+    	private final boolean stream;
     	private int completedactions;
     	
-    	public Command(Direction mapdirection, List<RobotAction> actions) {
-    		this.mapdirection = mapdirection;
+    	public Command(List<Direction> mapdirections, List<RobotAction> actions, boolean stream) {
+    		this.mapdirections = mapdirections;
     		this.actions = actions;
     		this.completedactions = 0;
+    		this.stream = stream;
     	}
     	
     	public boolean isComplete() {

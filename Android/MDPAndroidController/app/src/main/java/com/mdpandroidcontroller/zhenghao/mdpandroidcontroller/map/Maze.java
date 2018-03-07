@@ -140,6 +140,10 @@ public class Maze {
             return CellState.WAYPOINT;
         }
 
+        if(x >= MAZE_COLS - 3 && y >= MAZE_ROWS - 3){
+            return CellState.GOAL;
+        }
+
         if(maze[x+y*MAZE_COLS] == NORMAL_GRID){
             return CellState.NORMAL;
         }else if(maze[x+y*MAZE_COLS] == OBSTACLE_GRID){
