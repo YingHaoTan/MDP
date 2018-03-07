@@ -42,7 +42,7 @@ class ArduinoInterface(object):
 				counter = 0
 				while True:
 					nextByte = self.ser.read()
-					print(nextByte)
+					#print(nextByte)
 					counter+=1	
 					
 					if(nextByte == bytes('!', 'ascii') and counter == 10):

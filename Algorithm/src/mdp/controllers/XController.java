@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Timer;
 import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
@@ -27,7 +26,6 @@ import mdp.robots.SimulatorRobot;
 import mdp.tcp.AndroidCommandsTranslator;
 import mdp.tcp.AndroidInstruction;
 import mdp.tcp.AndroidUpdate;
-import mdp.tcp.StatusMessage;
 
 /**
  * XController is the main controller responsible for routing controls between
@@ -46,10 +44,24 @@ public class XController {
     private Queue<AndroidUpdate> outgoingAndroidQueue;
     private Semaphore outgoingSemaphore;
     private AndroidCommandsTranslator androidTranslator;
+    private boolean autoupdate;
+    private boolean communication;
 
-    public XController(MapState mstate, List<Consumer<AndroidInstruction>> androidInstructionListenerList, Queue<AndroidUpdate> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
+    public XController(MapState mstate) {
         this.mstate = mstate;
-        this.outgoingAndroidQueue = outgoingAndroidQueue;
+        this.autoupdate = true;
+        this.communication = false;
+    }
+    
+    /**
+     * Initialies communication channel for this XController instance
+     * @param androidInstructionListenerList
+     * @param outgoingAndroidQueue
+     * @param outgoingSemaphore
+     */
+    public void initializeCommunication(List<Consumer<AndroidInstruction>> androidInstructionListenerList, Queue<AndroidUpdate> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
+		this.communication = true;
+    	this.outgoingAndroidQueue = outgoingAndroidQueue;
         this.outgoingSemaphore = outgoingSemaphore;
         this.androidTranslator = new AndroidCommandsTranslator();
 
@@ -116,7 +128,11 @@ public class XController {
      * @param explorer
      */
     public void setExplorer(ExplorationBase explorer) {
+    	if(this.explorer != null)
+    		this.explorer.removeScanCompletedListener(this::onSensorScanCompleted);
+    	
         this.explorer = explorer;
+        this.explorer.addScanCompletedListener(this::onSensorScanCompleted);
     }
 
     /**
@@ -259,6 +275,11 @@ public class XController {
             mstate.setMapCellState(mstate.getWayPoint(), CellState.WAYPOINT);
         }
     }
+    
+    private void onSensorScanCompleted() {
+    	if(communication)
+    		sendAndroidUpdate(new AndroidUpdate(androidTranslator.sendArena(mstate.toString(MapDescriptorFormat.MDF1), mstate.toString(MapDescriptorFormat.MDF2))));
+    }
 
     private void handleAndroidInstruction(AndroidInstruction instruction) {
         // Handle android instruction
@@ -298,13 +319,13 @@ public class XController {
                 // do move backward
             }
         } else if (messageType.equals(CommConstants.CONTROLLER_MESSAGE_RESET)) {
-            SwingUtilities.invokeLater(() -> getMapState().reset());
+            SwingUtilities.invokeLater(() -> reset(getMapState()));
         } else if (messageType.equals(CommConstants.CONTROLLER_MESSAGE_UPDATE)) {
             String option = jsonObj.getString(CommConstants.JSONNAME_OPTION);
             if (option.equals(CommConstants.UPDATE_AUTO)) {
-                System.out.println("UPDATE AUTO CALLED");
+            	probot.setAutoUpdate(autoupdate = true);
             } else if (option.equals(CommConstants.UPDATE_MANUAL)) {
-
+            	probot.setAutoUpdate(autoupdate = false);
             } else if (option.equals(CommConstants.UPDATE_NOW)) {
                 Point rpoint = mstate.getRobotPoint();
                 RobotBase robot = getActiveRobot(ExecutionMode.PHYSICAL);
@@ -338,8 +359,10 @@ public class XController {
     }
 
     private void sendAndroidUpdate(AndroidUpdate message) {
-        outgoingAndroidQueue.offer(message);
-        outgoingSemaphore.release();
+    	if(autoupdate) {
+	        outgoingAndroidQueue.offer(message);
+	        outgoingSemaphore.release();
+    	}
     }
 
 }

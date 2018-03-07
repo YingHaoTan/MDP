@@ -24,10 +24,12 @@ public abstract class MovementBase {
     private MapState mstate;
     private RobotBase robot;
     private List<CellStateUpdateListener> cslisteners;
+    private List<Runnable> scanlisteners;
     
     
     public MovementBase(){
         this.cslisteners = new ArrayList<>();
+        this.scanlisteners = new ArrayList<>();
     }
     
     /**
@@ -44,6 +46,20 @@ public abstract class MovementBase {
      */
     public void removeCellStateUpdateListener(CellStateUpdateListener listener) {
         this.cslisteners.remove(listener);
+    }
+    
+    /**
+     * Adds scan completed listener
+     */
+    public void addScanCompletedListener(Runnable listener) {
+    	this.scanlisteners.add(listener);
+    }
+    
+    /**
+     * Removes scan completed listener
+     */
+    public void removeScanCompletedListener(Runnable listener) {
+    	this.scanlisteners.remove(listener);
     }
     
     /**
@@ -131,6 +147,9 @@ public abstract class MovementBase {
                 }
             }
         }
+        
+        for(Runnable listener: this.scanlisteners)
+        	listener.run();
     }
     
     

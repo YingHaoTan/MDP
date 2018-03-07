@@ -5,5 +5,5 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models;
  */
 
 public enum CellState {
-    UNEXPLORED, OBSTACLE, NORMAL, WAYPOINT, ROBOT, ROBOT_HEAD
+    UNEXPLORED, OBSTACLE, NORMAL, WAYPOINT, ROBOT, ROBOT_HEAD, GOAL
 }
