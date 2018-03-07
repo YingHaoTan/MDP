@@ -46,16 +46,15 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int noBlock) {
   int setBlocks = blockToTicks(noBlock);
-//  int setSpdR = 300;              //Right motor
-//  int setSpdL = 306;              //Left motor
   long lastTime = micros();
+  int setSpdR = 300;
+  int setSpdL = 306;
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
   lastTicks[0] = 0;
   lastTicks[1] = 0;
   int i = 100;
-  //for (int i = 100; i < 301 ; i++){
   while(i < 301){
     if(micros() - lastTime > 50){
       md.setSpeeds(i, i+10);
@@ -65,9 +64,6 @@ void goFORWARD(int noBlock) {
   }
 
   lastTime = millis();
-
-  //}
-  // md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
   while (mCounter[0] < setBlocks && mCounter[1] < setBlocks) {
@@ -83,7 +79,7 @@ void goFORWARD(int noBlock) {
   }
 
   md.setBrakes(400, 400);
-  resetMCounters();
+//  resetMCounters();
 }
 
 void goRIGHT(int angle) {
@@ -134,7 +130,7 @@ void goLEFT(int angle) {
   }
 
   md.setBrakes(400, 400);
-  resetMCounters();
+//  resetMCounters();
 }
 
 //Direction(dr): -1 = left, 0 = straight, 1 = right
@@ -157,7 +153,6 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
 //      *setSpdR += adjustment;
 //      *setSpdL -= -adjustment;
 //    }
-
     else{
       *setSpdR += adjustment;
       *setSpdL -= adjustment;
@@ -225,13 +220,36 @@ void calibrateRIGHT() {
   }
 }
 
+//JM - Attempt 1 at making code cleaner
+//void calibrateRIGHT() {
+//  scanRIGHT(&irRightReadings[0]);
+//  int turnTicks = 0;
+//  while (irRightReadings[0] != irRightReadings[1]) {
+//    resetMCounters();
+//    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 15;
+//    if (turnTicks > 0) {
+//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+//        md.setSpeeds(-150, 150);
+//      }
+//    }
+//    else {
+//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+//        md.setSpeeds(150, -150);
+//      }
+//    }
+//    md.setBrakes(400, 400);
+//    delay(100);
+//    scanRIGHT(&irRightReadings[0]);
+//  }
+//}
+
 //This part need to Optimize
 void calibrateFRONT() {
   int calibrate = 1;
   while (calibrate == 1) {
     scanFORWARD(&irFrontReadings[0]);
     resetMCounters();
-    // crude way to measure distance from front if all three read 0
+
     if (irFrontReadings[2] != 10 && irFrontReadings[0] != 10 ) {
       int turnTicks = 0;
       //Serial.println("Calibrating Front");
@@ -286,12 +304,12 @@ void toBlocks(){
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = minVal((irFrontReadings[0] - lfwdIrOS) / 10);
-  statusPayload.front2 = minVal((irFrontReadings[1] - mfwdIrOS) / 10);
-  statusPayload.front3 = minVal((irFrontReadings[2] - rfwdIrOS) / 10);
-  statusPayload.right1 = minVal((irRightReadings[0] - frgtIrOS) / 10);
-  statusPayload.right2 = minVal((irRightReadings[1] - brgtIrOS) / 10);
-  statusPayload.left1 = minVal((irLeftReading - flftIrOS) / 10);
+  statusPayload.front1 = shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10);
+  statusPayload.front2 = shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10);
+  statusPayload.front3 = shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10);
+  statusPayload.right1 = shortIrVal((irRightReadings[0] - frgtIrOS) / 10);
+  statusPayload.right2 = shortIrVal((irRightReadings[1] - brgtIrOS) / 10);
+  statusPayload.left1 = longIrVal((irLeftReading - flftIrOS) / 10);
   statusPayload.reached = 1;
 
   Message msg;
@@ -448,7 +466,7 @@ void commWithRPI() {
 
                 case CAL_SIDE:
                   scanRIGHT(&irRightReadings[0]);
-                  if(calCounter == 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <5)){
+                  if(calCounter >= 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <5))){
                     calibrateRIGHT();
                     calCounter = 0;
                   }
@@ -520,7 +538,7 @@ void stringCommands() {
   //int commands[] = {1, 2, 3, 2, 3, 1, 2, 3, 2, 3, 1, 0};
   //int commands[] = {1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 0};
   //int commands[] = {1, 1, 1, 1, 6, 2, 1, 4, 1, 2, 1, 4, 1, 1, 1, 3, 1, 1, 1, 1, 0};
-  int commands[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
+  int commands[] = {4,0};
   static int x;
   switch (commands[x]){
     case 1: 
@@ -543,9 +561,13 @@ void stringCommands() {
             break;
 
     case 4:
+            Serial.println("Calibrate Right");
             scanRIGHT(&irRightReadings[0]);
-            if(calCounter == 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <5)){
+            if(calCounter >= 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <5))){
               calibrateRIGHT();
+//              goRIGHT(90);
+//              calibrateFRONT();
+//              goLEFT(90);
               calCounter = 0;
             }
             break;
