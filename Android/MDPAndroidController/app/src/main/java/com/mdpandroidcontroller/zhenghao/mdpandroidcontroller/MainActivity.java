@@ -554,6 +554,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         public void onClick(View v) {
             goTable.setVisibility(VISIBLE);
             controlTable.setVisibility(GONE);
+            explorationButton.setChecked(true);
             fastestPathButton.setChecked(false);
             manualControlButton.setChecked(false);
         }
@@ -564,6 +565,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         public void onClick(View v) {
             goTable.setVisibility(VISIBLE);
             controlTable.setVisibility(GONE);
+            fastestPathButton.setChecked(true);
             explorationButton.setChecked(false);
             manualControlButton.setChecked(false);
         }
@@ -574,6 +576,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         public void onClick(View v) {
             goTable.setVisibility(GONE);
             controlTable.setVisibility(VISIBLE);
+            manualControlButton.setChecked(true);
             explorationButton.setChecked(false);
             fastestPathButton.setChecked(false);
         }
