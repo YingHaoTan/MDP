@@ -78,6 +78,7 @@ public class Program {
         srobot.install(left1);      
         
         srobot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_CORNER, front1, front2, front3, right1, right2));
+        srobot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_SIDE, right1, right2));
         
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
@@ -98,6 +99,7 @@ public class Program {
 	        probot.install(left1);    
 	        
 	        probot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_CORNER, front1, front2, front3, right1, right2));
+	        probot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_SIDE, right1, right2));
 	        
 	        wcontroller.setPhysicalRobot(probot);
 	        xcontroller.setPhysicalRobot(probot);

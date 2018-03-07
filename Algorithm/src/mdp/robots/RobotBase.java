@@ -381,9 +381,12 @@ public abstract class RobotBase {
     protected void move(Direction mapdirection, RobotAction... actions) {
     	dispatchMovement(mapdirection, actions);
     	
-    	for(CalibrationSpecification spec: this.getCalibrationSpecifications())
-    		if(spec.isInPosition(this))
+    	for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
+    		if(spec.isInPosition(this)) {
     			dispatchCalibration(spec.getCalibrationType());
+    			break;
+    		}
+    	}
     }
 
     /*

@@ -201,16 +201,17 @@ public class MDPTCPConnector {
                 outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
                 
-               /* ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
-                outToServer.writeBytes(new String(ins.toBytes()) + "~");
+               // ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
+                //outToServer.writeBytes(new String(ins.toBytes()) + "~");
+                /*
                 List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.START);
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);
                 
-                /*ArduinoStream strm = new ArduinoStream(0, actions);
+                ArduinoStream strm = new ArduinoStream(0, actions);
                 outToServer.writeBytes(new String(strm.toBytes()) + "~");
-                */
+                
                 /*
                 while(true) {
                 	if(currentID == nextExpectedID) {

@@ -98,7 +98,7 @@ public class PhysicalRobot extends RobotBase {
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
     	synchronized(commandqueue) {
-    		commandqueue.add(new Command(mapdirection, Arrays.asList(actions)));
+    		commandqueue.add(new Command(mapdirection, Arrays.asList(actions), false));
     	}
     	
     	if(autoupdate) {
@@ -128,7 +128,7 @@ public class PhysicalRobot extends RobotBase {
     @Override
 	protected void dispatchCalibration(RobotAction action) {
     	synchronized(commandqueue) {
-    		commandqueue.add(new Command(null, Arrays.asList(action)));
+    		commandqueue.add(new Command(null, Arrays.asList(action), false));
     	}
     	
         sendArduinoMessage(new ArduinoInstruction(action, false));
@@ -136,7 +136,9 @@ public class PhysicalRobot extends RobotBase {
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        // Crafts message
+    	synchronized(commandqueue) {
+    		commandqueue.add(new Command(null, actions, false));
+    	}
     	sendArduinoMessage(new ArduinoStream(actions));
     }
 
@@ -242,12 +244,14 @@ public class PhysicalRobot extends RobotBase {
     private class Command {
     	private final Direction mapdirection;
     	private final List<RobotAction> actions;
+    	private final boolean stream;
     	private int completedactions;
     	
-    	public Command(Direction mapdirection, List<RobotAction> actions) {
+    	public Command(Direction mapdirection, List<RobotAction> actions, boolean stream) {
     		this.mapdirection = mapdirection;
     		this.actions = actions;
     		this.completedactions = 0;
+    		this.stream = stream;
     	}
     	
     	public boolean isComplete() {
