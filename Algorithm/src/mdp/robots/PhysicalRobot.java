@@ -12,9 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.Semaphore;
+import java.util.function.Consumer;
 
 import mdp.models.Direction;
 import mdp.models.MapState;
@@ -22,8 +21,8 @@ import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 import mdp.tcp.ArduinoInstruction;
 import mdp.tcp.ArduinoUpdate;
-import mdp.tcp.StatusMessage;
-import java.util.Date;
+
+import java.util.Arrays;
 import mdp.tcp.ArduinoMessage;
 import mdp.tcp.ArduinoStream;
 
@@ -33,20 +32,21 @@ import mdp.tcp.ArduinoStream;
  */
 public class PhysicalRobot extends RobotBase {
 
-    private Queue<ArduinoUpdate> incomingArduinoQueue;
     private Queue<ArduinoMessage> outgoingArduinoQueue;
-    private Queue<StatusMessage> outgoingAndroidQueue;
     private Map<SensorConfiguration, Integer> readings = new HashMap<>();
-    private Queue<PhysicalRobot.NotifyTask> taskqueue;
-    private long timerDelay = (long) 10;
+    private Queue<Command> commandqueue;
+    private Semaphore outgoingSemaphore;
+    private volatile boolean initializing;
+    private boolean autoupdate;
     // Just to store robot supposed position
 
-    public PhysicalRobot(Dimension dimension, Direction orientation, Queue<ArduinoUpdate> incomingArduinoQueue, Queue<ArduinoMessage> outgoingArduinoQueue, Queue<StatusMessage> outgoingAndroidQueue) {
+    public PhysicalRobot(Dimension dimension, Direction orientation, List<Consumer<ArduinoUpdate>> arduinoUpdateListenerList, Queue<ArduinoMessage> outgoingArduinoQueue, Semaphore outgoingSemaphore) {
         super(dimension, orientation);
-        this.taskqueue = new LinkedList<>();
-        this.incomingArduinoQueue = incomingArduinoQueue;
+        this.commandqueue = new LinkedList<>();
         this.outgoingArduinoQueue = outgoingArduinoQueue;
-        this.outgoingAndroidQueue = outgoingAndroidQueue;
+        this.outgoingSemaphore = outgoingSemaphore;
+        
+        arduinoUpdateListenerList.add(this::handleArduinoUpdate);
     }
 
     @Override
@@ -63,66 +63,40 @@ public class PhysicalRobot extends RobotBase {
     public void init(MapState mstate) {
     	super.init(mstate);
     	
+    	// Set initialized to false
+    	initializing = true;
+    	
         // Tells TCP to send START command
-        ArduinoInstruction initMessage = new ArduinoInstruction(RobotAction.START, false);
-
-        outgoingArduinoQueue.add(initMessage);
-
-        //Waits for TCP's reply   
-        while (true) {
-            //System.out.println("size from physical robot=" + incomingArduinoQueue.size());
-            if (!incomingArduinoQueue.isEmpty()) {
-                ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.remove();
-                setArduinoSensorReadings(incomingArduinoUpdate);
-
-                break;
-            }
-            
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        /*System.out.println(incomingArduinoUpdate.getFront1());
-            System.out.println(incomingArduinoUpdate.getFront2());
-            System.out.println(incomingArduinoUpdate.getFront3());
-            System.out.println(incomingArduinoUpdate.getRight1());
-            System.out.println(incomingArduinoUpdate.getRight2());
-            System.out.println(incomingArduinoUpdate.getLeft1());*/
+        sendArduinoMessage(new ArduinoInstruction(RobotAction.START, false));
+        
+        // Block until initialization completes
+        while(initializing);
+    }
+    
+    /**
+     * Sets auto update flag
+     * @param autoupdate
+     */
+    public void setAutoUpdate(boolean autoupdate) {
+    	this.autoupdate = autoupdate;
+    }
+    
+    /**
+     * Checks if this physical robot is auto updating
+     * @return
+     */
+    public boolean isAutoUpdate() {
+    	return autoupdate;
     }
 
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
-        for (RobotAction action : actions) {
-            // How do I know from here whether I have obstacleInFront or not.. I'm putting this as false from here
-            // 1) The MapState containing the scanned obstacles is inside ExplorationBase.java
-            System.out.println("==========================");
-            System.out.println(action + "- Before sending message");
-            Date date = new Date();
-            System.out.println("Put-into-queue:" + date.toString());
-            ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
-            outgoingArduinoQueue.add(arduinoInstruction);
-
-            while (true) {
-                if (!incomingArduinoQueue.isEmpty()) {
-                    ArduinoUpdate incomingArduinoUpdate = incomingArduinoQueue.remove();
-                    setArduinoSensorReadings(incomingArduinoUpdate);
-                    date = new Date();
-                    System.out.println("Take-from-queue:" + date.toString());
-
-                    System.out.println(action + "- Action received");
-                    break;
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(PhysicalRobot.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-        }
+    	synchronized(commandqueue) {
+    		commandqueue.add(new Command(mapdirection, Arrays.asList(actions)));
+    	}
+    	
+        for (RobotAction action : actions)
+        	sendArduinoMessage(new ArduinoInstruction(action, false));
 
         // Update supposed robot location
         MapState mstate = this.getMapState();
@@ -136,50 +110,27 @@ public class PhysicalRobot extends RobotBase {
         } else if (mapdirection == Direction.RIGHT) {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
-        
-        NotifyTask task = new NotifyTask(mapdirection, actions);
-        taskqueue.offer(task);
-        if (taskqueue.size() == 1) {
-            this.getScheduler().schedule(task, timerDelay);
-        }
     }
     
     @Override
 	protected void dispatchCalibration(RobotAction action) {
-		ArduinoInstruction arduinoInstruction = new ArduinoInstruction(action, false);
-		outgoingArduinoQueue.add(arduinoInstruction);
+            sendArduinoMessage(new ArduinoInstruction(action, false));
 	}
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        int orientationIndex = 0;
-
         // Crafts message
-        ArduinoStream streamMessage = new ArduinoStream(actions);
-        outgoingArduinoQueue.add(streamMessage);
-
-        for (int i = 0; i < actions.size(); i++) {
-            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
-                NotifyTask task = new NotifyTask(null, new RobotAction[]{actions.get(i)});
-                taskqueue.offer(task);
-                if (taskqueue.size() == 1) {
-                    this.getScheduler().schedule(task, timerDelay);
-                }
-            } else {
-                NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[]{actions.get(i)});
-                taskqueue.offer(task);
-                if (taskqueue.size() == 1) {
-                    this.getScheduler().schedule(task, timerDelay);
-                }
-            }
-        }
+    	sendArduinoMessage(new ArduinoStream(actions));
     }
 
     public void stop() {
-        //send stop message
-        ArduinoInstruction arduinoInstruction = new ArduinoInstruction(RobotAction.STOP, false);
-        outgoingArduinoQueue.add(arduinoInstruction);
-
+        // Send stop message
+    	sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, false));
+    }
+    
+    private synchronized void sendArduinoMessage(ArduinoMessage message) {
+    	outgoingArduinoQueue.offer(message);
+    	outgoingSemaphore.release();
     }
 
     private void setArduinoSensorReadings(ArduinoUpdate arduinoUpdate) {
@@ -227,32 +178,47 @@ public class PhysicalRobot extends RobotBase {
         }
     }
 
-    /**
-     * NotifyTask is a TimerTask that notifies registered RobotActionListener on
-     * a specific robot action sequence completion
-     *
-     * @author Ying Hao
-     */
-    private class NotifyTask extends TimerTask {
-
-        private Direction mapdirection;
-        private RobotAction[] actions;
-
-        public NotifyTask(Direction mapdirection, RobotAction[] actions) {
-            this.mapdirection = mapdirection;
-            this.actions = actions;
-        }
-
-        @Override
-        public void run() {
-            PhysicalRobot.this.notify(mapdirection, actions);
-            PhysicalRobot.this.taskqueue.poll();
-
-            if (PhysicalRobot.this.taskqueue.size() > 0) {
-                PhysicalRobot.this.getScheduler().schedule(PhysicalRobot.this.taskqueue.peek(), timerDelay);
-            }
-        }
-
+    private void handleArduinoUpdate(ArduinoUpdate update) {
+        System.out.println("front1:" + (int)update.getFront1());
+        System.out.println("front2:" + (int)update.getFront2());
+        System.out.println("front3:" + (int)update.getFront3());
+        System.out.println("left1:" + (int)update.getLeft1());
+        System.out.println("right1:" + (int)update.getRight1());
+        System.out.println("right2:" + (int)update.getRight2());
+        
+    	setArduinoSensorReadings(update);
+    	
+    	if(initializing) {
+    		initializing = false;
+    	}
+    	else {
+    		Command command = commandqueue.peek();
+    		command.completedactions++;
+    		
+    		if(command.isComplete()) {
+    			synchronized(commandqueue) {
+    				commandqueue.poll();
+    			}
+    			
+    			this.notify(command.mapdirection, command.actions.toArray(new RobotAction[0]));
+    		}
+    	}
+    }
+    
+    private class Command {
+    	private final Direction mapdirection;
+    	private final List<RobotAction> actions;
+    	private int completedactions;
+    	
+    	public Command(Direction mapdirection, List<RobotAction> actions) {
+    		this.mapdirection = mapdirection;
+    		this.actions = actions;
+    		this.completedactions = 0;
+    	}
+    	
+    	public boolean isComplete() {
+    		return this.completedactions == actions.size();
+    	}
     }
 
 }

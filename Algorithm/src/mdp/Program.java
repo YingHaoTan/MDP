@@ -24,8 +24,8 @@ import mdp.models.SensorConfiguration;
 import mdp.robots.CalibrationSpecificationBuilder;
 import mdp.robots.PhysicalRobot;
 import mdp.robots.SimulatorRobot;
+import mdp.tcp.AndroidUpdate;
 import mdp.tcp.ArduinoMessage;
-import mdp.tcp.ArduinoUpdate;
 import mdp.tcp.MDPTCPConnector;
 import mdp.tcp.StatusMessage;
 
@@ -37,61 +37,20 @@ public class Program {
                 break;
             }
         }
+        
+        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
+        Queue<AndroidUpdate> outgoingAndroidQueue = new LinkedList<>();
+        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
+        mdpTCPConnector.startThreads();
 
         Dimension rdim = new Dimension(3, 3);
         
         MdpWindow window = new MdpWindow("Mdp Algorithm Simulator", new Dimension(15, 20), new Dimension(3, 3));
         MdpWindowController wcontroller = new MdpWindowController(window);
-        XController xcontroller = new XController(window.getMap().getMapState());
+        XController xcontroller = new XController(window.getMap().getMapState(), mdpTCPConnector.getAndroidInstructionListenerList(), outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
         MapFileHandler filehandler = new MapFileHandler();
         ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
-        
-        // SimulatorRobot
-        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
-        srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
-        srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
-        srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        srobot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));      
-        
-        // PhysicalRobot
-        Queue<ArduinoUpdate> incomingArduinoQueue = new LinkedList<>();
-        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
-        Queue<StatusMessage> outgoingAndroidQueue = new LinkedList<>();
-        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
-        probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
-        probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
-        probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
-        probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
-        probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
-        probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
-        
-        /*
-        probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
-        		.add(Direction.RIGHT)
-        		.setCalibrationType(RobotAction.CAL_SIDE)
-        		.build());
-        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
-        		.add(Direction.RIGHT)
-        		.setCalibrationType(RobotAction.CAL_SIDE)
-        		.build());*/
-        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
-        		.add(Direction.RIGHT)
-        		.add(Direction.UP)
-        		.setCalibrationType(RobotAction.CAL_CORNER)
-        		.build());
-        probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
-        		.add(Direction.RIGHT)
-        		.add(Direction.UP)
-        		.setCalibrationType(RobotAction.CAL_CORNER)
-        		.build());
-        
-        wcontroller.setSimulatorRobot(srobot);
-        xcontroller.setSimulatorRobot(srobot);
-        wcontroller.setPhysicalRobot(probot);
-        xcontroller.setPhysicalRobot(probot);
         
         wcontroller.setMapLoader(filehandler);
         wcontroller.setMapSaver(filehandler);
@@ -104,10 +63,42 @@ public class Program {
         xcontroller.setFastestPathPlanner(fastestpath);
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
-              
         
-        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(incomingArduinoQueue, outgoingArduinoQueue, outgoingAndroidQueue);
-        mdpTCPConnector.startThreads();
+        // SimulatorRobot
+        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
+        srobot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
+        srobot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
+        srobot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
+        srobot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
+        srobot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));      
+        
+        srobot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.add(Direction.UP)
+        		.setCalibrationType(RobotAction.CAL_CORNER)
+        		.build());
+        
+        wcontroller.setSimulatorRobot(srobot);
+        xcontroller.setSimulatorRobot(srobot);
+        
+        // PhysicalRobot
+        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, mdpTCPConnector.getOutgoingSemaphore());
+        probot.install(new SensorConfiguration(Direction.UP, -1, 2, 0.75));
+        probot.install(new SensorConfiguration(Direction.UP, 0, 2, 0.75));
+        probot.install(new SensorConfiguration(Direction.UP, 1, 2, 0.75));
+        probot.install(new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5));
+        probot.install(new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5));
+        probot.install(new SensorConfiguration(Direction.LEFT, 0, 4, 0.5));
+        
+        probot.addCalibrationSpecification(new CalibrationSpecificationBuilder()
+        		.add(Direction.RIGHT)
+        		.add(Direction.UP)
+        		.setCalibrationType(RobotAction.CAL_CORNER)
+        		.build());
+        
+        wcontroller.setPhysicalRobot(probot);
+        xcontroller.setPhysicalRobot(probot);
     }
 
 }

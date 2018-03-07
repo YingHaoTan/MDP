@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import javax.swing.SwingUtilities;
+
 import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.MapState;
@@ -184,7 +186,7 @@ public abstract class RobotBase {
      * Sets the current orientation of this robot instance
      *
      */
-    private void setCurrentOrientation(Direction direction) {
+    public void setCurrentOrientation(Direction direction) {
         this.orientation = direction;
     }
 
@@ -447,7 +449,7 @@ public abstract class RobotBase {
      */
     protected void notify(Direction mapdirection, RobotAction[] actions) {
         for (RobotActionListener listener : new ArrayList<>(listeners))
-            listener.onRobotActionCompleted(mapdirection, actions);
+            SwingUtilities.invokeLater(() -> listener.onRobotActionCompleted(mapdirection, actions));
     }
 
     /**
