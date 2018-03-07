@@ -232,11 +232,11 @@ public class RobotTranslator {
 	private Direction getDirFromString(String orientation){
 		Direction dir = Direction.UP;
 
-		if (orientation.equals(CommConstants.COMMON_UP)){
+		if (orientation.equals(CommConstants.COMMON_DOWN)){
 			dir = Direction.DOWN;
-		}else if(orientation.equals(CommConstants.COMMON_UP)){
+		}else if(orientation.equals(CommConstants.COMMON_LEFT)){
 			dir = Direction.LEFT;
-		}else if(orientation.equals(CommConstants.COMMON_UP)){
+		}else if(orientation.equals(CommConstants.COMMON_RIGHT)){
 			dir = Direction.RIGHT;
 		}
 
