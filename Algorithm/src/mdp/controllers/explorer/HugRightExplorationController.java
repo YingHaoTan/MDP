@@ -248,7 +248,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         if (currentState == States.BOUNDARY) {
-            /*
+            
             lastEightActions.add(actions[0]);
             if(lastEightActions.size()>8){
                 lastEightActions.pop();
@@ -275,7 +275,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     actionPriority[1] = RobotAction.TURN_RIGHT;
                  }
             }
-            */
+            
             
             if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 20) {
                 currentState = States.EXPLORATION;
@@ -300,18 +300,14 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                         return;
                     }
-                    /*else{
-                        if(action == RobotAction.FORWARD){
+                    else{
+                        if(i == 0 && action == RobotAction.FORWARD){
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;
                             i = -1;
                         }
-                        if(action == RobotAction.TURN_RIGHT){
-                            actionPriority[0] = RobotAction.FORWARD;
-                            actionPriority[1] = RobotAction.TURN_RIGHT;
-                            i = -1;
-                        }
-                    }*/
+                        
+                    }
                 }
                 currentState = States.ABOUT_TURN;
             }

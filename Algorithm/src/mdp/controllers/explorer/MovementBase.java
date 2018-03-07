@@ -283,7 +283,7 @@ public abstract class MovementBase {
     // Checks obstaclesCounter and noObstaclesCounter, to determine it's an obstacle or not
     private boolean isThereAnObstacle(Point point) {
         if(point.x >= 0 && point.x < obstaclesCounter.length && point.y >= 0 && point.y < obstaclesCounter[0].length){
-            if(obstaclesCounter[point.x][point.y] >= noObstaclesCounter[point.x][point.y])
+            if(obstaclesCounter[point.x][point.y] > noObstaclesCounter[point.x][point.y])
                 return true;
             else{
                 return false;
