@@ -31,12 +31,16 @@ void setup() {
 
   delay(2000);
   //Serial.println("Initializations Done");
-  //goFORWARD(15);
+  //goFORWARD(10);
 }
 
 void loop() {
-  //stringCommands();
-  commWithRPI();
+  stringCommands();
+  //commWithRPI();
+
+  //scanRIGHT(&irRightReadings[0]);
+  //Serial << abs(irRightReadings[0] - irRightReadings[1]) << endl;
+  //delay(1000);
 }
 
 //------------Functions for robot movements------------//
@@ -44,22 +48,32 @@ void goFORWARD(int noBlock) {
   int setBlocks = blockToTicks(noBlock);
   int setSpdR = 300;              //Right motor
   int setSpdL = 306;              //Left motor
-  long lastTime = millis();
+  long lastTime = micros();
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
   lastTicks[0] = 0;
   lastTicks[1] = 0;
-  for (int i = 100; i < 301 ; i++){
-    md.setSpeeds(i, i+10);
+  int i = 100;
+  //for (int i = 100; i < 301 ; i++){
+  while(i < 301){
+    if(micros() - lastTime > 50){
+      md.setSpeeds(i, i+10);
+      i++;
+      lastTime = micros();
+    }
   }
+
+  lastTime = millis();
+
+  //}
   // md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
   while (mCounter[0] < setBlocks && mCounter[1] < setBlocks) {
     if (millis() - lastTime > 100) {
-      //PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0);
-      PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0);
+      PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0); //Long distance
+      //PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
       lastTime = millis();
       md.setSpeeds(setSpdR, setSpdL);
     }
@@ -431,10 +445,10 @@ void commWithRPI() {
 
                 case CAL_SIDE:
                   scanRIGHT(&irRightReadings[0]);
-                  if(calCounter == 6 || (irRightReadings[0]!=irRightReadings[1])){
+                  //if(calCounter == 6 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <10) ){
                     calibrateRIGHT();
                     calCounter = 0;
-                  }
+                  //}
                   delay(500);
                   sendStatusUpdate();
                   incrementID();
@@ -498,15 +512,18 @@ void commWithRPI() {
 }
 
 void stringCommands() {
+  static int calCounter = 0;
   //int commands[] = {2, 1, 3, 1, 0};
   //int commands[] = {1, 2, 3, 2, 3, 1, 2, 3, 2, 3, 1, 0};
-  int commands[] = {1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 0};
+  //int commands[] = {1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 0};
   //int commands[] = {1, 1, 1, 1, 6, 2, 1, 4, 1, 2, 1, 4, 1, 1, 1, 3, 1, 1, 1, 1, 0};
+  int commands[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 0};
   static int x;
   switch (commands[x]){
     case 1: 
             Serial.println("Moving forward");
             goFORWARD(1);
+            calCounter++;
             break;
 
     case 2:
@@ -520,9 +537,12 @@ void stringCommands() {
             break;
 
     case 4:
+            if(calCounter == 4){
             Serial.println("Calibrating");
             scanRIGHT(&irRightReadings[0]);
+            calCounter = 0;
             calibrateRIGHT();
+            }
             break;
 
     case 5:
@@ -556,7 +576,7 @@ void stringCommands() {
             break;
   }
 
-  delay(1000);
+  delay(500);
   
   if(x <= sizeof(commands)/sizeof(int)){
     x++;
