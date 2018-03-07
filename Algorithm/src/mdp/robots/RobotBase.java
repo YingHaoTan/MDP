@@ -325,7 +325,6 @@ public abstract class RobotBase {
         }
         
         moveRobotStream(actionsequence, orientations);
-
     }
 
     public void move(RobotAction action) {
@@ -408,7 +407,7 @@ public abstract class RobotBase {
      * @param mapdirection
      * @param actions
      */
-    protected void notify(Direction mapdirection, RobotAction[] actions) {
+    protected void notify(Direction mapdirection, RobotAction... actions) {
         for (RobotActionListener listener : new ArrayList<>(listeners))
             SwingUtilities.invokeLater(() -> listener.onRobotActionCompleted(mapdirection, actions));
     }
