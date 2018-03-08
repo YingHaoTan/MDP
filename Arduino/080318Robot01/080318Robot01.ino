@@ -182,7 +182,10 @@ void calibrateRIGHT() {
   int turnTicks = 0;
   while (irRightReadings[0] != irRightReadings[1]) {
     resetMCounters();
-    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 10;
+    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 15;
+    if(abs((irRightReadings[0] - irRightReadings[1]) == 1) && turnTicks != 0){
+      turnTicks -= 20;
+    }
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
