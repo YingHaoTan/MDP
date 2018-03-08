@@ -13,11 +13,11 @@
 #define brgtIrPin A4 //Back right IR
 
 //---------------------Definitions for IR Sensor---------------------//
-#define mfwdIrOS -4 //Middle forward IR
-#define lfwdIrOS -2 //Left forward IR
-#define rfwdIrOS -2 //Right forward IR
+#define mfwdIrOS -5 //Middle forward IR
+#define lfwdIrOS -3 //Left forward IR
+#define rfwdIrOS -3 //Right forward IR
 #define frgtIrOS -2 //Front right IR. The only long range IR.
-#define flftIrOS 1 //Front left IR
+#define flftIrOS 2 //Front left IR
 #define brgtIrOS -2 //Back right IR
 
 #define shrtmodel 1080
@@ -44,10 +44,13 @@ int irLeftReading = 0;
 //---------------------Instantiate IR and Motor objects from library---------------------//
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0375, 0.09123);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0345, 0.115);
-SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.035, 0.110);
+SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0340, 0.120);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.03912, 0.06806);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
 SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.076500);
+
+//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.035, 0.110);
+
 
 
 //SharpIR ir1(lfwdIr, shrtmodel, 0.0353, 0.0934);

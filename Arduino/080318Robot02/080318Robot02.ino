@@ -34,8 +34,9 @@ void setup() {
 }
 
 void loop() {
-  //stringCommands();
+//  stringCommands();
   commWithRPI();
+//delay(2000);
 }
 
 //------------Functions for robot movements------------//
@@ -182,12 +183,13 @@ void calibrateRIGHT() {
   int turnTicks = 0;
   while (irRightReadings[0] != irRightReadings[1]) {
     resetMCounters();
+    
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 8;
     
     if(abs((irRightReadings[0] - irRightReadings[1]) == 1) && abs(turnTicks) > 2){
       turnTicks -= 1;
     }
-    
+//    Serial.println(turnTicks);
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -208,9 +210,9 @@ void calibrateRIGHT() {
 void calibrateFRONT() {
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
-  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
+  while (irFrontReadings[2] != 9 && irFrontReadings[0] != 9) {
     resetMCounters();
-    turnTicks = (irFrontReadings[0] - 10) * 20;
+    turnTicks = (irFrontReadings[0] - 9) * 20;
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(200, 200);
@@ -233,18 +235,18 @@ void scanFORWARD(int *pData) {
   pData[0] = lfwdIrVal.distance(); //Left
   pData[1] = mfwdIrVal.distance(); // Middle
   pData[2] = rfwdIrVal.distance(); //Right
-  // Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << endl;
+   //Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << " \n" << endl;
 }
 
 void scanRIGHT(int *pData) {
   pData[0] = frgtIrVal.distance(); //Right Front
   pData[1] = brgtIrVal.distance(); //Right Back
-  // Serial << "RIGHT: ->^ Right(Short): " << pData[0] << " ->v Right(Long): " << pData[1] << endl;
+   //Serial << "RIGHT: -> Right(Short): " << pData[0] << " -> Right(Long): " << pData[1] << " \n" << endl;
 }
 
 void scanLEFT() {
   irLeftReading = flftIrVal.distance();
-  // Serial << "LEFT: <-^ Left(Long): " << irLeftReading << endl;
+   //Serial << "LEFT: <- Left(Long): " << irLeftReading << " \n" << endl;
 }
 
 void toBlocks(){
@@ -418,20 +420,17 @@ void commWithRPI() {
                   break;
 
                 case CAL_SIDE:
-                  scanRIGHT(&irRightReadings[0]);
+//                  scanRIGHT(&irRightReadings[0]);
                   if(calCounter >= 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <7))){
                     calibrateRIGHT();
                     calCounter = 0;
                   }
-//                  if(irRightReading[0] != 9 || ir Right Reading[1] != 10){
-//                    goRIGHT(90);
-//                    delay(100);
-//                    calibrateFRONT();
-//                    delay(100);
-//                    goLEFT(90);
-//                    delay(100);
-//                    calibrateRIGHT();
-//                  }
+                  
+                  if (irRightReadings[0] <= 7 || irRightReadings[0] >= 11  ){
+                    goRIGHT(90);
+                    calibrateFRONT();
+                    goLEFT(90);
+                  }
                   delay(150);
                   sendStatusUpdate();
                   incrementID();
@@ -501,7 +500,11 @@ void stringCommands() {
   //int commands[] = {1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 0};
   //int commands[] = {1, 1, 1, 1, 6, 2, 1, 4, 1, 2, 1, 4, 1, 1, 1, 3, 1, 1, 1, 1, 0};
   //int commands[] = {6,2,1,1,1,0};
-  int commands[] = {1,1,1,1,2,1,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,3,1,2,1,1,2,1,1,1,1,2,1,2,1,1,1,3,1,1,1,1,3,1,1,1,2,0};
+//  int commands[] = {1,1,1,1,2,1,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,3,1,2,1,1,2,1,1,1,1,2,1,2,1,1,1,3,1,1,1,1,3,1,1,1,2,0};
+//  int commands[] = {1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,0};
+int commands[] = {5};
+  
+  int threshold = 35;
   static int x;
   switch (commands[x]){
     case 1: 
@@ -527,24 +530,39 @@ void stringCommands() {
             scanRIGHT(&irRightReadings[0]);
             if(calCounter >= 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <7))){
               calibrateRIGHT();
-//              goRIGHT(90);
-//              calibrateFRONT();
-//              goLEFT(90);
               calCounter = 0;
+            }
+            
+            if (irRightReadings[0] <= 7 || irRightReadings[0] >= 11  ){
+              goRIGHT(90);
+              calibrateFRONT();
+              goLEFT(90);
             }
             break;
 
     case 5:
             Serial.println("Doing Full Scan");
+            
             scanFORWARD(&irFrontReadings[0]);
             scanLEFT();
             scanRIGHT(&irRightReadings[0]);
-            Serial << "Left Forward IR: " << shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10) << " blocks away " <<endl;
-            Serial << "Mid Forward IR: " << shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10) << " blocks away " <<endl;
-           Serial << "Right Forward IR: " << shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10) <<" blocks away \n" <<endl;
-           Serial << "Front Right IR: " << shortIrVal((irRightReadings[0] - frgtIrOS) / 10) <<" blocks away " <<endl;
-           Serial << "Back Right IR: " << shortIrVal((irRightReadings[1] - brgtIrOS) / 10) <<" blocks away \n" <<endl;
-           Serial << "Left Long IR: " << longIrVal((irLeftReading - flftIrOS) / 10)<<" blocks away " <<endl;
+            
+            if (irFrontReadings[0] - lfwdIrOS > threshold)
+              Serial << 0 << " blocks away \n" << endl;
+            else
+              Serial << "Left Forward IR: " << shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10) << " blocks away " << endl;
+            
+            if (irFrontReadings[1] - mfwdIrOS > threshold)
+              Serial << 0 << " blocks away \n" << endl;
+            else
+              Serial << "Mid Forward IR: " << shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10) << " blocks away " << endl;
+            if (irFrontReadings[2] - rfwdIrOS > threshold)
+              Serial << 0 << " blocks away \n" << endl;
+            else
+            Serial << "Right Forward IR: " << shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10) << " blocks away \n" << endl;
+            Serial << "Front Right IR: " << shortIrVal((irRightReadings[0] - frgtIrOS) / 10) << " blocks away " << endl;
+            Serial << "Back Right IR: " << shortIrVal((irRightReadings[1] - brgtIrOS) / 10) << " blocks away \n" << endl;
+            Serial << "Left Long IR: " << longIrVal((irLeftReading - flftIrOS) / 10) << " blocks away " << endl;
             break;
             
     case 6:
@@ -624,21 +642,37 @@ void resendStatusUpdate() {
 }
 
 void sendStatusUpdate() {
+  int threshold = 35 ;
   scanFORWARD(&irFrontReadings[0]);
   scanLEFT();
   scanRIGHT(&irRightReadings[0]);
-
+  
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10);
-  statusPayload.front2 = shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10);
-  statusPayload.front3 = shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10);
+//  statusPayload.front1 = shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10);
+//  statusPayload.front2 = shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10);
+//  statusPayload.front3 = shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10);
+ if (irFrontReadings[0] - lfwdIrOS > threshold)
+    statusPayload.front1 =  0;
+  else
+    statusPayload.front1 =  shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10);
+  
+  if (irFrontReadings[1] - mfwdIrOS > threshold)
+    statusPayload.front2 =  0;
+  else
+    statusPayload.front2 = shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10);
+  if (irFrontReadings[2] - rfwdIrOS > threshold)
+    statusPayload.front3 = 0;
+  else
+    statusPayload.front3 =  shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10);
   statusPayload.right1 = shortIrVal((irRightReadings[0] - frgtIrOS) / 10);
   statusPayload.right2 = shortIrVal((irRightReadings[1] - brgtIrOS) / 10);
   statusPayload.left1 = longIrVal((irLeftReading - flftIrOS) / 10);
   statusPayload.reached = 1;
 
+ 
+            
   //Serial << irFrontReadings[1] << " " << irFrontReadings[0] << " " << irFrontReadings[2] << " " << irRightReadings[0] << " " << irRightReadings[1] << " " << irLeftReading << endl;
   //Serial << statusPayload.front1 << " " << statusPayload.front2 << " " << statusPayload.front3 << " " << statusPayload.right1 << " " << statusPayload.right2 << " " << statusPayload.left1 << endl;
 

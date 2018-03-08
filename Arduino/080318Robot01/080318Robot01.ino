@@ -34,8 +34,10 @@ void setup() {
 }
 
 void loop() {
-//  stringCommands();
-  commWithRPI();
+  Serial.println("-------------------------------------------------------------------");
+  stringCommands();
+  delay(2000);
+//  commWithRPI();
 }
 
 //------------Functions for robot movements------------//
@@ -231,18 +233,18 @@ void scanFORWARD(int *pData) {
   pData[0] = lfwdIrVal.distance(); //Left
   pData[1] = mfwdIrVal.distance(); // Middle
   pData[2] = rfwdIrVal.distance(); //Right
-  // Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << endl;
+  Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << " \n" << endl;
 }
 
 void scanRIGHT(int *pData) {
   pData[0] = frgtIrVal.distance(); //Right Front
   pData[1] = brgtIrVal.distance(); //Right Back
-  // Serial << "RIGHT: ->^ Right(Short): " << pData[0] << " ->v Right(Long): " << pData[1] << endl;
+  Serial << "RIGHT: ->^ Right(Short): " << pData[0] << " -> Right(Long): " << pData[1] << " \n" <<endl;
 }
 
 void scanLEFT() {
   irLeftReading = flftIrVal.distance();
-  // Serial << "LEFT: <-^ Left(Long): " << irLeftReading << endl;
+  Serial << "LEFT: <- Left(Long): " << irLeftReading << " \n" << endl;
 }
 
 void toBlocks(){
@@ -498,7 +500,7 @@ void stringCommands() {
   //int commands[] = {1, 2, 3, 2, 3, 1, 2, 3, 2, 3, 1, 0};
   //int commands[] = {1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 0};
   //int commands[] = {1, 1, 1, 1, 6, 2, 1, 4, 1, 2, 1, 4, 1, 1, 1, 3, 1, 1, 1, 1, 0};
-  int commands[] = {6,0};
+  int commands[] = {5};
   static int x;
   switch (commands[x]){
     case 1: 
