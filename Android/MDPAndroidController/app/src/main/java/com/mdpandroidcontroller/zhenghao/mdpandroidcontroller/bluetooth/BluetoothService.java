@@ -11,8 +11,10 @@ import android.util.Log;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.Constants;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -471,6 +473,7 @@ public class BluetoothService {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private final BufferedReader mmBufferedReader;
 
         public ConnectedThread(BluetoothSocket socket) {
             Log.d(TAG, "create ConnectedThread");
@@ -488,22 +491,23 @@ public class BluetoothService {
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
+
+            mmBufferedReader = new BufferedReader(new InputStreamReader(mmInStream));
+
         }
 
         public void run() {
             Log.d(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
-            int bytes;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
+                    String readString = mmBufferedReader.readLine();
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
-                    Log.d(TAG, "ConnectedThread: read string - " + new String(buffer));
+                    mHandler.obtainMessage(Constants.MESSAGE_READ, -1, -1, readString).sendToTarget();
+                    Log.d(TAG, "ConnectedThread: read string - " + readString);
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();

@@ -27,6 +27,13 @@ public abstract class MovementBase {
     private List<Runnable> scanlisteners;
     
     
+    // need to worry about reset too
+    private int[][] obstaclesCounter;
+    private int[][] noObstaclesCounter;
+    
+    
+    
+    
     public MovementBase(){
         this.cslisteners = new ArrayList<>();
         this.scanlisteners = new ArrayList<>();
@@ -66,6 +73,7 @@ public abstract class MovementBase {
      * Scan area using sensors and updates cell states
      */
     protected void sensorsScan() {
+        
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = getRobot().getSensors();
 
@@ -87,28 +95,58 @@ public abstract class MovementBase {
                 // Should also check for out-of-bounds (more applicable in physical robot)
                 switch (sDirection) {
                     case UP:
+                        incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + reading));
+                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y + reading), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y + reading)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        for (int range = 1; range < reading; range++) {
+                            incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + range));
+                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y + range)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        }
+                        /*
                         this.setCellState(new Point(sCoordinate.x, sCoordinate.y + reading), CellState.OBSTACLE, null);
                         for (int range = 1; range < reading; range++) {
                             this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
+                        }*/
                         break;
                     case DOWN:
+                        incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - reading));
+                        this.setCellState(new Point(sCoordinate.x, sCoordinate.y - reading), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y - reading)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        for (int range = 1; range < reading; range++) {
+                            incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - range));
+                            this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y - range)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        }
+                        
+                        /*
                         this.setCellState(new Point(sCoordinate.x, sCoordinate.y - reading), CellState.OBSTACLE, null);
                         for (int range = 1; range < reading; range++) {
                             this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
-                        }
+                        }*/
                         break;
                     case LEFT:
+                        incrementObstacleCounter(new Point(sCoordinate.x - reading, sCoordinate.y));
+                        this.setCellState(new Point(sCoordinate.x - reading, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x - reading, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        for (int range = 1; range < reading; range++) {
+                            incrementNoObstacleCounter(new Point(sCoordinate.x - range, sCoordinate.y));
+                            this.setCellState(new Point(sCoordinate.x  - range, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x  - range, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        }
+                        /*
                         this.setCellState(new Point(sCoordinate.x - reading, sCoordinate.y), CellState.OBSTACLE, null);
                         for (int range = 1; range < reading; range++) {
                             this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
-                        }
+                        }*/
                         break;
                     case RIGHT:
+                        incrementObstacleCounter(new Point(sCoordinate.x + reading, sCoordinate.y));
+                        this.setCellState(new Point(sCoordinate.x + reading, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x + reading, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        for (int range = 1; range < reading; range++) {
+                            incrementNoObstacleCounter(new Point(sCoordinate.x + range, sCoordinate.y));
+                            this.setCellState(new Point(sCoordinate.x  + range, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x  + range, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                        }
+                        
+                        /*
                         this.setCellState(new Point(sCoordinate.x + reading, sCoordinate.y), CellState.OBSTACLE, null);
                         for (int range = 1; range < reading; range++) {
                             this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
-                        }
+                        }*/
                         break;
                 }
             } else {
@@ -121,28 +159,63 @@ public abstract class MovementBase {
                 
                 switch (sDirection) {
                     case UP:
+                        
+                        for (int range = 1; range <= maxRange; range++) {
+                            if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y + range)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + range));
+                                this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y + range)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                            }
+                            
+                            
+                        }
+                        
+                        /*
                         for (int range = 1; range <= maxRange; range++) {
                         	if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y + range)) != CellState.WAYPOINT)
-                            	this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
-                        }
+                                    this.setCellState(new Point(sCoordinate.x, sCoordinate.y + range), CellState.NORMAL, null);
+                        }*/
                         break;
                     case DOWN:
                         for (int range = 1; range <= maxRange; range++) {
-                        	if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y - range)) != CellState.WAYPOINT)
-                            	this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
+                            if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y - range)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - range));
+                                this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), (isThereAnObstacle(new Point(sCoordinate.x, sCoordinate.y - range)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                            }    
                         }
+                        
+                        /*
+                        for (int range = 1; range <= maxRange; range++) {
+                        	if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y - range)) != CellState.WAYPOINT)
+                                    this.setCellState(new Point(sCoordinate.x, sCoordinate.y - range), CellState.NORMAL, null);
+                        }*/
                         break;
                     case LEFT:
                         for (int range = 1; range <= maxRange; range++) {
-                        	if(mstate.getMapCellState(new Point(sCoordinate.x - range, sCoordinate.y)) != CellState.WAYPOINT)
-                            	this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
+                            if(mstate.getMapCellState(new Point(sCoordinate.x - range, sCoordinate.y)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x - range, sCoordinate.y));
+                                this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x - range, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                            }    
                         }
+                        
+                        /*
+                        for (int range = 1; range <= maxRange; range++) {
+                        	if(mstate.getMapCellState(new Point(sCoordinate.x - range, sCoordinate.y)) != CellState.WAYPOINT)
+                                    this.setCellState(new Point(sCoordinate.x - range, sCoordinate.y), CellState.NORMAL, null);
+                        }*/
                         break;
                     case RIGHT:
                         for (int range = 1; range <= maxRange; range++) {
-                        	if(mstate.getMapCellState(new Point(sCoordinate.x + range, sCoordinate.y)) != CellState.WAYPOINT)
-                            	this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
+                            if(mstate.getMapCellState(new Point(sCoordinate.x + range, sCoordinate.y)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x + range, sCoordinate.y));
+                                this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), (isThereAnObstacle(new Point(sCoordinate.x + range, sCoordinate.y)) ? CellState.OBSTACLE : CellState.NORMAL), null);
+                            }    
                         }
+                        
+                        /*
+                        for (int range = 1; range <= maxRange; range++) {
+                        	if(mstate.getMapCellState(new Point(sCoordinate.x + range, sCoordinate.y)) != CellState.WAYPOINT)
+                                    this.setCellState(new Point(sCoordinate.x + range, sCoordinate.y), CellState.NORMAL, null);
+                        }*/
                         break;
                 }
             }
@@ -178,6 +251,8 @@ public abstract class MovementBase {
 
     protected void setMapState(MapState mstate){
         this.mstate = mstate;
+        this.noObstaclesCounter = new int[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height];
+        this.obstaclesCounter = new int[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height]; 
     }
     
     /**
@@ -202,5 +277,31 @@ public abstract class MovementBase {
      */
     protected RobotBase getRobot() {
         return robot;
+    }
+
+    
+    // Checks obstaclesCounter and noObstaclesCounter, to determine it's an obstacle or not
+    private boolean isThereAnObstacle(Point point) {
+        if(point.x >= 0 && point.x < obstaclesCounter.length && point.y >= 0 && point.y < obstaclesCounter[0].length){
+            if(obstaclesCounter[point.x][point.y] > noObstaclesCounter[point.x][point.y])
+                return true;
+            else{
+                return false;
+            }
+        }
+        // If out of bounds, return true
+        return true;
+    }
+    
+    
+    private void incrementObstacleCounter(Point point){
+        if(point.x >= 0 && point.x < obstaclesCounter.length && point.y >= 0 && point.y < obstaclesCounter[0].length)
+            this.obstaclesCounter[point.x][point.y]++;
+    }
+    
+    private void incrementNoObstacleCounter(Point point){
+        if(point.x >= 0 && point.x < obstaclesCounter.length && point.y >= 0 && point.y < obstaclesCounter[0].length)
+            this.noObstaclesCounter[point.x][point.y]++;
+    
     }
 }

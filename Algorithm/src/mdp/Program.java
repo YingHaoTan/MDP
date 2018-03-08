@@ -61,15 +61,15 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
         
-        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 2, 0.75);
-        SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 2, 0.75);
-        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 2, 0.75);
-        SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 2, 0.5);
-        SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 2, 0.5);
-        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 0, 4, 0.5);
+        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 2, 0.8);
+        SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 2, 0.8);
+        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 2, 0.8);
+        SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 2, 0.8);
+        SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 2, 0.8);
+        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 0, 4, 0.8);
         
         // SimulatorRobot
-        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
+        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.UP);
         srobot.install(front1);
         srobot.install(front2);
         srobot.install(front3);

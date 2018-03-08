@@ -54,8 +54,9 @@ public class ControlMessageHandler extends Handler {
                 mParentActivity.onMessageDeviceName(msg);
                 break;
             case Constants.MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
-                String readMessage = new String(readBuf, 0, msg.arg1);
+                //byte[] readBuf = (byte[]) msg.obj;
+                //String readMessage = new String(readBuf, 0, msg.arg1);
+                String readMessage = (String) msg.obj;
                 Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
 
                 mParentActivity.onMessageRead(msg);

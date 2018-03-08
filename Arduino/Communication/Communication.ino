@@ -55,51 +55,52 @@ void loop() {
                 switch (instructMsg.action) {
                   case TURN_LEFT:
                     //turnLeft();
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case TURN_RIGHT:
                     //turnRight();
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case FORWARD:
                     //moveForward();
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case SCAN:
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case START:
-                    delay(500);
-                    digitalWrite(LED_BUILTIN, HIGH);
+                    //delay(500);
+                    
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case STOP:
                     //Serial.flush();
-                    delay(500);
+                    //delay(500);
                     yetToReceiveAck = false;
+                    alreadyReceived = false;
                     break;
                   case CAL_CORNER:
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
                     break;
                   case CAL_SIDE:
-                    delay(500);
+                    //delay(500);
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
@@ -126,7 +127,7 @@ void loop() {
             RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
           }
           memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
-
+          digitalWrite(LED_BUILTIN, HIGH);
           // you have all your actions inside streamMsg.streamActions;
 
           RingBuffer_erase(&usbBufferIn, 5 + payloadSize);
