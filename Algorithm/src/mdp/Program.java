@@ -2,8 +2,8 @@ package mdp;
 
 import java.awt.Dimension;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,8 +83,8 @@ public class Program {
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
         
-        Queue<ArduinoMessage> outgoingArduinoQueue = new LinkedList<>();
-        Queue<AndroidUpdate> outgoingAndroidQueue = new LinkedList<>();
+        Queue<ArduinoMessage> outgoingArduinoQueue = new ConcurrentLinkedQueue<>();
+        Queue<AndroidUpdate> outgoingAndroidQueue = new ConcurrentLinkedQueue<>();
         try {
 	        MDPTCPConnector mdpTCPConnector = new MDPTCPConnector(outgoingArduinoQueue, outgoingAndroidQueue);
 	        mdpTCPConnector.startThreads();
