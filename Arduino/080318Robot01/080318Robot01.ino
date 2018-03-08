@@ -31,16 +31,11 @@ void setup() {
 
   delay(2000);
   //Serial.println("Initializations Done");
-  //goFORWARD(10);
 }
 
 void loop() {
 //  stringCommands();
   commWithRPI();
-
-  //scanRIGHT(&irRightReadings[0]);
-  //Serial << abs(irRightReadings[0] - irRightReadings[1]) << endl;
-  //delay(1000);
 }
 
 //------------Functions for robot movements------------//
@@ -79,7 +74,6 @@ void goFORWARD(int noBlock) {
   }
 
   md.setBrakes(400, 400);
-//  resetMCounters();
 }
 
 void goRIGHT(int angle) {
@@ -148,11 +142,6 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
       *setSpdR += -adjustment * dr;
       *setSpdL -= adjustment * dr;
     }
-
-//    else if( dr == -1){
-//      *setSpdR += adjustment;
-//      *setSpdL -= -adjustment;
-//    }
     else{
       *setSpdR += adjustment;
       *setSpdL -= adjustment;
@@ -187,116 +176,54 @@ int blockToTicks(int blocks){
   return (1183-98) * blocks;
 }
 
+//JM - Attempt 1 at making code cleaner
 void calibrateRIGHT() {
-  int calibrateF = 1;
-  while (calibrateF == 1) {
+  scanRIGHT(&irRightReadings[0]);
+  int turnTicks = 0;
+  while (irRightReadings[0] != irRightReadings[1]) {
+    resetMCounters();
+    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 15;
+    if(abs((irRightReadings[0] - irRightReadings[1]) == 1) && turnTicks != 0){
+      turnTicks -= 20;
+    }
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-150, 150);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(150, -150);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(500);
     scanRIGHT(&irRightReadings[0]);
-    int turnTicks = 0;
-    resetMCounters();
-    // Serial << "IR Front: " << irRightReadings[0] << " IR Back: " << irRightReadings[1] << endl;
-//    if ((abs(irRightReadings[0] - irRightReadings[1]) > 0)) {
-    if (irRightReadings[0] != irRightReadings[1]) {
-      //Serial.println("Calibrating Right");
-      turnTicks = (irRightReadings[0] - irRightReadings[1]) * 15;
-      if (turnTicks > 0) {
-        //Serial << "Moving right abit of ticks: " << turnTicks << endl;
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-          md.setSpeeds(-150, 150);
-        }
-      }
-      else {
-        //Serial << "Moving left abit of ticks: " << turnTicks << endl;
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-          md.setSpeeds(150, -150);
-        }
-      }
-      md.setBrakes(400, 400);
-      delay(100);
-    }
-    else {
-      //Serial.println("Right Calibration complete");
-      calibrateF = 0;
-    }
   }
 }
 
 //JM - Attempt 1 at making code cleaner
-//void calibrateRIGHT() {
-//  scanRIGHT(&irRightReadings[0]);
-//  int turnTicks = 0;
-//  while (irRightReadings[0] != irRightReadings[1]) {
-//    resetMCounters();
-//    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 15;
-//    if (turnTicks > 0) {
-//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-//        md.setSpeeds(-150, 150);
-//      }
-//    }
-//    else {
-//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-//        md.setSpeeds(150, -150);
-//      }
-//    }
-//    md.setBrakes(400, 400);
-//    delay(100);
-//    scanRIGHT(&irRightReadings[0]);
-//  }
-//}
-
-//This part need to Optimize
 void calibrateFRONT() {
-  int calibrate = 1;
-  while (calibrate == 1) {
-    scanFORWARD(&irFrontReadings[0]);
+  scanFORWARD(&irFrontReadings[0]);
+  int turnTicks = 0;
+  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
     resetMCounters();
-
-    if (irFrontReadings[2] != 10 && irFrontReadings[0] != 10 ) {
-      int turnTicks = 0;
-      //Serial.println("Calibrating Front");
-      turnTicks = (irFrontReadings[0] - 10) * 20;
-      //Increase speed if further from block, reverse if less
-      if (turnTicks > 0) {
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-          md.setSpeeds(200, 200);
-        }
+    turnTicks = (irFrontReadings[0] - 10) * 20;
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(200, 200);
       }
-      else {
-        while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-          md.setSpeeds(-200, -200);
-        }
-      }
-      md.setBrakes(400, 400);
-      delay(100);
     }
     else {
-      //Serial.println("Front Calibration complete");
-      calibrate = 0;
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-200, -200);
+      }
     }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanFORWARD(&irFrontReadings[0]);
   }
 }
-
-//JM - Attempt 1 at making code cleaner
-//void calibrateFRONT() {
-//  scanFORWARD(&irFrontReadings[0]);
-//  int turnTicks = 0;
-//  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
-//    resetMCounters();
-//    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 20;
-//    if (turnTicks > 0) {
-//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-//        md.setSpeeds(200, 200);
-//      }
-//    }
-//    else {
-//      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-//        md.setSpeeds(-200, -200);
-//      }
-//    }
-//    md.setBrakes(400, 400);
-//    delay(100);
-//    scanFORWARD(&irRightReadings[0]);
-//  }
-//}
 
 
 //------------Functions for IR Sensors------------//
@@ -472,13 +399,15 @@ void commWithRPI() {
                   delay(100);
                   calibrateFRONT();
                   delay(100);
-                  goRIGHT(90);
-                  delay(100);
-                  calibrateFRONT();
-                  delay(100);
-                  goLEFT(90);
-                  delay(100);
-                  calibrateRIGHT();
+//                  if(irRightReading[0] != 9 || ir Right Reading[1] != 10){
+                    goRIGHT(90);
+                    delay(100);
+                    calibrateFRONT();
+                    delay(100);
+                    goLEFT(90);
+                    delay(100);
+                    calibrateRIGHT();
+//                  }
                   delay(500);
                   calCounter = 0;
                   sendStatusUpdate();
@@ -492,6 +421,15 @@ void commWithRPI() {
                     calibrateRIGHT();
                     calCounter = 0;
                   }
+//                  if(irRightReading[0] != 9 || ir Right Reading[1] != 10){
+//                    goRIGHT(90);
+//                    delay(100);
+//                    calibrateFRONT();
+//                    delay(100);
+//                    goLEFT(90);
+//                    delay(100);
+//                    calibrateRIGHT();
+//                  }
                   delay(500);
                   sendStatusUpdate();
                   incrementID();
@@ -560,7 +498,7 @@ void stringCommands() {
   //int commands[] = {1, 2, 3, 2, 3, 1, 2, 3, 2, 3, 1, 0};
   //int commands[] = {1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 1, 0};
   //int commands[] = {1, 1, 1, 1, 6, 2, 1, 4, 1, 2, 1, 4, 1, 1, 1, 3, 1, 1, 1, 1, 0};
-  int commands[] = {4,0};
+  int commands[] = {6,0};
   static int x;
   switch (commands[x]){
     case 1: 
@@ -599,6 +537,12 @@ void stringCommands() {
             scanFORWARD(&irFrontReadings[0]);
             scanLEFT();
             scanRIGHT(&irRightReadings[0]);
+            Serial << "Left Forward IR: " << shortIrVal((irFrontReadings[0] - lfwdIrOS) / 10) << " blocks away " <<endl;
+            Serial << "Mid Forward IR: " << shortIrVal((irFrontReadings[1] - mfwdIrOS) / 10) << " blocks away " <<endl;
+           Serial << "Right Forward IR: " << shortIrVal((irFrontReadings[2] - rfwdIrOS) / 10) <<" blocks away \n" <<endl;
+           Serial << "Front Right IR: " << shortIrVal((irRightReadings[0] - frgtIrOS) / 10) <<" blocks away " <<endl;
+           Serial << "Back Right IR: " << shortIrVal((irRightReadings[1] - brgtIrOS) / 10) <<" blocks away \n" <<endl;
+           Serial << "Left Long IR: " << longIrVal((irLeftReading - flftIrOS) / 10)<<" blocks away " <<endl;
             break;
             
     case 6:

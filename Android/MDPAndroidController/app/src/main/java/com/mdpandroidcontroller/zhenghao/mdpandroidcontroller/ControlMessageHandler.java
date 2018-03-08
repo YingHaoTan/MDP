@@ -2,9 +2,7 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller;
 
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by Zhenghao on 20/2/18.
@@ -54,8 +52,9 @@ public class ControlMessageHandler extends Handler {
                 mParentActivity.onMessageDeviceName(msg);
                 break;
             case Constants.MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
-                String readMessage = new String(readBuf, 0, msg.arg1);
+                //byte[] readBuf = (byte[]) msg.obj;
+                //String readMessage = new String(readBuf, 0, msg.arg1);
+                String readMessage = (String) msg.obj;
                 Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
 
                 mParentActivity.onMessageRead(msg);

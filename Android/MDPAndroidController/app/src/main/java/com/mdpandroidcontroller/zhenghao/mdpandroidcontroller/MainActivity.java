@@ -25,7 +25,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.MazeGridAdapter;
-import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothClass;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothService = null;
-    private BluetoothClass mBluetoothClass = null;
     private ControlMessageHandler mHandler =
             ControlMessageHandler.getInstance().withParentActivity(this);
 
@@ -401,18 +399,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         mBluetoothService.connect(device);
     }
 
-    private void connectDeviceNew(String address) {
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        Log.d(TAG, "connectDevice: connecting device " + device.getName());
-        try {
-            mBluetoothClass.ConnectToDevice(device);
-        } catch (InterruptedException e) {
-            Log.d(TAG, "connectDeviceNew: connecting device interrupted ex");
-            e.printStackTrace();
-        }
-
-    }
-
     private void updateConnectionUI(String deviceName, String deviceAddress) {
         Log.d(TAG, "updateConnection start");
         connectionString.setText("Device connected: " + deviceName + "@" + deviceAddress);
@@ -613,6 +599,14 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     Button.OnClickListener goButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
+            // Send manual/auto info first
+//            if (updateModeSwitch.isChecked()) {
+//                mBluetoothService.write(translator.commandUpdateAuto().getBytes());
+//            }
+//            else {
+//                mBluetoothService.write(translator.commandUpdateManual().getBytes());
+//            }
+
             if(explorationButton.isChecked()){
                 //send message to robot via bluetooth
                 mBluetoothService.write(translator.commandExplore().getBytes());
@@ -705,8 +699,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     @Override
     public void onMessageRead(Message msg) {
-        byte[] readBuf = (byte[]) msg.obj;
-        String readMessage = new String(readBuf, 0, msg.arg1);
+        //byte[] readBuf = (byte[]) msg.obj;
+        //String readMessage = new String(readBuf, 0, msg.arg1);
+        String readMessage = (String) msg.obj;
         Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
 
         translator.decodeMessage(readMessage);

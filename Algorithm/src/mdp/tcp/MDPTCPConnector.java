@@ -192,7 +192,6 @@ public class MDPTCPConnector {
                 /*byte[] test = {0x01,0x01};
                 System.out.println(StatusMessage.checkMessageType(test));
                  */
-                ArduinoMessage lastSentArduinoMessage = null;
                 //long timer = System.currentTimeMillis();
 
                 // Longer timeout, because need to take into account of robot moving. Could implement a simple ACK message from Arduino.
@@ -230,29 +229,31 @@ public class MDPTCPConnector {
                 	Thread.yield();
                 	outgoingSemaphore.acquire();
                 	
-                    if (!outgoingArduinoQueue.isEmpty() && currentID == nextExpectedID) {
-                        // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
-                    	lastSentArduinoMessage = outgoingArduinoQueue.remove();
-                        lastSentArduinoMessage.setID(currentID);
-                        System.out.println("Sending: " + currentID + " " + lastSentArduinoMessage.getMessageAction());
-                        
-                        outToServer.writeBytes(new String(lastSentArduinoMessage.toBytes()) + "~");
-                        yetToReceiveAck = true;
-                        //timer = System.currentTimeMillis();
-                        
-                        if(lastSentArduinoMessage.getMessageAction() == RobotAction.STOP){
-                            setSentStop(true);
-                        } 
-                        else{
-                            setSentStop(false);
-                            incrementID();
-                        }
-                        
-                        processed++;
+                	ArduinoMessage arduinoMessage = null;
+                    if (currentID == nextExpectedID) {
+                    	if((arduinoMessage = outgoingArduinoQueue.poll()) != null) {
+	                        // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
+                    		arduinoMessage.setID(currentID);
+	                        System.out.println("Sending: " + currentID + " " + arduinoMessage.getMessageAction());
+	                        
+	                        outToServer.writeBytes(new String(arduinoMessage.toBytes()) + "~");
+	                        yetToReceiveAck = true;
+	                        //timer = System.currentTimeMillis();
+	                        
+	                        if(arduinoMessage.getMessageAction() == RobotAction.STOP){
+	                            setSentStop(true);
+	                        } 
+	                        else{
+	                            setSentStop(false);
+	                            incrementID();
+	                        }
+	                        
+	                        processed++;
+                    	}
                     }
                     
-                    if (!outgoingAndroidQueue.isEmpty()) {
-                    	AndroidUpdate update = outgoingAndroidQueue.remove();
+                    AndroidUpdate update = null;
+                    if ((update = outgoingAndroidQueue.poll()) != null) {
                     	outToServer.writeBytes(new String(update.toBytes()) + "~");
                     	
                     	System.out.println("Sending android: " + update.getMessage());
