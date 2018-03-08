@@ -12,12 +12,14 @@ public class SensorConfiguration {
 
     private Direction direction;
     private int coordinate;
+    private int mindistance;
     private int maxdistance;
     private double reliability;
 
-    public SensorConfiguration(Direction direction, int coordinate, int maxdistance, double reliability) {
+    public SensorConfiguration(Direction direction, int coordinate, int mindistance, int maxdistance, double reliability) {
         this.direction = direction;
         this.coordinate = coordinate;
+        this.mindistance = mindistance;
         this.maxdistance = maxdistance;
         this.reliability = reliability;
     }
@@ -38,6 +40,10 @@ public class SensorConfiguration {
      */
     public int getCoordinate() {
         return coordinate;
+    }
+    
+    public int getMinDistance() {
+        return mindistance;
     }
 
     /**
