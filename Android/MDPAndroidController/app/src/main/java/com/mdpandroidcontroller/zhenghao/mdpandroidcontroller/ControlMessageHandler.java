@@ -2,9 +2,7 @@ package com.mdpandroidcontroller.zhenghao.mdpandroidcontroller;
 
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by Zhenghao on 20/2/18.
