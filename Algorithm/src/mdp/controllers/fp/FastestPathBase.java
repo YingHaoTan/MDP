@@ -67,7 +67,6 @@ public abstract class FastestPathBase implements RobotActionListener {
                 ArrayList<Direction> streamDirections = new ArrayList<>();
                 while ((direction = next()) != null) {
                     streamDirections.add(direction);
-                    //robot.move(direction);
                 }
                 robot.moveStream(streamDirections);
             } else {

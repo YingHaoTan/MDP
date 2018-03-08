@@ -23,6 +23,7 @@ class Main(object):
 		while True:
 			if(not to_arduino_queue.empty()):
 				to_send_bytes = to_arduino_queue.get()
+				print("(ARDUINO_INSTRUCTION) to Arduino (FROM QUEUE): " + str(to_send_bytes))
 				to_send_bytes.insert(0, bytes("~", "ascii"))
 				to_send_bytes.append(bytes("!", "ascii"))
 				arduino.write_to_arduino(b''.join(to_send_bytes))
@@ -30,22 +31,23 @@ class Main(object):
 			temp = arduino.read_from_arduino()
 			if temp is not None:
 				string_to_send_tcp = ""
-				print("Receives from Arduino:")
-				print(temp)
+						
+				temp[0] = (int(temp[0])).to_bytes(1, byteorder='big').decode('ascii')
 				for i in range(len(temp)):
-					string_to_send_tcp += temp[i].decode("ascii")			
+					string_to_send_tcp += temp[i]	
 				from_arduino_queue.put(string_to_send_tcp)
-			
+				print("(ARDUINO_UPDATE) to PC (INTO QUEUE): " + str(string_to_send_tcp))
+				
 			time.sleep(0.001)
 			
 
-	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_pc_queue, host='', port=5000):
+	def PC_Thread(self, to_arduino_queue, from_arduino_queue, to_pc_queue, to_android_queue, host='', port=5000):
 		serversock = socket.socket()	#create a new socket object
 		serversock.bind((host, port))	#bind socket
 		serversock.setblocking(False)
 		serversock.settimeout(0.0)
 		serversock.listen(1)
-		print ("Listening")
+		print ("Listening on TCP...")
 		#clientsock, clientaddr = serversock.accept()
 		#print ("Connection from: " + str(clientaddr))
 		received = []
@@ -54,13 +56,14 @@ class Main(object):
 
 		ARDUINO_INSTRUCTION = (2).to_bytes(1, byteorder='big')
 		ARDUINO_STREAM = (3).to_bytes(1, byteorder='big')
+		ANDROID_UPDATE = (6).to_bytes(1, byteorder='big')
 		
 		while True:
 			try:
 				clientsock, clientaddr = serversock.accept()
 				clientsock.setblocking(False)
 				clientsock.settimeout(0.0)
-				print ("Connection from: " + str(clientaddr))
+				print ("TCP Connection from: " + str(clientaddr))
 				break
 			except:
 				continue
@@ -69,34 +72,39 @@ class Main(object):
 		while True:
 			while not message_end:
 				try: 
-					data = clientsock.recv(1024)           				
+					data = clientsock.recv(1024)        				
 					for i in range(len(data)):
 						# if new line
-						if(data[i] == 126):
+						if(data[i] == 126 ):
 							message_end = True
 							print("Received from TCP: " + str(datetime.datetime.now()))
-							break
-						received.append(data[i].to_bytes(1, byteorder='big'))
+							# sends to Arduino
+							# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
+							if message_end and len(received) > 0:
+								if(received[0] == ARDUINO_INSTRUCTION):
+									print("(ARDUINO_INSTRUCTION) to Arduino (INTO QUEUE): " + str(received))
+									#print(received)
+									to_arduino_queue.put(received)
+									
+								elif (received[0] == ARDUINO_STREAM):
+									print('(ARDUINO_STREAM) to Arduino (INTO QUEUE): ' + str(received))
+									#print(received)
+									to_arduino_queue.put(received)
+
+								elif (received[0] == ANDROID_UPDATE):
+									print('(ANDROID_UPDATE) to Android (INTO QUEUE): ' + str(received))
+									#print(received)
+									to_android_queue.put(received[1:])
+
+								message_end = False
+								received = []
+						else:
+							received.append(data[i].to_bytes(1, byteorder='big'))
 				except:
 					break
 				
 			
-			# sends to Arduino
-			# ONLY RECEIVES THESE TWO THINGS FROM PC = ARDUINO_INSTRUCTION((byte)(0x02)), ARDUINO_STREAM((byte)(0x03)), ANDROID_UPDATE((byte)0x05);
-			if message_end and len(received) > 0:
-				if(received[0] == ARDUINO_INSTRUCTION):
-					print("Sends to Arduino: " + str(datetime.datetime.now()))
-					print(received)
-					to_arduino_queue.put(received)
-					
-				elif (received[0] == ARDUINO_STREAM):
-					print('Received Arduino stream :' + str(len(received)))
-					print(received)
-					to_arduino_queue.put(received)
-
-				message_end = False
-				received = []
-
+			
 			
 			
 			# sends to bluetooth
@@ -107,24 +115,21 @@ class Main(object):
 			# receives from Arduino, doesn't block
 			if(not from_arduino_queue.empty()):
 				string_to_send_tcp = from_arduino_queue.get()
-				print("Received from Arduino: " + str(datetime.datetime.now()))
 				# Ends with a ~
 				string_to_send_tcp += "~"
-				print("sending to PC")
+				#print("(ARDUINO_UPDATE) to PC: " + str(datetime.datetime.now()))
+				print("(ANDROID_UPDATE) to PC (FROM QUEUE): " + str(string_to_send_tcp))
 				clientsock.sendall(string_to_send_tcp.encode("ascii"))
 
 
 			# receives from Bluetooth, doesn't block
 			if(not to_pc_queue.empty()):
-				print("sending to PC from Android")
 				from_android_str = to_pc_queue.get()
+				print("(ARDUINO_UPDATE) to PC (FROM QUEUE): " + str(from_android_str))
 				clientsock.sendall(from_android_str.encode("ascii"))
 			
 
 			time.sleep(0.001)
-			#send to algo
-			
-			#receive from algo
 
 		clientsock.close()
 		
@@ -145,16 +150,28 @@ class Main(object):
 		ANDROID_INSTRUCTION = (5).to_bytes(1, byteorder='big')
 		
 		while(True):
-			data = self.android.read()
 			
-			to_send = ANDROID_INSTRUCTION + data
-			to_send = to_send.decode("ascii")+'~'
-			to_pc_queue.put(to_send)
-			print(to_send)
+			data = self.android.read()
+			if data is not None:
+				to_send = ANDROID_INSTRUCTION + data
+				to_send = to_send.decode("ascii")+'~'
+				to_pc_queue.put(to_send)
+				print("(ANDROID_INSTRUCTION) to PC (INTO QUEUE): " + str(to_send))
+				#print(to_send)
+			time.sleep(0.001)
 
 
 	def write_android(self, to_android_queue):
-		pass
+		while True:
+			if(not to_android_queue.empty()):
+				data = to_android_queue.get()
+				data.append(bytes('\n', 'ascii'))
+				self.android.write(b''.join(data))
+				print("(ANDROID_INSTRUCTION) to ANDROID (FROM QUEUE): " + str(data))
+				#print(b''.join(data))
+				#print('Sent to Android'   + str(datetime.datetime.now()))
+			time.sleep(0.001)
+
 
 	def threads_create(self):
 		try: 		
@@ -171,7 +188,7 @@ class Main(object):
 			
 			##think theres problem with the queue passed in. I think it should also pcqueue.
 			##t1 need all the queue since it is at the center of the communication.
-			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_pc_queue, '', 5000))
+			t1 = Thread(target=self.PC_Thread, args=(to_arduino_queue,from_arduino_queue, to_pc_queue, to_android_queue,'', 5000))
 
 			serial_ports = ArduinoInterface.list_ports()
 			for port in serial_ports:
@@ -180,8 +197,7 @@ class Main(object):
 					to_connect = port
 			
 
-			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
-			#t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,'/dev/ttyACM0', 115200))
+			t2 = Thread(target=self.Arduino_Thread, args=(to_arduino_queue,from_arduino_queue,to_connect, 115200))
 			
 			
 
@@ -190,14 +206,13 @@ class Main(object):
 			write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
 
 			t1.start()
-			#t2.start()
+			t2.start()
 			read_android_thread.start()
 			write_android_thread.start()
 			
 			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, '', 1))
 
-	
-			
+
 
 			#t3.start()
 	

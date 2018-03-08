@@ -29,21 +29,37 @@ void setup() {
 
   delay(2000);
   //Serial.println("Initializations Done");
-  //  goFORWARD(7);
+    //goFORWARD(12);
   //goFORWARDObst(10,0);
+
+  //goFORWARD(1);
+
+  //calibrateRIGHT();
+  //goRIGHT(90);
+  //calibrateFRONT();
+  //goLEFT(90);
+  //calibrateRIGHT();
 }
 
 void loop() {
+  //stringCommands();
   commWithRPI();
 }
 
-
+void goFront(int noBlocks){
+  while(mRev[0] < noBlocks && mRev[1] < noBlocks){
+    md.setSpeeds(300, 300);
+    Serial << "During: M1-mRev1:" << mRev[0] << "-mCounter:" << mCounter[0] << " M2-mRev2:" << mRev[1] << "-mCounter:" << mCounter[1] << endl;
+  }
+  Serial << "After: M1-mRev1:" << mRev[0] << "-mCounter:" << mCounter[0] << " M2-mRev2:" << mRev[1] << "-mCounter:" << mCounter[1] << endl;
+  md.setBrakes(400, 400);
+}
 
 //------------Functions for robot movements------------//
 void goFORWARD(int noBlock) {
   int kP = 100;
-  int kI = 0;
-  int kD = 8;
+  int kI = 6;
+  int kD = 15;
   int error = 0;
   int errorRate = 0;
   int adjustment = 0;
@@ -51,9 +67,9 @@ void goFORWARD(int noBlock) {
   int lastError = 0;
   int lastTicks[2] = {0, 0};
   int setSpd1 = 300;              //Right motor
-  int setSpd2 = 304;              //Left motor
+  int setSpd2 = 306;              //Left motor
   long lastTime = millis();
-
+  resetMCounters();
   md.setSpeeds(setSpd1, setSpd2);
   delay(50);
 
@@ -66,9 +82,9 @@ void goFORWARD(int noBlock) {
       lastTicks[1] = mCounter[1];
       errorRate = error - lastError;                                                  //Counting change in error (for Kd)
       lastError = error;                                                              //Reassign the previous error as current error
-      totalErrors += error;                                                           //Add up total number of errors (for Ki)
+      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
       if (abs(error) > 0) {                                                           //if error exists
-        adjustment = kP * error + kI * totalErrors + kD * errorRate;
+        adjustment = kP * error - kI * totalErrors + kD * errorRate;
         adjustment /= 100;
         setSpd1 += adjustment;
         setSpd2 -= adjustment;
@@ -82,47 +98,93 @@ void goFORWARD(int noBlock) {
 }
 
 int angleToTicks(long angle){
-  return 8827 * angle / 1000;
+  return 17654 * angle / 1000;
 }
 
 void goRIGHT(int angle) {
-  int ticks = angleToTicks(angle);
-  static int errorRight = 0;
-  static int errorLeft = 0;
+  int ticks = angleToTicks(angle) - 30;
+  int kP = 150;
+  int kI = 6;
+  int kD = 15;
+  int error = 0;
+  int errorRate = 0;
+  int adjustment = 0;
+  int totalErrors = 0;
+  int lastError = 0;
+  int lastTicks[2] = {0, 0};
+  int setSpd1 = -200;              //Right motor
+  int setSpd2 = 206;              //Left motor
+  long lastTime = millis();
+  resetMCounters();
+  md.setSpeeds(setSpd1, setSpd2);
+  delay(10);
+      // Right                  Left
+  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+    if (millis() - lastTime > 50) {
+      lastTime = millis();
+      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      lastTicks[0] = mCounter[0];
+      lastTicks[1] = mCounter[1];
+      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
+      lastError = error;                                                              //Reassign the previous error as current error
+      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
+      if (abs(error) > 0) {                                                           //if error exists
+        adjustment = kP * error - kI * totalErrors + kD * errorRate;
+        adjustment /= 100;
+        setSpd1 += -adjustment;
+        setSpd2 -= adjustment;
 
-  while(mCounter[0] > -ticks && mCounter[1] < ticks)
-    md.setSpeeds(-250, 250);
+        md.setSpeeds(setSpd1, setSpd2);
+                  Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
+      }
+    }
+  }
   md.setBrakes(400, 400);
   resetMCounters();
-  delay(300);
-
-  do{
-    
-    errorRight = mCounter[0];
-    errorLeft = mCounter[1];
-    resetMCounters();
-    tickCorrection(errorRight, errorLeft);
-  }while(abs(errorRight) > 5 && abs(errorLeft) > 5);
 }
 
 void goLEFT(int angle) {
-  int ticks = angleToTicks(angle);
-  static int errorRight = 0;
-  static int errorLeft = 0;
+  int ticks = angleToTicks(angle) - 30;
+  int kP = 150;
+  int kI = 6;
+  int kD = 15;
+  int error = 0;
+  int errorRate = 0;
+  int adjustment = 0;
+  int totalErrors = 0;
+  int lastError = 0;
+  int lastTicks[2] = {0, 0};
+  int setSpd1 = 200;              //Right motor
+  int setSpd2 = -206;              //Left motor
+  long lastTime = millis();
+  resetMCounters();
+  md.setSpeeds(setSpd1, setSpd2);
+  delay(10);
+      // Right                  Left
+  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+    if (millis() - lastTime > 50) {
+      lastTime = millis();
+      Serial.println("----");                       //Note: setSpeeds(mRIGHT, mLEFT)
+      error = (mCounter[1] - lastTicks[1]) - (mCounter[0] - lastTicks[0]);            //0 = right motor, 1 = left motor, lesser tick time mean faster
+      lastTicks[0] = mCounter[0];
+      lastTicks[1] = mCounter[1];
+      errorRate = error - lastError;                                                  //Counting change in error (for Kd)
+      lastError = error;                                                              //Reassign the previous error as current error
+      totalErrors += 2;                                                           //Add up total number of errors (for Ki)
+      if (abs(error) > 0) {                                                           //if error exists
+        adjustment = kP * error - kI * totalErrors + kD * errorRate;
+        adjustment /= 100;
+        setSpd1 += adjustment;
+        setSpd2 -= -adjustment;
 
-  while(mCounter[0] < ticks && mCounter[1] > -ticks)
-    md.setSpeeds(250, -250);
+        md.setSpeeds(setSpd1, setSpd2);
+                  Serial << "Setting speeds to:" << "M1 Speed: " << setSpd1 << " M2 Speed: " << setSpd2 << endl;
+      }
+    }
+  }
   md.setBrakes(400, 400);
   resetMCounters();
-  delay(300);
-
-  do{
-    
-    errorRight = mCounter[0];
-    errorLeft = mCounter[1];
-    resetMCounters();
-    tickCorrection(errorRight, errorLeft);
-  }while(abs(errorRight) > 5 && abs(errorLeft) > 5);
 }
 
 void PIDControl(int *setSpdR, int *setSpdL) {
@@ -376,20 +438,23 @@ void scanLEFT() {
 
 //------------Functions for Motors------------//
 void mEncoder(int motor, int setTick){
-  encState[motor] = digitalRead(encA[motor]);
-
+  //encState[motor] = digitalRead(encA[motor]);
+  mCounter[motor]++;
+  /*
+  int direction = 0;
   if(encState[motor] != encLastState[motor]){          //Was there a change in state?
     if(digitalRead(encB[motor]) != encState[motor]){    //If EncA state is different from EncB
-      mCounter[motor]++;                               //Then it's going forward so ++ ticks
+      direction = 1;                              //Then it's going forward so ++ ticks
     }
     else{
-      mCounter[motor]--;                               //Else it is going in reverse so -- ticks
+      direction = -1;                               //Else it is going in reverse so -- ticks
     }
   }
+  */
     
-  encLastState[motor] = encState[motor];
-
-  if((mCounter[motor] % setTick) == 0){
+  //encLastState[motor] = encState[motor];
+  //Serial << "Inside mEncoder() for Motor: " << motor << " Ticks: " << mCounter[motor] << " " << mRev[motor] << " Direction " << direction << endl;
+  if(((mCounter[motor] % setTick) == 0 && (mCounter[motor]!=0))){
     mRev[motor]++;
   }
 }
@@ -404,13 +469,13 @@ void resetMCounters() {
 //ISR for Motor 1 Encoders
 ISR(PCINT2_vect) {
   flag[0] = 1;
-  mEncoder(0, 592);
+  mEncoder(0, 1183);
 }
 
 //ISR for Motor 2 Encoders
 ISR(PCINT0_vect) {
   flag[1] = 1;
-  mEncoder(1, 592);
+  mEncoder(1, 1183);
 }
 
 //Standard function to enable interrupts on any pins
@@ -455,6 +520,7 @@ void commWithRPI() {
               switch (instructMsg.action) {
                 case TURN_LEFT:
                   goLEFT(90);
+                  delay(1000);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -462,6 +528,7 @@ void commWithRPI() {
                   break;
                 case TURN_RIGHT:
                   goRIGHT(90);
+                  delay(1000);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -469,6 +536,7 @@ void commWithRPI() {
                   break;
                 case FORWARD:
                   goFORWARD(1);
+                  delay(1000);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -480,9 +548,11 @@ void commWithRPI() {
                   calibrateFRONT();
                   goLEFT(90);
                   calibrateRIGHT();
+                  delay(1000);
                   calCounter = 0;
                   sendStatusUpdate();
                   incrementID();
+                  alreadyReceived = false;
                   break;
 
                 case CAL_SIDE:
@@ -491,12 +561,13 @@ void commWithRPI() {
                     calibrateRIGHT();
                     calCounter = 0;
                   }
+                  delay(1000);
                   sendStatusUpdate();
                   incrementID();
                   break;
 
                 case SCAN:
-                  sendStatusUpdate();
+                  sendStatusUpdate(); 
                   incrementID();
                   alreadyReceived = false;
                   break;
@@ -550,6 +621,104 @@ void commWithRPI() {
   }
 }
 
+void toBlocks(){
+  scanFORWARD(&irFrontReadings[0]);
+  scanLEFT();
+  scanRIGHT(&irRightReadings[0]);
+
+  // Put sensor readings here
+  StatusMessage statusPayload;
+  statusPayload.id = last_sent;
+  statusPayload.front1 = minVal((irFrontReadings[0] - offset1) / 10);
+  statusPayload.front2 = minVal((irFrontReadings[1] - offset2) / 10);
+  statusPayload.front3 = minVal((irFrontReadings[2] - offset3) / 10);
+  statusPayload.right1 = minVal((irRightReadings[0] - offset4) / 10);
+  statusPayload.right2 = minVal((irRightReadings[1] - offset6) / 10);
+  statusPayload.left1 = minVal((irLeftReading - offset5) / 10);
+  statusPayload.reached = 1;
+
+  Message msg;
+  msg.type = ARDUINO_UPDATE;
+  memcpy(&msg.payload, &statusPayload, 8);
+
+  uint8_t tmpOutBuffer[64] = {0};
+  tmpOutBuffer[0] = '~';
+  memcpy(&tmpOutBuffer[1], &msg, 9);
+  tmpOutBuffer[10] = '!';
+
+  /*
+  Serial << "----------" << endl;
+  Serial << "frontLEFT: " << tmpOutBuffer[3] << endl;
+  Serial << "frontMID: " << tmpOutBuffer[4] << endl;
+  Serial << "frontRIGHT: " << tmpOutBuffer[5] << endl;
+  Serial << "rightFRONT: " << tmpOutBuffer[6] << endl;
+  Serial << "rightBACK: " << tmpOutBuffer[7] << endl;
+  Serial << "left: " << tmpOutBuffer[8] << endl;
+  Serial << "----------" << endl;
+  */
+
+  Serial.print((int)tmpOutBuffer[3]);
+  Serial.print((int)tmpOutBuffer[4]);
+  Serial.println((int)tmpOutBuffer[5]);
+ // Serial.write((uint8_t *)&tmpOutBuffer, sizeof(tmpOutBuffer));
+  Serial.flush();
+
+}
+
+void stringCommands() {
+  int commands[] = {5};
+  static int x;
+  switch (commands[x]){
+    case 1: 
+            Serial.println("Moving forward");
+            goFORWARD(1);
+            break;
+
+    case 2:
+            Serial.println("Moving left");
+            goLEFT(90);
+            break;
+
+    case 3:
+            Serial.println("Moving right");
+            goRIGHT(90);
+            break;
+
+    case 4:
+            Serial.println("Calibrating");
+            scanRIGHT(&irRightReadings[0]);
+            calibrateRIGHT();
+            break;
+
+    case 5:
+            Serial.println("Doing Full Scan");
+            //scanFORWARD(&irFrontReadings[0]);
+            //scanLEFT();
+            //scanRIGHT(&irRightReadings[0]);
+            toBlocks();
+            break;
+            
+    case 6:
+            Serial.println("Accelerated movement");
+            break;
+            
+    case 7:
+            Serial.println("Going backwards");
+            md.setSpeeds(-300, -300);
+            delay(1500);
+            md.setBrakes(400, 400);
+            resetMCounters();
+            break;
+  }
+
+  delay(200);
+  
+  if(x <= sizeof(commands)/sizeof(int)){
+    x++;
+  }
+  
+}
+
 void putIncomingUSBMessageToBuffer() {
   uint8_t tmpBuffer[1024] = {0}; //not allocated
   uint8_t length = 0;
@@ -587,18 +756,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = minVal((irFrontReadings[1] - offset1) / 10);
-  statusPayload.front2 = minVal((irFrontReadings[0] - offset2) / 10);
+  statusPayload.front1 = minVal((irFrontReadings[0] - offset1) / 10);
+  statusPayload.front2 = minVal((irFrontReadings[1] - offset2) / 10);
   statusPayload.front3 = minVal((irFrontReadings[2] - offset3) / 10);
   statusPayload.right1 = minVal((irRightReadings[0] - offset4) / 10);
   statusPayload.right2 = minVal((irRightReadings[1] - offset6) / 10);
   statusPayload.left1 = minVal((irLeftReading - offset5) / 10);
-  //statusPayload.front1 = 10;
-  //statusPayload.front2 = 11;
-  //statusPayload.front3 = 12;
-  //statusPayload.right1 = 13;
-  //statusPayload.right2 = 14;
-  //statusPayload.left1 = 15;
   statusPayload.reached = 1;
 
   //Serial << irFrontReadings[1] << " " << irFrontReadings[0] << " " << irFrontReadings[2] << " " << irRightReadings[0] << " " << irRightReadings[1] << " " << irLeftReading << endl;
@@ -608,15 +771,14 @@ void sendStatusUpdate() {
   // Crafts message to send
   Message msg;
   msg.type = ARDUINO_UPDATE;
-  memcpy(&msg.payload, &statusPayload, sizeof(statusPayload));
+  memcpy(&msg.payload, &statusPayload, 8);
 
   uint8_t tmpOutBuffer[64] = {0};
   tmpOutBuffer[0] = '~';
-  memcpy(&tmpOutBuffer[1], &msg, sizeof(msg));
-  tmpOutBuffer[sizeof(msg) + 1] = '!';
+  memcpy(&tmpOutBuffer[1], &msg, 9);
+  tmpOutBuffer[10] = '!';
 
-  // Need to test
-  Serial.write((byte *)&tmpOutBuffer, sizeof(tmpOutBuffer));
+  Serial<<'~'<<(int)tmpOutBuffer[1]<<(int)tmpOutBuffer[2]<<(int)tmpOutBuffer[3]<<(int)tmpOutBuffer[4]<<(int)tmpOutBuffer[5]<<(int)tmpOutBuffer[6]<<(int)tmpOutBuffer[7]<<(int)tmpOutBuffer[8]<<(int)tmpOutBuffer[9]<<'!'<<endl;
   Serial.flush();
 
   //start_timer()

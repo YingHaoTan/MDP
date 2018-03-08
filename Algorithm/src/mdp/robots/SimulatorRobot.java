@@ -146,6 +146,7 @@ public class SimulatorRobot extends RobotBase {
      * @return
      */
     private int getObstacleDistance(SensorConfiguration sensor) {
+        
     	MapState mstate = this.getSimulationMapState();
         Direction sdirection = this.getSensorDirection(sensor);
         Point scoordinate = this.getSensorCoordinate(sensor);
@@ -178,6 +179,18 @@ public class SimulatorRobot extends RobotBase {
             }
         }
 
+        
+        // Simulate false readings
+        double reliability = sensor.getReliability();
+        double seed = Math.random();
+        
+        // Send error readings
+        if(seed > reliability && distance > 0){
+            //distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
+            distance = distance - 1;
+        }
+        
+        
         return distance;
     }
 
