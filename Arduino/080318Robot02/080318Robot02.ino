@@ -125,7 +125,6 @@ void goLEFT(int angle) {
   }
 
   md.setBrakes(400, 400);
-//  resetMCounters();
 }
 
 //Direction(dr): -1 = left, 0 = straight, 1 = right
@@ -177,7 +176,6 @@ int blockToTicks(int blocks){
   return (1183-98) * blocks;
 }
 
-//JM - Attempt 1 at making code cleaner
 void calibrateRIGHT() {
   scanRIGHT(&irRightReadings[0]);
   int turnTicks = 0;
@@ -189,7 +187,6 @@ void calibrateRIGHT() {
     if(abs((irRightReadings[0] - irRightReadings[1]) == 1) && abs(turnTicks) > 2){
       turnTicks -= 1;
     }
-//    Serial.println(turnTicks);
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -206,7 +203,6 @@ void calibrateRIGHT() {
   }
 }
 
-//JM - Attempt 1 at making code cleaner
 void calibrateFRONT() {
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
@@ -229,6 +225,12 @@ void calibrateFRONT() {
   }
 }
 
+//------------Functions for Checklists------------//
+
+void checkDistance(){
+  scanLEFT();
+  Serial << "Block is : " << irLeftReading/10 * 10 << " away" << endl;
+}
 
 //------------Functions for IR Sensors------------//
 void scanFORWARD(int *pData) {
@@ -420,7 +422,6 @@ void commWithRPI() {
                   break;
 
                 case CAL_SIDE:
-//                  scanRIGHT(&irRightReadings[0]);
                   if(calCounter >= 4 || ((irRightReadings[0]!=irRightReadings[1]) && abs(irRightReadings[0] - irRightReadings[1] <7))){
                     calibrateRIGHT();
                     calCounter = 0;
