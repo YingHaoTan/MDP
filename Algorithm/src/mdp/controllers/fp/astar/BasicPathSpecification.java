@@ -56,7 +56,7 @@ public class BasicPathSpecification implements PathSpecification {
 
 	@Override
 	public double calculateHeuristicValue(MapState mstate, Point destination, State state) {
-		return Math.abs(destination.x - state.getLocation().x) + Math.abs(destination.y - state.getLocation().y);
+		return 0;
 	}
 
 }
