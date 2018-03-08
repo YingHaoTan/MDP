@@ -37,6 +37,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     int exploringUnexplored;
     int neighbourCounter;
     int aboutTurn;
+    int justTurnedCounter;
     boolean justTurned;
     States currentState;
 
@@ -64,14 +65,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         exploringUnexplored = 0;
         neighbourCounter = 0;
         aboutTurn = 0;
+        justTurnedCounter = 0;
         justTurned = false;
 
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                    justTurnedCounter++;
                     justTurned = true;
                 } else {
-                    justTurned = false;
+                    justTurnedCounter = 0;
+                    justTurned= false;
                 }
                 getRobot().move(action);
                 break;
@@ -237,6 +241,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        
+        this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
+        
+
         // Update internal map state
         sensorsScan();
         
@@ -293,17 +301,35 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     System.out.println("========================");
                     if (canMove(actionToMapDirection(action))) {
                         // Do not turn twice in a row while exploring boundary
-                        if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
-                            if (justTurned) {
+                        if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT){
+                            if(justTurned){
                                 continue;
+                            }
+                            else{
+                                justTurned = true;
+                            }
+                        }
+                        else{
+                            justTurned = false;
+                        }
+                        
+                        
+                        
+                        
+                        
+                        /*if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                            if (justTurnedCounter == 4) {
+                                actionPriority[0] = RobotAction.FORWARD;
+                                actionPriority[1] = RobotAction.TURN_RIGHT;
+                                i = -1;
                             }
                         }
 
                         if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
-                            justTurned = true;
+                            justTurnedCounter++;
                         } else {
-                            justTurned = false;
-                        }
+                            justTurnedCounter = 0;
+                        }*/
                         
                         getRobot().move(action);
                         
@@ -314,6 +340,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         if(i == 0 && action == RobotAction.FORWARD){
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;
+                            justTurnedCounter = 0;
                             i = -1;
                         }*/
                         
