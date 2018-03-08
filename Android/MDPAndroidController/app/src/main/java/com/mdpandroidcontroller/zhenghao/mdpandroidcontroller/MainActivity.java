@@ -611,6 +611,14 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     Button.OnClickListener goButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
+            // Send manual/auto info first
+//            if (updateModeSwitch.isChecked()) {
+//                mBluetoothService.write(translator.commandUpdateAuto().getBytes());
+//            }
+//            else {
+//                mBluetoothService.write(translator.commandUpdateManual().getBytes());
+//            }
+
             if(explorationButton.isChecked()){
                 //send message to robot via bluetooth
                 mBluetoothService.write(translator.commandExplore().getBytes());
@@ -703,8 +711,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     @Override
     public void onMessageRead(Message msg) {
-        byte[] readBuf = (byte[]) msg.obj;
-        String readMessage = new String(readBuf, 0, msg.arg1);
+        //byte[] readBuf = (byte[]) msg.obj;
+        //String readMessage = new String(readBuf, 0, msg.arg1);
+        String readMessage = (String) msg.obj;
         Log.d(TAG, "handleMessage::MESSAGE_READ - message:" + readMessage);
 
         translator.decodeMessage(readMessage);
