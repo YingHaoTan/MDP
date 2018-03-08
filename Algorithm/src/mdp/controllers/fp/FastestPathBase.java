@@ -85,10 +85,13 @@ public abstract class FastestPathBase implements RobotActionListener {
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
         Direction mdirection = next();
-        if (mdirection != null) {
-            robot.move(mdirection);
-        } else {
-            complete();
+        
+        if(actions.length > 1 || actions[0] != RobotAction.SCAN) {
+            if (mdirection != null) {
+                robot.move(mdirection);
+            } else {
+                complete();
+            }
         }
     }
 

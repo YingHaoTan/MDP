@@ -185,10 +185,10 @@ public class SimulatorRobot extends RobotBase {
         double seed = Math.random();
         
         // Send error readings
-        if(seed > reliability && distance > 0){
-            //distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
-            distance = distance - 1;
-        }
+        /*if(seed > reliability && distance > 0){
+            distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
+            //distance = distance - 1;
+        }*/
         
         
         return distance;
