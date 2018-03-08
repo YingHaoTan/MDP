@@ -184,6 +184,10 @@ public abstract class MovementBase {
                 }
             }
         }
+        /*System.out.println("========== Obstacles Counter =============");
+        printGrid(obstaclesCounter);
+        System.out.println("========== No Obstacles Counter =============");
+        printGrid(noObstaclesCounter);*/
         
         for(Runnable listener: this.scanlisteners)
         	listener.run();
@@ -250,6 +254,13 @@ public abstract class MovementBase {
     protected void resetObstaclesChanged(){
         this.obstacleChangedFlag = false;
     }
+    
+    protected void setNoObstacleUpperLimit(List<Point> points){
+        for(Point point : points){
+            noObstaclesCounter[point.x][point.y] = 99;
+        }
+    
+    }
 
     
     // Checks obstaclesCounter and noObstaclesCounter, to determine it's an obstacle or not
@@ -295,5 +306,15 @@ public abstract class MovementBase {
         }
         return false;
         
+    }
+    
+    private void printGrid(int[][] grid){
+        for(int y = grid[0].length - 1; y >= 0; y--){
+            for(int x = 0; x< grid.length; x++){
+                System.out.print(grid[x][y] +" ");
+            }
+            System.out.println();
+        }
+    
     }
 }

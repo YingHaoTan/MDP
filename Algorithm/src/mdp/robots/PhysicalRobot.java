@@ -51,7 +51,7 @@ public class PhysicalRobot extends RobotBase {
         this.outgoingSemaphore = outgoingSemaphore;
         this.androidTranslator = new AndroidCommandsTranslator();
         this.autoupdate = true;
-        
+
         arduinoUpdateListenerList.add(this::handleArduinoUpdate);
     }
 
@@ -67,49 +67,53 @@ public class PhysicalRobot extends RobotBase {
     // This mstate should match Android's input. Tt's using the simulator's grid for now until integration with Android
     @Override
     public void init(MapState mstate) {
-    	super.init(mstate);
-    	
-    	// Set initialized to false
-    	initializing = true;
-    	
+        super.init(mstate);
+
+        // Set initialized to false
+        initializing = true;
+
         // Tells TCP to send START command
         sendArduinoMessage(new ArduinoInstruction(RobotAction.START, false));
-        
+
         // Block until initialization completes
-        while(initializing);
+        while (initializing);
     }
-    
+
     /**
      * Sets auto update flag
+     *
      * @param autoupdate
      */
     public void setAutoUpdate(boolean autoupdate) {
-    	this.autoupdate = autoupdate;
+        this.autoupdate = autoupdate;
     }
-    
+
     /**
      * Checks if this physical robot is auto updating
+     *
      * @return
      */
     public boolean isAutoUpdate() {
-    	return autoupdate;
+        return autoupdate;
     }
 
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
-    	synchronized(commandqueue) {
-    		commandqueue.add(new Command(Arrays.asList(mapdirection), Arrays.asList(actions), false));
-    	}
-    	
-    	if(autoupdate) {
-        	if(mapdirection == null)
-        		sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotTurning()));
-        	else
-        		sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotMoving()));
+        synchronized (commandqueue) {
+            commandqueue.add(new Command(Arrays.asList(mapdirection), Arrays.asList(actions), false));
         }
-    	
-        for (RobotAction action : actions)
-        	sendArduinoMessage(new ArduinoInstruction(action, false));
+
+        if (autoupdate) {
+            if (mapdirection == null) {
+                sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotTurning()));
+            } else {
+                sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotMoving()));
+            }
+        }
+
+        for (RobotAction action : actions) {
+            sendArduinoMessage(new ArduinoInstruction(action, false));
+        }
 
         // Update supposed robot location
         MapState mstate = this.getMapState();
@@ -124,35 +128,35 @@ public class PhysicalRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
     }
-    
+
     @Override
-	protected void dispatchCalibration(RobotAction action) {
-    	synchronized(commandqueue) {
-    		commandqueue.add(new Command(null, Arrays.asList(action), false));
-    	}
-    	
+    protected void dispatchCalibration(RobotAction action) {
+        synchronized (commandqueue) {
+            commandqueue.add(new Command(null, Arrays.asList(action), false));
+        }
+
         sendArduinoMessage(new ArduinoInstruction(action, false));
-	}
+    }
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-    	synchronized(commandqueue) {
-    		commandqueue.add(new Command(orientations, actions, false));
-    	}
-    	
-    	sendArduinoMessage(new ArduinoStream(actions));
+        synchronized (commandqueue) {
+            commandqueue.add(new Command(orientations, actions, false));
+        }
+
+        sendArduinoMessage(new ArduinoStream(actions));
     }
 
     public void stop() {
         // Send stop message
-    	sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, false));
+        sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, false));
     }
-    
+
     private synchronized void sendArduinoMessage(ArduinoMessage message) {
-    	outgoingArduinoQueue.offer(message);
-    	outgoingSemaphore.release();
+        outgoingArduinoQueue.offer(message);
+        outgoingSemaphore.release();
     }
-    
+
     private void sendAndroidUpdate(AndroidUpdate message) {
         outgoingAndroidQueue.offer(message);
         outgoingSemaphore.release();
@@ -193,86 +197,88 @@ public class PhysicalRobot extends RobotBase {
                             readings.put(sensor, right2);
                             break;
                     }
+                    break;
                 case LEFT:
-                    if (sensor.getCoordinate() == 0) {
-                        readings.put(sensor, left1);
-                    }
-				default:
-					break;
+
+                    readings.put(sensor, left1);
+
+                    break;
+                default:
+                    break;
             }
         }
     }
 
     private void handleArduinoUpdate(ArduinoUpdate update) {
-        System.out.println("front1:" + (int)update.getFront1());
-        System.out.println("front2:" + (int)update.getFront2());
-        System.out.println("front3:" + (int)update.getFront3());
-        System.out.println("left1:" + (int)update.getLeft1());
-        System.out.println("right1:" + (int)update.getRight1());
-        System.out.println("right2:" + (int)update.getRight2());
-        
-    	setArduinoSensorReadings(update);
-    	
-    	if(initializing) {
-    		initializing = false;
-    	}
-    	else {
-    		Command command = commandqueue.peek();
-    		
-    		if(command != null) {
-	    		command.completedactions++;
-	    		
-	    		if(command.isComplete()) {
-	    			synchronized(commandqueue) {
-	    				commandqueue.poll();
-	    			}
-	    			
-	    			if(command.actions.size() != 1 || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)) {
-	    				if(command.stream) {
-	    					int orientationIndex = 0;
-	    					
-	    					for(int i = 0; i < command.actions.size(); i++) {
-	    						RobotAction action = command.actions.get(i);
-	    						
-	    						if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT)
-	    							this.notify(null, action);
-	    						else
-	    							this.notify(command.mapdirections.get(orientationIndex++), action);
-	    					}
-	    				}
-	    				else {
-	    					this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
-	    				}
-	    			}
-	    			
-	    			if(autoupdate) {
-	    				MapState mstate = getMapState();
-	    				Point rpoint = mstate.getRobotPoint();
-	    				
-	    				sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotStopped()));
-	    				sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
-	    			}
-	    		}
-    		}
-    	}
+        System.out.println("front1:" + (int) update.getFront1());
+        System.out.println("front2:" + (int) update.getFront2());
+        System.out.println("front3:" + (int) update.getFront3());
+        System.out.println("left1:" + (int) update.getLeft1());
+        System.out.println("right1:" + (int) update.getRight1());
+        System.out.println("right2:" + (int) update.getRight2());
+
+        setArduinoSensorReadings(update);
+
+        if (initializing) {
+            initializing = false;
+        } else {
+            Command command = commandqueue.peek();
+
+            if (command != null) {
+                command.completedactions++;
+
+                if (command.isComplete()) {
+                    synchronized (commandqueue) {
+                        commandqueue.poll();
+                    }
+
+                    if (command.actions.size() != 1 || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)) {
+                        if (command.stream) {
+                            int orientationIndex = 0;
+
+                            for (int i = 0; i < command.actions.size(); i++) {
+                                RobotAction action = command.actions.get(i);
+
+                                if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
+                                    this.notify(null, action);
+                                } else {
+                                    this.notify(command.mapdirections.get(orientationIndex++), action);
+                                }
+                            }
+                        } else {
+                            this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
+                        }
+                    }
+
+                    if (autoupdate) {
+                        MapState mstate = getMapState();
+                        Point rpoint = mstate.getRobotPoint();
+
+                        sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotStopped()));
+                        sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
+                    }
+                }
+            }
+        }
     }
-    
+
     private class Command {
-    	private final List<Direction> mapdirections;
-    	private final List<RobotAction> actions;
-    	private final boolean stream;
-    	private int completedactions;
-    	
-    	public Command(List<Direction> mapdirections, List<RobotAction> actions, boolean stream) {
-    		this.mapdirections = mapdirections;
-    		this.actions = actions;
-    		this.completedactions = 0;
-    		this.stream = stream;
-    	}
-    	
-    	public boolean isComplete() {
-    		return this.completedactions == actions.size();
-    	}
+
+        private final List<Direction> mapdirections;
+        private final List<RobotAction> actions;
+        private final boolean stream;
+        private int completedactions;
+
+        public Command(List<Direction> mapdirections, List<RobotAction> actions, boolean stream) {
+            this.mapdirections = mapdirections;
+            this.actions = actions;
+            this.completedactions = 0;
+            this.stream = stream;
+        }
+
+        public boolean isComplete() {
+            return this.completedactions == actions.size();
+        }
     }
 
 }
