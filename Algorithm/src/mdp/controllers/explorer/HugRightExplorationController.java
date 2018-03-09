@@ -314,9 +314,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             } else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
-                    /*System.out.println("========================");
+                    System.out.println("========================");
                     System.out.println("Current orienttion: " + getRobot().getCurrentOrientation() + " Checking if I can move " + action);
-                    System.out.println("========================");*/
+                    System.out.println("========================");
                     if (canMove(actionToMapDirection(action))) {
                         // Do not turn twice in a row while exploring boundary
                         if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -361,7 +361,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             }
                         }*/
 
-                        //System.out.println(currentState);
+                        System.out.println(currentState);
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;

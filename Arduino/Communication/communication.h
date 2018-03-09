@@ -1,4 +1,4 @@
-#define ARDUINO_UPDATE                             0x01
+s#define ARDUINO_UPDATE                             0x01
 #define ARDUINO_INSTRUCTION                        0x02
 #define ARDUINO_STREAM                             0x03
 

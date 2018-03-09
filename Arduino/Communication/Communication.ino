@@ -127,6 +127,21 @@ void loop() {
             RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
           }
           memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
+
+          for (int i = 0; i < payloadSize; i++){
+            uint8_t action = streamMsg.streamActions[i];
+            switch(action){
+              case FORWARD:
+                break;
+              case TURN_RIGHT:
+                break;
+              case TURN_LEFT:
+                break;  
+              
+            }
+            
+          }
+          
           digitalWrite(LED_BUILTIN, HIGH);
           // you have all your actions inside streamMsg.streamActions;
 
