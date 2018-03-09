@@ -1,3 +1,6 @@
+#include <Arduino.h>
+#line 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+#line 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
 #include <Streaming.h>
 #include <SharpIR.h>
 #include <DualVNH5019MotorShield.h>
@@ -11,6 +14,85 @@ static int lastTicks[2] = {0, 0};
 static int lastError;
 static int totalErrors;
 
+#line 14 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void setup();
+#line 36 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void loop();
+#line 43 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void goFORWARD(int noBlock);
+#line 80 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void goRIGHT(int angle);
+#line 105 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void goLEFT(int angle);
+#line 131 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr);
+#line 153 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void tickCorrection(int right, int left);
+#line 171 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+int angleToTicks(long angle);
+#line 175 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+int blockToTicks(int blocks);
+#line 179 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void calibrateRIGHT();
+#line 206 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void calibrateFRONT();
+#line 230 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void checkDistance();
+#line 236 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void scanFORWARD(int *pData);
+#line 243 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void scanRIGHT(int *pData);
+#line 249 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void scanLEFT();
+#line 254 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void toBlocks();
+#line 298 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void mEncoder(int motor, int setTick);
+#line 320 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void resetMCounters();
+#line 340 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void pciSetup(byte pin);
+#line 349 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void commWithRPI();
+#line 497 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void stringCommands();
+#line 609 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+uint8_t shortIrVal(uint8_t val);
+#line 617 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+uint8_t longIrVal(uint8_t val);
+#line 625 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void putIncomingUSBMessageToBuffer();
+#line 640 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void resendStatusUpdate();
+#line 646 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void sendStatusUpdate();
+#line 700 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void incrementID();
+#line 704 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
+void decrementID();
+#line 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+void RingBuffer_init(RingBuffer *_this);
+#line 14 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+unsigned int RingBuffer_modulo_inc(const unsigned int value, const unsigned int modulus);
+#line 24 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+unsigned int RingBuffer_modulo_dec(const unsigned int value, const unsigned int modulus);
+#line 30 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+uint8_t RingBuffer_empty(RingBuffer *_this);
+#line 35 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+void RingBuffer_flush(RingBuffer *_this, uint8_t clearBuffer);
+#line 46 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+bool RingBuffer_full(RingBuffer *_this);
+#line 51 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+uint8_t RingBuffer_pop(RingBuffer *_this);
+#line 65 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+bool RingBuffer_get(RingBuffer *_this, uint8_t *buffer, uint16_t index);
+#line 77 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+void RingBuffer_push(RingBuffer *_this, uint8_t value);
+#line 93 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+bool RingBuffer_erase(RingBuffer *_this, uint16_t range);
+#line 108 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+bool RingBuffer_find(RingBuffer *_this, uint8_t value);
+#line 14 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\080318Robot02.ino"
 void setup() {
   Serial.begin(115200);
   RingBuffer_init(&usbBufferIn);
@@ -709,3 +791,126 @@ void decrementID() {
     last_sent = last_sent - 1;
   }
 }
+
+#line 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\080318Robot02\\RingBuffer.ino"
+void RingBuffer_init(RingBuffer *_this)
+{
+    /*****
+      The following clears:
+        -> buf
+        -> head
+        -> tail
+        -> count
+      and sets head = tail
+    ***/
+    memset (_this, 0, sizeof (*_this));
+}
+
+unsigned int RingBuffer_modulo_inc(const unsigned int value, const unsigned int modulus)
+{
+    unsigned int my_value = value + 1;
+    if (my_value >= modulus)
+    {
+      my_value  = 0;
+    }
+    return (my_value);
+}
+
+unsigned int RingBuffer_modulo_dec(const unsigned int value, const unsigned int modulus)
+{
+    unsigned int my_value = (0==value) ? (modulus - 1) : (value - 1);
+    return (my_value);
+}
+
+uint8_t RingBuffer_empty(RingBuffer *_this)
+{
+    return (0==_this->count);
+}
+
+void RingBuffer_flush(RingBuffer *_this, uint8_t clearBuffer)
+{
+  _this->count  = 0;
+  _this->head   = 0;
+  _this->tail   = 0;
+  if (clearBuffer)
+  {
+    memset (_this->buf, 0, sizeof (_this->buf));
+  }
+}
+
+bool RingBuffer_full(RingBuffer *_this)
+{
+    return (_this->count>=RINGBUFFER_SIZE);
+}
+
+uint8_t RingBuffer_pop(RingBuffer *_this)
+{
+    uint8_t c;
+    if (_this->count>0)
+    {
+      c = _this->buf[_this->tail];
+      _this->buf[_this->tail] = 0xfe;
+      _this->tail = RingBuffer_modulo_inc (_this->tail, RINGBUFFER_SIZE);
+      --_this->count;
+      return c;
+    }
+    return 0;
+}
+
+bool RingBuffer_get(RingBuffer *_this, uint8_t *buffer, uint16_t index)
+{
+    if (_this->count>0 && buffer){
+       *buffer = _this->buf[(_this->tail+index) % RINGBUFFER_SIZE];
+       return true;
+    }
+    else{
+      *buffer = 0;
+      return false;
+    }
+}
+
+void RingBuffer_push(RingBuffer *_this, uint8_t value)
+{
+    if (_this->count < RINGBUFFER_SIZE)
+    {
+      _this->buf[_this->head] = value;
+      _this->head = RingBuffer_modulo_inc (_this->head, RINGBUFFER_SIZE);
+      ++_this->count;
+    }
+    else
+    {
+      _this->buf[_this->head] = value;
+      _this->head = RingBuffer_modulo_inc (_this->head, RINGBUFFER_SIZE);
+      _this->tail = RingBuffer_modulo_inc (_this->tail, RINGBUFFER_SIZE);
+    }
+}
+
+bool RingBuffer_erase(RingBuffer *_this, uint16_t range)
+{
+    if (range <= _this->count)
+    {
+        for(uint16_t i = 0; i < range; i++)
+            RingBuffer_pop(_this);
+
+//        _this->tail = (_this->tail + range) % RINGBUFFER_SIZE;
+//        _this->count -= range;
+      return true;
+    }
+    else
+      return false;
+}
+
+bool RingBuffer_find(RingBuffer *_this, uint8_t value)
+{
+    if (_this)
+    {
+        for (uint16_t i = 0; i < _this->count; i++)
+        {
+            if (_this->buf[(_this->tail + i) % RINGBUFFER_SIZE] == value)
+                return true;
+        }
+    }
+    return false;
+}
+
+

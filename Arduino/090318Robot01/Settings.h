@@ -14,10 +14,10 @@
 
 //---------------------Definitions for IR Sensor---------------------//
 #define mfwdIrOS -5 //Middle forward IR
-#define lfwdIrOS -3 //Left forward IR
-#define rfwdIrOS -3 //Right forward IR
+#define lfwdIrOS -2 //Left forward IR
+#define rfwdIrOS -2 //Right forward IR
 #define frgtIrOS -2 //Front right IR. The only long range IR.
-#define flftIrOS 1 //Front left IR
+#define flftIrOS 2 //Front left IR
 #define brgtIrOS -2 //Back right IR
 
 #define shrtmodel 1080
