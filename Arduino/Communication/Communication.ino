@@ -132,16 +132,35 @@ void loop() {
             uint8_t action = streamMsg.streamActions[i];
             switch(action){
               case FORWARD:
+                int forwardCount = 1
+                while(true){
+                  if((i+1) < payloadSize && streamMsg.streamActions[i+1] == FORWARD){
+                    forwardCount++;
+                    i++;        
+                  }
+                  else{
+                    break;  
+                  }
+                }
+                //moveForward(forwardCount);
+                sendStatusUpdate();
+                incrementID();
+                alreadyReceived = false;
                 break;
               case TURN_RIGHT:
+                //turn_right();
+                sendStatusUpdate();
+                incrementID();
+                alreadyReceived = false;
                 break;
               case TURN_LEFT:
-                break;  
-              
-            }
-            
+                //turn_left();
+                sendStatusUpdate();
+                incrementID();
+                alreadyReceived = false;
+                break;   
+            } 
           }
-          
           digitalWrite(LED_BUILTIN, HIGH);
           // you have all your actions inside streamMsg.streamActions;
 
