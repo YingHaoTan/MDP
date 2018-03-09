@@ -100,9 +100,9 @@ public class SimulatorRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
 
-        for (RobotAction action : actions) {
+        /*for (RobotAction action : actions) {
             System.out.println(action);
-        }
+        }*/
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -179,6 +179,7 @@ public class SimulatorRobot extends RobotBase {
             }
         }
 
+        
         
         // Simulate false readings
         double reliability = sensor.getReliability();
