@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="300dp"
+    android:layout_height="630dp"
+    android:layout_gravity="center"
+    android:background="@drawable/layout_border">
+
+    <TextView
+        android:id="@+id/commandListClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:text="X"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:layout_gravity="right"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/commandListPopoutTitle"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textSize="24sp"/>
+
+</LinearLayout>

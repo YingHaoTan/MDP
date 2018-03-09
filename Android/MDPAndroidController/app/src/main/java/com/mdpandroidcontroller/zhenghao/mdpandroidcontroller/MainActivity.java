@@ -32,9 +32,11 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Set;
 
@@ -98,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     private Switch updateModeSwitch = null;
     private Button updateButton = null;
     private Button voiceControlButton = null;
+    private Button voiceCommandListButton = null;
+    private Dialog commandListDialog = null;
+    private TextView closeList = null;
 
     private TableLayout goTable = null;
     private TableLayout controlTable = null;
@@ -142,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         arenaInit(); //initialization for components within the arena portion
         controllerInit(); //initialization for components within the controller portion
         settingsPopupInit(); //initialization for the popup
+        commandListPopupInit(); //initialization for the command list popup
     }
 
     private void arenaInit(){
@@ -187,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         voiceControlButton = (Button) findViewById(R.id.voiceControlButton);
         voiceControlButton.setOnClickListener(voiceControlButtonListener);
         voiceControlResult = (TextView) findViewById(R.id.voiceControlResult);
+        voiceCommandListButton = (Button) findViewById(R.id.voiceControlCommand);
+        voiceCommandListButton.setOnClickListener(voiceCommandListButtonListener);
     }
 
     private void settingsPopupInit(){
@@ -238,6 +246,25 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
         resetButton = (Button) settingsDialog.findViewById(R.id.resetButton);
         resetButton.setOnClickListener(resetButtonListener);
+    }
+
+    private void commandListPopupInit() {
+        commandListDialog = new Dialog(this);
+        commandListDialog.setContentView(R.layout.command_list_popout);
+
+        closeList = (TextView) findViewById(R.id.commandListClose);
+
+        if (closeList == null) {
+            Log.e(TAG, "Command list popout NPE");
+        }
+        else {
+            closeList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    commandListDialog.dismiss();
+                }
+            });
+        }
     }
 
     Button.OnClickListener connectButtonListener = new Button.OnClickListener() {
@@ -358,6 +385,12 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     }
 
     private void onVoiceControlInputReceived(ArrayList<String> result) {
+        // Convert result array to small case
+        ListIterator<String> iterator = result.listIterator();
+        while(iterator.hasNext()) {
+            iterator.set(iterator.next().toLowerCase());
+        }
+
         // Check if the result arraylist contains any command phrase
         List<String> commandPhrasesList = Arrays.asList(Constants.VOICE_COMMOND_PHRASES);
         String inputPhrase;
@@ -387,6 +420,14 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
                 return translator.commandTurnRight();
             case Constants.VOICE_COMMAND_BACKWARD:
                 return translator.commandMoveBack();
+            case Constants.VOICE_COMMAND_EXPLORE:
+                return translator.commandExplore();
+            case Constants.VOICE_COMMAND_FATEST_PATH:
+                return translator.commandFastestPath();
+            case Constants.VOICE_COMMAND_AUTO_UPDATE:
+                return translator.commandUpdateAuto();
+            case Constants.VOICE_COMMAND_MANUAL_UPDATE:
+                return translator.commandUpdateManual();
             default:
                 Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
                 return null;
@@ -657,6 +698,14 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         public void onClick(View view) {
             Log.d(TAG, "voiceControlButton onClick");
             promptSpeechInput();
+        }
+    };
+
+    Button.OnClickListener voiceCommandListButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "voiceCommandListButton onClick");
+            commandListDialog.show();
         }
     };
 
