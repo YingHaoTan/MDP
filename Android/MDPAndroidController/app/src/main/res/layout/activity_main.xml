@@ -210,6 +210,15 @@
                     android:layout_below="@+id/voiceControlButton"
                     android:text="@string/voiceInputText" />
 
+                <Button
+                    android:id="@+id/voiceControlCommand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36sp"
+                    android:layout_alignStart="@+id/voiceControlResult"
+                    android:layout_below="@+id/modeHeaderTextView"
+                    android:text="@string/voiceCheckCommand"/>
+
+
                 <TableLayout
                     android:id="@+id/goTable"
                     android:layout_width="140sp"

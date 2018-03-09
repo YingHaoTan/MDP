@@ -24,6 +24,8 @@
     <string name="alternativeControl">Alternative Control Mode:</string>
     <string name="speech_prompt">Say something&#8230;</string>
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="voiceCheckCommand">Command list</string>
+    <string name="commandListPopoutTitle">Available Commands</string>
 
     <!-- Strings for robot status-->
     <string name="statusMoving">Moving</string>

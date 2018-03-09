@@ -34,7 +34,12 @@ public class Constants {
     public static final String VOICE_COMMAND_LEFT = "turn left";
     public static final String VOICE_COMMAND_RIGHT = "turn right";
     public static final String VOICE_COMMAND_BACKWARD = "move backward";
+    public static final String VOICE_COMMAND_EXPLORE = "explore mode";
+    public static final String VOICE_COMMAND_FATEST_PATH = "fastest path mode";
+    public static final String VOICE_COMMAND_AUTO_UPDATE = "auto update";
+    public static final String VOICE_COMMAND_MANUAL_UPDATE = "manual update";
     public static final String[] VOICE_COMMOND_PHRASES =
-            {VOICE_COMMAND_FORWARD, VOICE_COMMAND_LEFT, VOICE_COMMAND_RIGHT, VOICE_COMMAND_BACKWARD};
+            {VOICE_COMMAND_FORWARD, VOICE_COMMAND_LEFT, VOICE_COMMAND_RIGHT, VOICE_COMMAND_BACKWARD,
+                    VOICE_COMMAND_EXPLORE, VOICE_COMMAND_FATEST_PATH, VOICE_COMMAND_AUTO_UPDATE, VOICE_COMMAND_MANUAL_UPDATE};
 
 }

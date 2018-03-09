@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorNoDevice">#c6c6c6</color>
+
+    <color name="colorBorder">@color/colorPrimaryDark</color>
 </resources>
