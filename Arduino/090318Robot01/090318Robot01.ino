@@ -55,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  stringCommands();
+//  stringCommands();
   //  commWithRPI();
 }
 
@@ -283,13 +283,14 @@ void resetMCounters() {
 //ISR for Motor 1 (Right) Encoders
 ISR(PCINT2_vect) {
   mCounter[0]++;
-//  Serial.println(mCounter[0]);
+  Serial.print(" Motor 1: ");
+  Serial.println(mCounter[0]);
 }
 
 //ISR for Motor 2 (Left) Encoders
 ISR(PCINT0_vect) {
   mCounter[1]++;
-//  Serial.println(mCounter[1]);
+  Serial.println(mCounter[1]);
 }
 
 //Standard function to enable interrupts on any pins
