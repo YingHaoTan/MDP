@@ -108,9 +108,6 @@ void loop() {
                 }
                 RingBuffer_erase(&usbBufferIn, 6);
               }
-
-            } else {
-              RingBuffer_pop(&usbBufferIn);
             }
           }
         } else if (messageType == ARDUINO_STREAM) {
@@ -122,6 +119,9 @@ void loop() {
 
           uint8_t tmpInBuffer;
           if (4+payloadSize <= usbBufferIn.count) {
+
+            } else {
+              RingBuffer_pop(&usbBufferIn);
             if(RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4+payloadSize) == true && tmpInBuffer == '!'){
               uint8_t tmpPayload[payloadSize] = {0};
               for (int i = 0; i < payloadSize; i++) {
@@ -216,12 +216,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = 0;
-  statusPayload.front2 = 0;
-  statusPayload.front3 = 0;
+  statusPayload.front1 = 2;
+  statusPayload.front2 = 2;
+  statusPayload.front3 = 2;
   statusPayload.right1 = 0;
   statusPayload.right2 = 0;
-  statusPayload.left1 = 0;
+  statusPayload.left1 = 1;
   statusPayload.reached = 1;
 
 

@@ -203,13 +203,13 @@ public class MDPTCPConnector {
                // ArduinoInstruction ins = new ArduinoInstruction(lastSent, RobotAction.FORWARD, true);
                 //outToServer.writeBytes(new String(ins.toBytes()) + "~");
                 
-                List<RobotAction> actions = new ArrayList<>();
+                /*List<RobotAction> actions = new ArrayList<>();
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);
                 actions.add(RobotAction.FORWARD);
                 
                 ArduinoStream strm = new ArduinoStream(0, actions);
-                outToServer.writeBytes(new String(strm.toBytes()) + "~");
+                outToServer.writeBytes(new String(strm.toBytes()) + "~");*/
                 
                 /*
                 while(true) {

@@ -383,13 +383,16 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             System.out.println("========================");
             System.out.println("About turning now");
             System.out.println("========================");
-            aboutTurn++;
+            /*aboutTurn++;
             if (aboutTurn == 2) {
                 currentState = States.BOUNDARY;
                 aboutTurn = 0;
                 justTurned = true;
             }
-            getRobot().move(RobotAction.TURN_RIGHT);
+            getRobot().move(RobotAction.TURN_RIGHT);*/
+            justTurned = true;
+            currentState = States.BOUNDARY;
+            getRobot().move(RobotAction.ABOUT_TURN);
         }
         if (currentState == States.EXPLORATION) {
             System.out.println("FP Exploration here..");

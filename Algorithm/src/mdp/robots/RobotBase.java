@@ -328,7 +328,7 @@ public abstract class RobotBase {
     }
 
     public void move(RobotAction action) {
-        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.SCAN) {
+        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.SCAN || action == RobotAction.ABOUT_TURN) {
             Direction newDirection = getCurrentOrientation();
 
             if (action == RobotAction.TURN_RIGHT) {
@@ -360,6 +360,21 @@ public abstract class RobotBase {
                         break;
                     case RIGHT:
                         newDirection = Direction.UP;
+                        break;
+                }
+            } else if(action == RobotAction.ABOUT_TURN){
+                switch (getCurrentOrientation()) {
+                    case UP:
+                        newDirection = Direction.DOWN;
+                        break;
+                    case DOWN:
+                        newDirection = Direction.UP;
+                        break;
+                    case LEFT:
+                        newDirection = Direction.RIGHT;
+                        break;
+                    case RIGHT:
+                        newDirection = Direction.LEFT;
                         break;
                 }
             }
