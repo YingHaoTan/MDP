@@ -34,13 +34,13 @@ class ArduinoInterface(object):
 		#while True:
 		if(self.ser.inWaiting()):
 			inByte = self.ser.read()
-			#print(inByte)
+			print(inByte)
 			if(inByte == bytes('~', 'ascii')):
 				toReturn = []
 				counter = 0
 				while True:
 					nextByte = self.ser.read()
-					#print(nextByte)
+					print(nextByte)
 					counter+=1	
 					if(nextByte == bytes('!', 'ascii') and counter == 10):
 						#print(toReturn)

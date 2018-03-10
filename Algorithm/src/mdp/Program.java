@@ -66,7 +66,7 @@ public class Program {
         SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 3, 0.9);
         SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 0, 3, 0.9);
         SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 3, 0.9);
-        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.9);
+        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 5, 0.9);
         
         // SimulatorRobot
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);

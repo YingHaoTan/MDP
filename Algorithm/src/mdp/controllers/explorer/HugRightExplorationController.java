@@ -210,9 +210,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         List<Point> points = getMapState().convertRobotPointToMapPoints(robotPoint);
         boolean hasUnexplored = false;
         for (Point point : points) {
-            if (getMapState().getMapCellState(point) == CellState.OBSTACLE) {
+            /*if (getMapState().getMapCellState(point) == CellState.OBSTACLE) {
                 return false;
-            }
+            }*/
             if (getMapState().getMapCellState(point) == CellState.UNEXPLORED) {
                 hasUnexplored = true;
             }
@@ -223,16 +223,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     // Can also be optimized
     private List<Point> nearbyRobotPoints(Point rPoint) {
         List<Point> nearbyRobotPoints = new ArrayList<Point>();
-        /*for (int x = -1; x < 2; x++) {
-            if (rPoint.x + x > 0 && (rPoint.x + x) < getMapState().getMapSystemDimension().width && x != 0) {
-                nearbyRobotPoints.add(new Point(rPoint.x + x, rPoint.y));
-            }
-        }
-        for (int y = -1; y < 2; y++) {
-            if (rPoint.y + y > 0 && (rPoint.y + y) < getMapState().getMapSystemDimension().height && y != 0) {
-                nearbyRobotPoints.add(new Point(rPoint.x, rPoint.y + y));
-            }
-        }*/
 
         // Top of rPoint
         if (rPoint.y + 1 < getMapState().getMapSystemDimension().height) {
@@ -311,6 +301,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 80) {
                 currentState = States.EXPLORATION;
+                //currentState = States.COMPLETED;
+                //complete();
             } else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
@@ -377,13 +369,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         actionPriority[1] = RobotAction.FORWARD;
                         actionPriority[2] = RobotAction.TURN_LEFT;
                         currentState = States.BOUNDARY;
-                    } /*
-                        if(i == 0 && action == RobotAction.FORWARD){
-                            actionPriority[0] = RobotAction.TURN_RIGHT;
-                            actionPriority[1] = RobotAction.FORWARD;
-                            justTurnedCounter = 0;
-                            i = -1;
-                        }*/
+                    }
                 }
                 currentState = States.ABOUT_TURN;
 
@@ -407,11 +393,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         if (currentState == States.EXPLORATION) {
             System.out.println("FP Exploration here..");
+            
+            // Tune here depending on the map!
+            // U can switch the positioning of the two for loops depending on the map
+            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
+                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
 
-            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
-                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
                     Point tempPoint = new Point(x, y);
-
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
                         neighbourPoints.add(nearbyRobotPoints(tempPoint));
@@ -422,13 +410,14 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
 
-                if (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                while (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
                         if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
                             neighbourCounter = i;
                             return;
                         }
                     }
+                    exploringUnexplored++;
                 }
 
                 //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
@@ -447,43 +436,33 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (exploringUnexplored < unexploredPoints.size() && currentState != States.COMPLETED) {
             if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
                 neighbourCounter++;
-                //if( neighbourCounter > neighbourPoints.get(exploringUnexplored).size()){
-
-                //}
-                /*if (neighbourCounter == neighbourPoints.get(exploringUnexplored).size()) {
-                    fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false);
-                } else {
-                    fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
-                }*/
                 for (int i = neighbourCounter; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
                     if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
-                        break;
-                    }
-                }
-
-            } else {
-                exploringUnexplored++;
-                neighbourCounter = 0;
-                while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
-                    exploringUnexplored++;
-
-                    //System.out.println(unexploredPoints.get(exploringUnexplored) + " is " + isUnexplored(unexploredPoints.get(exploringUnexplored)));
-                    if (exploringUnexplored == unexploredPoints.size()) {
-                        preComplete();
                         return;
                     }
                 }
-                if (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
-                    for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
-                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
-                            neighbourCounter = i;
-                            break;
-                        }
-                    }
 
+            }
+            exploringUnexplored++;
+            neighbourCounter = 0;
+            while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                exploringUnexplored++;
+
+                //System.out.println(unexploredPoints.get(exploringUnexplored) + " is " + isUnexplored(unexploredPoints.get(exploringUnexplored)));
+                if (exploringUnexplored == unexploredPoints.size()) {
+                    preComplete();
+                    return;
                 }
+            }
+            while (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                    if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
+                        neighbourCounter = i;
+                        return;
+                    }
+                }
+                exploringUnexplored++;
 
-                //fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(neighbourCounter), false);
             }
         } else if (currentState != States.COMPLETED) {
             preComplete();
