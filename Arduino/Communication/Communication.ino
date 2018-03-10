@@ -15,7 +15,7 @@ bool yetToReceiveAck = false;
 bool alreadyReceived = false;
 bool stopFlag = false;
 unsigned long timer = millis();
-unsigned long timeout = 1000; // 250 milliseconds
+unsigned long timeout = 10000; // 250 milliseconds
 
 
 void setup() {
@@ -120,52 +120,62 @@ void loop() {
           RingBuffer_get(&usbBufferIn, &streamMsg.id, 2);
           RingBuffer_get(&usbBufferIn, &payloadSize, 3);
 
-          uint8_t tmpPayload[payloadSize] = {0};
-
-          //Serial.write(payloadSize);
-          for (int i = 0; i < payloadSize; i++) {
-            RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
+          uint8_t tmpInBuffer;
+          if (4+payloadSize <= usbBufferIn.count) {
+            if(RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4+payloadSize) == true && tmpInBuffer == '!'){
+              uint8_t tmpPayload[payloadSize] = {0};
+              for (int i = 0; i < payloadSize; i++) {
+                RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
+              }
+              memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
+              //Serial.println( payloadSize + 5);
+              //Serial.println(usbBufferIn.count);
+              
+              //Serial.println(usbBufferIn.count);
+              for (int i = 0; i < payloadSize; i++){
+                digitalWrite(LED_BUILTIN, HIGH);
+                delay(1000);
+                digitalWrite(LED_BUILTIN, LOW);
+                delay(1000);
+                int forwardCount = 0;
+                uint8_t action = streamMsg.streamActions[i];
+                
+                /*
+                switch(action){
+                  case FORWARD:
+                    forwardCount= 1;
+                    while(true){
+                      if((i+1) < payloadSize && streamMsg.streamActions[i+1] == FORWARD){
+                        forwardCount++;
+                        i++;        
+                      }
+                      else{
+                        break;  
+                      }
+                    }
+                    //moveForward(forwardCount);
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case TURN_RIGHT:
+                    //turn_right();
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;
+                  case TURN_LEFT:
+                    //turn_left();
+                    sendStatusUpdate();
+                    incrementID();
+                    alreadyReceived = false;
+                    break;   
+                } 
+                */
+              }
+              RingBuffer_erase(&usbBufferIn, payloadSize + 5);
+            }
           }
-          memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
-
-          for (int i = 0; i < payloadSize; i++){
-            uint8_t action = streamMsg.streamActions[i];
-            switch(action){
-              case FORWARD:
-                int forwardCount = 1
-                while(true){
-                  if((i+1) < payloadSize && streamMsg.streamActions[i+1] == FORWARD){
-                    forwardCount++;
-                    i++;        
-                  }
-                  else{
-                    break;  
-                  }
-                }
-                //moveForward(forwardCount);
-                sendStatusUpdate();
-                incrementID();
-                alreadyReceived = false;
-                break;
-              case TURN_RIGHT:
-                //turn_right();
-                sendStatusUpdate();
-                incrementID();
-                alreadyReceived = false;
-                break;
-              case TURN_LEFT:
-                //turn_left();
-                sendStatusUpdate();
-                incrementID();
-                alreadyReceived = false;
-                break;   
-            } 
-          }
-          digitalWrite(LED_BUILTIN, HIGH);
-          // you have all your actions inside streamMsg.streamActions;
-
-          RingBuffer_erase(&usbBufferIn, 5 + payloadSize);
-
         }
       } else {
         RingBuffer_pop(&usbBufferIn);

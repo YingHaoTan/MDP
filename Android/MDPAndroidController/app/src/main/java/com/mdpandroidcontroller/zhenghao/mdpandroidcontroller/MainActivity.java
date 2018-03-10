@@ -32,7 +32,6 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -211,11 +210,11 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             }
         });
 
-        robotxSelection = (EditText) settingsDialog.findViewById(R.id.robotRowSelection);
-        robotySelection = (EditText) settingsDialog.findViewById(R.id.robotColSelection);
+        robotxSelection = (EditText) settingsDialog.findViewById(R.id.robotColSelection);
+        robotySelection = (EditText) settingsDialog.findViewById(R.id.robotRowSelection);
         robotdSpinner = (Spinner) settingsDialog.findViewById(R.id.robotDirSpinner);
-        waypointxSelection = (EditText) settingsDialog.findViewById(R.id.waypointRowSelection);
-        waypointySelection = (EditText) settingsDialog.findViewById(R.id.waypointColSelection);
+        waypointxSelection = (EditText) settingsDialog.findViewById(R.id.waypointColSelection);
+        waypointySelection = (EditText) settingsDialog.findViewById(R.id.waypointRowSelection);
 
         List<String> list = new ArrayList<String>();
         list.add("Up");

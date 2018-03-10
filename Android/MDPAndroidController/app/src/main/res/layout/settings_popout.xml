@@ -31,22 +31,6 @@
             android:layout_alignParentTop="true"
             android:gravity="center_vertical"
             android:text="@string/robotStartText" />
-        <TextView
-            android:id="@+id/robotRowTextView"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:text="@string/robotRowText"
-            android:layout_below="@+id/robotStartTextView" />
-
-        <EditText
-            android:id="@+id/robotRowSelection"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/robotStartTextView"
-            android:layout_toRightOf="@+id/robotRowTextView"
-            android:inputType="number"
-            android:text="0"/>
 
         <TextView
             android:id="@+id/robotColTextView"
@@ -54,14 +38,31 @@
             android:layout_height="40dp"
             android:gravity="center_vertical"
             android:text="@string/robotColText"
-            android:layout_below="@+id/robotRowTextView" />
+            android:layout_below="@+id/robotStartTextView" />
 
         <EditText
             android:id="@+id/robotColSelection"
             android:layout_width="200dp"
             android:layout_height="40dp"
-            android:layout_below="@+id/robotRowTextView"
+            android:layout_below="@+id/robotStartTextView"
             android:layout_toRightOf="@+id/robotColTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/robotRowTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/robotRowText"
+            android:layout_below="@+id/robotColTextView" />
+
+        <EditText
+            android:id="@+id/robotRowSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/robotColTextView"
+            android:layout_toRightOf="@+id/robotRowTextView"
             android:inputType="number"
             android:text="0"/>
 
@@ -71,20 +72,20 @@
             android:layout_height="40dp"
             android:gravity="center_vertical"
             android:text="@string/robotDirText"
-            android:layout_below="@+id/robotColTextView"/>
+            android:layout_below="@+id/robotRowTextView"/>
 
         <Spinner
             android:id="@+id/robotDirSpinner"
             android:layout_width="200dp"
             android:layout_height="40dp"
-            android:layout_below="@+id/robotColTextView"
+            android:layout_below="@+id/robotRowTextView"
             android:layout_toRightOf="@+id/robotDirTextView"/>
 
         <Button
             android:id="@+id/robotButton"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_below="@id/robotColTextView"
+            android:layout_height="40dp"
+            android:layout_below="@id/robotRowTextView"
             android:layout_alignParentEnd="true"
             android:text="@string/send" />
 
@@ -105,36 +106,36 @@
             android:text="@string/waypointText" />
 
         <TextView
-            android:id="@+id/waypointRowTextView"
-            android:layout_width="150dp"
-            android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:text="@string/waypointRowText"
-            android:layout_below="@+id/waypointTextView" />
-
-        <EditText
-            android:id="@+id/waypointRowSelection"
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/waypointTextView"
-            android:layout_toRightOf="@+id/waypointRowTextView"
-            android:inputType="number"
-            android:text="0"/>
-
-        <TextView
             android:id="@+id/waypointColTextView"
             android:layout_width="150dp"
             android:layout_height="40dp"
             android:gravity="center_vertical"
             android:text="@string/waypointColText"
-            android:layout_below="@+id/waypointRowTextView" />
+            android:layout_below="@+id/waypointTextView" />
 
         <EditText
             android:id="@+id/waypointColSelection"
             android:layout_width="200dp"
             android:layout_height="40dp"
-            android:layout_below="@+id/waypointRowTextView"
+            android:layout_below="@+id/waypointTextView"
             android:layout_toRightOf="@+id/waypointColTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/waypointRowTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/waypointRowText"
+            android:layout_below="@+id/waypointColTextView" />
+
+        <EditText
+            android:id="@+id/waypointRowSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/waypointColTextView"
+            android:layout_toRightOf="@+id/waypointRowTextView"
             android:inputType="number"
             android:text="0"/>
 
@@ -142,7 +143,7 @@
             android:id="@+id/waypointButton"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_below="@+id/waypointRowTextView"
+            android:layout_below="@+id/waypointColTextView"
             android:layout_alignParentEnd="true"
             android:text="@string/send" />
 
