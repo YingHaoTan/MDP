@@ -56,12 +56,12 @@ void setup() {
   delay(50);
   goFORWARD(blockToTicks(3));
   */
-
+  goFORWARD(blockToTicks2(10));
 }
 
 void loop() {
   //stringCommands();
-  commWithRPI();
+//  commWithRPI();
 
     //Serial << mCounter[0] << " " << mCounter[1] << endl;
 }
@@ -78,7 +78,7 @@ void goFORWARD(int distance) {
   totalErrors = 0;
   lastTicks[0] = 0;
   lastTicks[1] = 0;
-  int i = 100;
+  int i = 50;
   while (i < 301) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(i, i + 10);
@@ -90,7 +90,7 @@ void goFORWARD(int distance) {
   lastTime = millis();
   delay(50);
 
-  while (mCounter[0] < distance && mCounter[1] < distance) {
+  while (mCounter[0] < distance - 596 && mCounter[1] < distance - 596) {
     //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
     if (millis() - lastTime > 100) {
       if (distance > blockToTicks(1))
@@ -102,7 +102,19 @@ void goFORWARD(int distance) {
       md.setSpeeds(setSpdR, setSpdL);
     }
   }
-
+  i = 0;
+  while (mCounter[0] < distance && mCounter[1] < distance) {
+    if (micros() - lastTime > 50) {
+      md.setSpeeds(setSpdR - i, setSpdL - i);
+      i++;
+      Serial.println(setSpdR - i);
+      if(i > 150){
+        i = 150;
+      }
+      lastTime = micros();
+    }
+  }
+  
   md.setBrakes(400, 400);
 }
 
@@ -249,6 +261,9 @@ int blockToTicks(int blocks) {
   return (1183 - 98) * blocks;
 }
 
+int blockToTicks2(int blocks) {
+  return 1192 * blocks;
+}
 
 
 //------------Functions for Checklists------------//
