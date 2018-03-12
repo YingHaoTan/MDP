@@ -1,69 +1,158 @@
 package mdp.robots;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.util.List;
 
 import mdp.models.CellState;
+import mdp.models.Direction;
 import mdp.models.RobotAction;
 import mdp.models.SensorConfiguration;
 
 /**
  * CalibrationSpecification provides methods to communicate path information
- * 
+ *
  * @author Ying Hao
  */
 public class CalibrationSpecification {
-	private RobotAction calibrationType;
-	private SensorConfiguration[] sensors;
-	
-	public CalibrationSpecification(RobotAction calibrationType, SensorConfiguration... sensors) {
-		this.calibrationType = calibrationType;
-		this.sensors = sensors;
-	}
-	
-	/**
-	 * Validates if the current vicinity of the robot fulfils the condition for calibration
-	 * @param up
-	 * @param down
-	 * @param left
-	 * @param right
-	 * @return
-	 */
-	public boolean isInPosition(RobotBase robot) {
-		boolean inPosition = true;
-		
-		for(SensorConfiguration sensor: sensors) {
-			Point location = robot.getSensorCoordinate(sensor);
-			
-			switch(robot.getSensorDirection(sensor)) {
-				case UP:
-					location = new Point(location.x, location.y + 1);
-					break;
-				case DOWN:
-					location = new Point(location.x, location.y - 1);
-					break;
-				case LEFT:
-					location = new Point(location.x - 1, location.y);
-					break;
-				case RIGHT:
-					location = new Point(location.x + 1, location.y);
-					break;
-				default:
-					break;
-			}
-			
-			CellState state = robot.getMapState().getMapCellState(location);
-			inPosition &= state == null || state == CellState.OBSTACLE;
-		}
-		
-		return inPosition;
-	}
-	
-	/**
-	 * Gets the calibration type for this specification instance
-	 * @return
-	 */
-	public RobotAction getCalibrationType() {
-		return calibrationType;
-	}
+
+    private RobotAction calibrationType;
+    private SensorConfiguration[] sensors;
+
+    public CalibrationSpecification(RobotAction calibrationType, SensorConfiguration... sensors) {
+        this.calibrationType = calibrationType;
+        this.sensors = sensors;
+    }
+
+    /**
+     * Validates if the vicinity of the robot with respect to offsetX and
+     * offsetY fulfils the condition for calibration
+     *
+     * @param robot
+     * @param offsetX
+     * @param offsetY
+     * @param offsetActions
+     * @return
+     */
+    public boolean isInPosition(RobotBase robot, RobotAction... offsetActions) {
+        boolean inPosition = true;
+
+        for (SensorConfiguration sensor : sensors) {
+            Direction direction = robot.getSensorDirection(sensor);
+            Point location = robot.getSensorCoordinate(sensor);
+
+            if (offsetActions != null) {
+                Point robotloc = robot.getMapState().getRobotPoint();
+                
+                for (RobotAction offsetA : offsetActions) {
+                    if (offsetA == RobotAction.TURN_RIGHT) {
+                        switch (direction) {
+                            case UP:
+                                direction = Direction.RIGHT;
+                                break;
+                            case DOWN:
+                                direction = Direction.LEFT;
+                                break;
+                            case LEFT:
+                                direction = Direction.UP;
+                                break;
+                            case RIGHT:
+                                direction = Direction.DOWN;
+                                break;
+
+                        }
+                    } else if (offsetA == RobotAction.TURN_LEFT) {
+                        switch (direction) {
+                            case UP:
+                                direction = Direction.LEFT;
+                                break;
+                            case DOWN:
+                                direction = Direction.RIGHT;
+                                break;
+                            case LEFT:
+                                direction = Direction.DOWN;
+                                break;
+                            case RIGHT:
+                                direction = Direction.UP;
+                                break;
+                        }
+                    } else if (offsetA == RobotAction.ABOUT_TURN) {
+                        switch (direction) {
+                            case UP:
+                                direction = Direction.DOWN;
+                                break;
+                            case DOWN:
+                                direction = Direction.UP;
+                                break;
+                            case LEFT:
+                                direction = Direction.RIGHT;
+                                break;
+                            case RIGHT:
+                                direction = Direction.LEFT;
+                                break;
+                        }
+                    } else if (offsetA == RobotAction.FORWARD) {
+                        switch(direction) {
+                            case UP:
+                                robotloc = new Point(robotloc.x, robotloc.y + 1);
+                                break;
+                            case DOWN:
+                                robotloc = new Point(robotloc.x, robotloc.y - 1);
+                                break;
+                            case LEFT:
+                                robotloc = new Point(robotloc.x - 1, robotloc.y);
+                                break;
+                            case RIGHT:
+                                robotloc = new Point(robotloc.x + 1, robotloc.y);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    
+                    if (direction == Direction.UP) {
+                        location = new Point(robotloc.x + sensor.getCoordinate(), robotloc.y);
+                    } else if (direction == Direction.DOWN) {
+                        location = new Point(robotloc.x - sensor.getCoordinate(), robotloc.y);
+                    } else if (direction == Direction.LEFT) {
+                        location = new Point(robotloc.x, robotloc.y + sensor.getCoordinate());
+                    } else {
+                        location = new Point(robotloc.x, robotloc.y - sensor.getCoordinate());
+                    }
+                }
+            }
+
+            switch (direction) {
+                case UP:
+                    location = new Point(location.x, location.y + 1);
+                    break;
+                case DOWN:
+                    location = new Point(location.x, location.y - 1);
+                    break;
+                case LEFT:
+                    location = new Point(location.x - 1, location.y);
+                    break;
+                case RIGHT:
+                    location = new Point(location.x + 1, location.y);
+                    break;
+                default:
+                    break;
+            }
+
+            CellState state = robot.getMapState().getMapCellState(location);
+            inPosition &= state == null || state == CellState.OBSTACLE;
+        }
+
+        return inPosition;
+    }
+
+    /**
+     * Gets the calibration type for this specification instance
+     *
+     * @return
+     */
+    public RobotAction getCalibrationType() {
+        return calibrationType;
+    }
 
 }

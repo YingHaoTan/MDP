@@ -100,9 +100,9 @@ public class SimulatorRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
 
-        /*for (RobotAction action : actions) {
+        for (RobotAction action : actions) {
             System.out.println(action);
-        }*/
+        }
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -112,7 +112,7 @@ public class SimulatorRobot extends RobotBase {
     }
     
     @Override
-	protected void dispatchCalibration(RobotAction action) {
+	public void dispatchCalibration(RobotAction action) {
 		System.out.println("Calibration Data: " + action);
 	}
 
@@ -180,7 +180,7 @@ public class SimulatorRobot extends RobotBase {
         }
 
         
-        
+        /*
         // Simulate false readings
         double reliability = sensor.getReliability();
         double seed = Math.random();
@@ -189,7 +189,7 @@ public class SimulatorRobot extends RobotBase {
         if(seed > reliability && distance > 0){
             distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
             //distance = distance - 1;
-        }
+        }*/
         
         
         return distance;

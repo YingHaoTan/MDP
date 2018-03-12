@@ -15,6 +15,7 @@ import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.models.CellState;
 import mdp.models.Direction;
 import mdp.models.RobotAction;
+import mdp.robots.CalibrationSpecification;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 
@@ -307,7 +308,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
                     System.out.println("========================");
-                    System.out.println("Current orienttion: " + getRobot().getCurrentOrientation() + " Checking if I can move " + action);
+                    System.out.println("Current Point: " + getMapState().getRobotPoint() + " Current orienttion: " + getRobot().getCurrentOrientation() + " Checking if I can move " + action);
                     System.out.println("========================");
                     if (canMove(actionToMapDirection(action))) {
                         // Do not turn twice in a row while exploring boundary
@@ -362,7 +363,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
 
                         getRobot().move(action);
-
                         return;
                     } else if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
                         actionPriority[0] = RobotAction.TURN_RIGHT;
@@ -372,7 +372,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     }
                 }
                 currentState = States.ABOUT_TURN;
-
                 actionPriority[0] = RobotAction.TURN_RIGHT;
                 actionPriority[1] = RobotAction.FORWARD;
                 actionPriority[2] = RobotAction.TURN_LEFT;
@@ -392,6 +391,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             getRobot().move(RobotAction.TURN_RIGHT);*/
             justTurned = true;
             currentState = States.BOUNDARY;
+            // Tell Ying Hao that here confirm can send CAL_CORNER
             getRobot().move(RobotAction.ABOUT_TURN);
         }
         if (currentState == States.EXPLORATION) {
@@ -476,8 +476,24 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         getRobot().removeRobotActionListener(this);
+        
+        RobotBase robot = getRobot();
+        CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+        if(spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)){
+            robot.move(RobotAction.ABOUT_TURN);
+        }
+        else if(spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)){
+            robot.move(RobotAction.TURN_LEFT);
+        }
+        else if(spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)){
+            robot.move(RobotAction.TURN_RIGHT);
+        }
+        
+        robot.dispatchCalibration(spec.getCalibrationType());
+        
         getRobot().stop();
         super.complete();
+        
     }
 
     private void preComplete() {
