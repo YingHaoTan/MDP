@@ -270,10 +270,10 @@ public abstract class RobotBase {
 
         actionsequence.add(RobotAction.FORWARD);
 
-        setCurrentOrientation(mapdirection);
-
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
+        
+        setCurrentOrientation(mapdirection);
     }
 
     public void moveStream(ArrayList<Direction> streamDirections) {
@@ -379,8 +379,8 @@ public abstract class RobotBase {
                 }
             }
 
-            setCurrentOrientation(newDirection);
             move(null, action);
+            setCurrentOrientation(newDirection);
         } else {
             move(orientation, action);
         }
@@ -393,14 +393,14 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
-    	dispatchMovement(mapdirection, actions);
-    	
-    	for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
-    		if(spec.isInPosition(this)) {
+        for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
+    		if(spec.isInPosition(this, null)) {
     			dispatchCalibration(spec.getCalibrationType());
     			break;
     		}
     	}
+        
+    	dispatchMovement(mapdirection, actions);
     }
 
     /*
@@ -453,5 +453,5 @@ public abstract class RobotBase {
      * Dispatches a calibration hint
      * @param action
      */
-    protected abstract void dispatchCalibration(RobotAction action);
+    public abstract void dispatchCalibration(RobotAction action);
 }

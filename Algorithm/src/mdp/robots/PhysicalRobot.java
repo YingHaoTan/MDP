@@ -130,7 +130,7 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void dispatchCalibration(RobotAction action) {
+    public void dispatchCalibration(RobotAction action) {
         synchronized (commandqueue) {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
@@ -149,6 +149,14 @@ public class PhysicalRobot extends RobotBase {
         synchronized (commandqueue) {
             commandqueue.add(new Command(orientations, actions, false));
         }
+        
+        /*
+        for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
+    		if(spec.isInPosition(this)) {
+    			dispatchCalibration(spec.getCalibrationType());
+    			break;
+    		}
+    	}*/
 
         sendArduinoMessage(new ArduinoStream(actions));
     }
