@@ -56,11 +56,13 @@ void setup() {
   delay(50);
   goFORWARD(blockToTicks(3));
   */
-  goFORWARD(blockToTicks2(10));
+
+  goFORWARD(blockToTicks(4));
+  delay(150);
 }
 
 void loop() {
-  //stringCommands();
+  stringCommands();
 //  commWithRPI();
 
     //Serial << mCounter[0] << " " << mCounter[1] << endl;
@@ -90,34 +92,52 @@ void goFORWARD(int distance) {
   lastTime = millis();
   delay(50);
 
-  while (mCounter[0] < distance - 596 && mCounter[1] < distance - 596) {
+if (distance <= 1192){
+    while (mCounter[0] < distance && mCounter[1] < distance) {
     //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
     if (millis() - lastTime > 100) {
-      if (distance > blockToTicks(1))
-        PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0); //Long distance
-      else {
-        PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
-      }
+      PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
       lastTime = millis();
       md.setSpeeds(setSpdR, setSpdL);
     }
   }
-  i = 0;
-  while (mCounter[0] < distance && mCounter[1] < distance) {
-    if (micros() - lastTime > 50) {
-      md.setSpeeds(setSpdR - i, setSpdL - i);
-      i++;
-      Serial.println(setSpdR - i);
-      if(i > 150){
-        i = 150;
+} else {
+    while (mCounter[0] < distance - 596 && mCounter[1] < distance - 596) {
+      //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
+      if (millis() - lastTime > 100) {
+        PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0); //Long distance
+        lastTime = millis();
+        md.setSpeeds(setSpdR, setSpdL);
       }
-      lastTime = micros();
+    }
+    i = 0;
+    lastTime = micros();
+    while (mCounter[0] < distance && mCounter[1] < distance) {
+      if (micros() - lastTime > 50) {
+        md.setSpeeds(setSpdR - i, setSpdL - i);
+        i++;
+        if(i > 150)
+          i = 150;
+        lastTime = micros();
+      }
     }
   }
-  
   md.setBrakes(400, 400);
 }
 
+//while (mCounter[0] < distance - 596 && mCounter[1] < distance - 596) {
+//    //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
+//    if (millis() - lastTime > 100) {
+//      if (distance > blockToTicks(1))
+//        PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0); //Long distance
+//      else {
+//        PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
+//      }
+//      lastTime = millis();
+//      md.setSpeeds(setSpdR, setSpdL);
+//    }
+//  }
+  
 void goRIGHT(int angle) {
   int ticks = angleToTicks(angle) - 51;
   int setSpdR = -200;              //Right motor
@@ -258,12 +278,12 @@ int angleToTicks(long angle) {
 }
 
 int blockToTicks(int blocks) {
-  return (1183 - 98) * blocks;
+  if (blocks == 1)
+    return (1183 - 98) * blocks;
+  else
+    return 1192 * blocks;
 }
 
-int blockToTicks2(int blocks) {
-  return 1192 * blocks;
-}
 
 
 //------------Functions for Checklists------------//
@@ -517,8 +537,8 @@ void stringCommands() {
   //int commands[] = {4,1,4,1,4,1,4,0};
   //int commands[] = {3,3,3,3,1,1,1,0};
   //int commands[] = {2,2,2,2,1,1,1,0};
-  int commands[] = {6, 7,0};
-  int threshold = 35;
+//  int commands[] = {6, 7,0};
+int commands[] = {1,4,1,4,1,4,0};
   static int x;
   switch (commands[x]) {
     case 1:
