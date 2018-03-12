@@ -37,7 +37,7 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-  goFORWARD(blockToTicks(11));
+  //goFORWARD(blockToTicks(11));
   /*
   delay(50);
   goRIGHT(90);
@@ -61,7 +61,7 @@ void setup() {
 
 void loop() {
   //stringCommands();
-  //commWithRPI();
+  commWithRPI();
 
     //Serial << mCounter[0] << " " << mCounter[1] << endl;
 }
