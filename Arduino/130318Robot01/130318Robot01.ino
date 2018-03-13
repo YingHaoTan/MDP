@@ -56,11 +56,14 @@ void setup() {
   delay(50);
   goFORWARD(blockToTicks(3));
   */
-//  goFORWARD(blockToTicks(10));
+  goRIGHT(180);
+  delay(200);
+  goRIGHT(90);
 }
 
 void loop() {
 //  stringCommands();
+//  delay(200);
   commWithRPI();
 
     //Serial << mCounter[0] << " " << mCounter[1] << endl;
@@ -137,9 +140,10 @@ if (distance <= 1192){
 //  }
   
 void goRIGHT(int angle) {
-  int ticks = angleToTicks(angle) - 51;
-  int setSpdR = -200;              //Right motor
-  int setSpdL = 206;              //Left motor
+//  int ticks = angleToTicks(angle) - 51;
+  int ticks = angleToTicks(angle);
+  int setSpdR = -300;              //Right motor
+  int setSpdL = 306;              //Left motor
   long lastTime = millis();
   lastError = 0;
   totalErrors = 0;
@@ -150,20 +154,32 @@ void goRIGHT(int angle) {
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
-  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+  while (mCounter[0] < ticks-100 && mCounter[1] < ticks-100) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, 1);
       lastTime = millis();
       md.setSpeeds(setSpdR, setSpdL);
     }
   }
+  int i = 0;
+  lastTime = micros();
+  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+    if (micros() - lastTime > 50) {
+      md.setSpeeds(setSpdR + i, setSpdL - i);
+      i++;
+      if(i > 100)
+        i = 100;
+      lastTime = micros();
+    }
+  }
   md.setBrakes(400, 400);
 }
 
 void goLEFT(int angle) {
-  int ticks = angleToTicks(angle) - 51;
-  int setSpdR = 200;              //Right motor
-  int setSpdL = -206;              //Left motor
+//  int ticks = angleToTicks(angle) - 51;
+int ticks = angleToTicks(angle);  
+  int setSpdR = 300;              //Right motor
+  int setSpdL = -306;              //Left motor
   long lastTime = millis();
   lastError = 0;
   totalErrors = 0;
@@ -174,14 +190,24 @@ void goLEFT(int angle) {
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
-  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+  while (mCounter[0] < ticks-100 && mCounter[1] < ticks-100) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, -1);
       lastTime = millis();
       md.setSpeeds(setSpdR, setSpdL);
     }
   }
-
+  int i = 0;
+  lastTime = micros();
+  while (mCounter[0] < ticks && mCounter[1] < ticks) {
+    if (micros() - lastTime > 50) {
+      md.setSpeeds(setSpdR - i, setSpdL + i);
+      i++;
+      if(i > 100)
+        i = 100;
+      lastTime = micros();
+    }
+  }
   md.setBrakes(400, 400);
 }
 
@@ -271,7 +297,8 @@ void calibrateCORNER() {
 }
 
 int angleToTicks(long angle) {
-  return 17654 * angle / 1000;
+  return 17100 * angle / 1000;
+//  return 16764 * angle / 1000;
 }
 
 int blockToTicks(int blocks) {
@@ -429,7 +456,7 @@ void commWithRPI() {
                   break;
 
                 case START:
-                  calibrateRIGHT();
+//                  calibrateRIGHT();
                   delay(100);
                   sendStatusUpdate();
                   incrementID();
@@ -530,8 +557,8 @@ void stringCommands() {
   //int commands[] = {4,1,4,1,4,1,4,0};
   //int commands[] = {3,3,3,3,1,1,1,0};
   //int commands[] = {2,2,2,2,1,1,1,0};
-  int commands[] = {4,1,0};
-//int commands[] = {5};
+//  int commands[] = {4,1,0};
+int commands[] = {5};
   static int x;
   switch (commands[x]) {
     case 1:
