@@ -39,34 +39,33 @@ void setup() {
   D Serial.println("Initializations Done");
   //goFORWARD(blockToTicks(11));
   /*
-  delay(50);
-  goRIGHT(90);
-  delay(50);
-  goFORWARD(blockToTicks(6));
-  delay(50);
-  goLEFT(90);
-  delay(50);
-  goFORWARD(blockToTicks(5));
-  delay(50);
-  goRIGHT(90);
-  delay(50);
-  goFORWARD(blockToTicks(6));
-  delay(50);
-  goLEFT(90);
-  delay(50);
-  goFORWARD(blockToTicks(3));
+    delay(50);
+    goRIGHT(90);
+    delay(50);
+    goFORWARD(blockToTicks(6));
+    delay(50);
+    goLEFT(90);
+    delay(50);
+    goFORWARD(blockToTicks(5));
+    delay(50);
+    goRIGHT(90);
+    delay(50);
+    goFORWARD(blockToTicks(6));
+    delay(50);
+    goLEFT(90);
+    delay(50);
+    goFORWARD(blockToTicks(3));
   */
-  goRIGHT(180);
-  delay(200);
-  goRIGHT(90);
+//goFORWARD(blockToTicks(11));
+
 }
 
 void loop() {
-//  stringCommands();
-//  delay(200);
+  //  stringCommands();
+  //  delay(200);
   commWithRPI();
 
-    //Serial << mCounter[0] << " " << mCounter[1] << endl;
+  //Serial << mCounter[0] << " " << mCounter[1] << endl;
 }
 
 
@@ -93,16 +92,16 @@ void goFORWARD(int distance) {
   lastTime = millis();
   delay(50);
 
-if (distance <= 1192){
+  if (distance <= 1192) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
-    //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
-    if (millis() - lastTime > 100) {
-      PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
-      lastTime = millis();
-      md.setSpeeds(setSpdR, setSpdL);
+      //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
+      if (millis() - lastTime > 100) {
+        PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
+        lastTime = millis();
+        md.setSpeeds(setSpdR, setSpdL);
+      }
     }
-  }
-} else {
+  } else {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
       //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
       if (millis() - lastTime > 100) {
@@ -117,7 +116,7 @@ if (distance <= 1192){
       if (micros() - lastTime > 50) {
         md.setSpeeds(setSpdR - i, setSpdL - i);
         i++;
-        if(i > 100)
+        if (i > 100)
           i = 100;
         lastTime = micros();
       }
@@ -138,9 +137,9 @@ if (distance <= 1192){
 //      md.setSpeeds(setSpdR, setSpdL);
 //    }
 //  }
-  
+
 void goRIGHT(int angle) {
-//  int ticks = angleToTicks(angle) - 51;
+  //  int ticks = angleToTicks(angle) - 51;
   int ticks = angleToTicks(angle);
   int setSpdR = -300;              //Right motor
   int setSpdL = 306;              //Left motor
@@ -153,8 +152,7 @@ void goRIGHT(int angle) {
 
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
-
-  while (mCounter[0] < ticks-100 && mCounter[1] < ticks-100) {
+  while (mCounter[0] < ticks - 200 && mCounter[1] < ticks - 200) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, 1);
       lastTime = millis();
@@ -167,7 +165,7 @@ void goRIGHT(int angle) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(setSpdR + i, setSpdL - i);
       i++;
-      if(i > 100)
+      if (i > 100)
         i = 100;
       lastTime = micros();
     }
@@ -177,7 +175,7 @@ void goRIGHT(int angle) {
 
 void goLEFT(int angle) {
 //  int ticks = angleToTicks(angle) - 51;
-int ticks = angleToTicks(angle);  
+  int ticks = angleToTicks(angle);
   int setSpdR = 300;              //Right motor
   int setSpdL = -306;              //Left motor
   long lastTime = millis();
@@ -190,7 +188,7 @@ int ticks = angleToTicks(angle);
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
-  while (mCounter[0] < ticks-100 && mCounter[1] < ticks-100) {
+  while (mCounter[0] < ticks - 200 && mCounter[1] < ticks - 200) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, -1);
       lastTime = millis();
@@ -203,7 +201,7 @@ int ticks = angleToTicks(angle);
     if (micros() - lastTime > 50) {
       md.setSpeeds(setSpdR - i, setSpdL + i);
       i++;
-      if(i > 100)
+      if (i > 100)
         i = 100;
       lastTime = micros();
     }
@@ -297,8 +295,11 @@ void calibrateCORNER() {
 }
 
 int angleToTicks(long angle) {
-  return 17100 * angle / 1000;
-//  return 16764 * angle / 1000;
+  if (angle == 90)
+    return 16900 * angle / 1000;
+  else
+     return 17300 * angle / 1000;
+  //  return 16764 * angle / 1000;
 }
 
 int blockToTicks(int blocks) {
@@ -456,7 +457,7 @@ void commWithRPI() {
                   break;
 
                 case START:
-//                  calibrateRIGHT();
+                  //                  calibrateRIGHT();
                   delay(100);
                   sendStatusUpdate();
                   incrementID();
@@ -488,8 +489,8 @@ void commWithRPI() {
           RingBuffer_get(&usbBufferIn, &payloadSize, 3);
 
           uint8_t tmpInBuffer;
-          if (4+payloadSize <= usbBufferIn.count) {
-            if(RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4+payloadSize) == true && tmpInBuffer == '!'){
+          if (4 + payloadSize <= usbBufferIn.count) {
+            if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4 + payloadSize) == true && tmpInBuffer == '!') {
               uint8_t tmpPayload[payloadSize] = {0};
               for (int i = 0; i < payloadSize; i++) {
                 RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
@@ -497,23 +498,23 @@ void commWithRPI() {
               memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
               //Serial.println( payloadSize + 5);
               //Serial.println(usbBufferIn.count);
-              
+
               //Serial.println(usbBufferIn.count);
-              for (int i = 0; i < payloadSize; i++){
+              for (int i = 0; i < payloadSize; i++) {
                 int forwardCount = 0;
                 uint8_t action = streamMsg.streamActions[i];
-                
-                
-                switch(action){
+
+
+                switch (action) {
                   case FORWARD:
-                    forwardCount= 1;
-                    while(true){
-                      if((i+1) < payloadSize && streamMsg.streamActions[i+1] == FORWARD){
+                    forwardCount = 1;
+                    while (true) {
+                      if ((i + 1) < payloadSize && streamMsg.streamActions[i + 1] == FORWARD) {
                         forwardCount++;
-                        i++;        
+                        i++;
                       }
-                      else{
-                        break;  
+                      else {
+                        break;
                       }
                     }
                     goFORWARD(blockToTicks(forwardCount));
@@ -532,9 +533,9 @@ void commWithRPI() {
                     sendStatusUpdate();
                     incrementID();
                     alreadyReceived = false;
-                    break;   
-                } 
-                
+                    break;
+                }
+
               }
               RingBuffer_erase(&usbBufferIn, payloadSize + 5);
             }
@@ -557,8 +558,8 @@ void stringCommands() {
   //int commands[] = {4,1,4,1,4,1,4,0};
   //int commands[] = {3,3,3,3,1,1,1,0};
   //int commands[] = {2,2,2,2,1,1,1,0};
-//  int commands[] = {4,1,0};
-int commands[] = {5};
+  //  int commands[] = {4,1,0};
+  int commands[] = {5};
   static int x;
   switch (commands[x]) {
     case 1:
