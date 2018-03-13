@@ -278,47 +278,45 @@ public abstract class RobotBase {
         
         List<RobotAction> actionsequence = new ArrayList<>();
         List<Direction> orientations = new ArrayList<>();
+        Direction lOrientation = orientation;
         for (int i = 0; i < streamDirections.size(); i++) {
             Direction mapdirection = streamDirections.get(i);
 
-            if (orientation == Direction.UP) {
+            if (lOrientation == Direction.UP) {
                 if (mapdirection == Direction.LEFT) {
                     actionsequence.add(RobotAction.TURN_LEFT);
                 } else if (mapdirection == Direction.RIGHT) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.DOWN) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.ABOUT_TURN);
                 }
-            } else if (orientation == Direction.DOWN) {
+            } else if (lOrientation == Direction.DOWN) {
                 if (mapdirection == Direction.RIGHT) {
                     actionsequence.add(RobotAction.TURN_LEFT);
                 } else if (mapdirection == Direction.LEFT) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.UP) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                	actionsequence.add(RobotAction.ABOUT_TURN);
                 }
-            } else if (orientation == Direction.LEFT) {
+            } else if (lOrientation == Direction.LEFT) {
                 if (mapdirection == Direction.DOWN) {
                     actionsequence.add(RobotAction.TURN_LEFT);
                 } else if (mapdirection == Direction.UP) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.RIGHT) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                	actionsequence.add(RobotAction.ABOUT_TURN);
                 }
             } else if (mapdirection == Direction.UP) {
                 actionsequence.add(RobotAction.TURN_LEFT);
             } else if (mapdirection == Direction.DOWN) {
                 actionsequence.add(RobotAction.TURN_RIGHT);
             } else if (mapdirection == Direction.LEFT) {
-                actionsequence.add(RobotAction.TURN_RIGHT);
-                actionsequence.add(RobotAction.TURN_RIGHT);
+            	actionsequence.add(RobotAction.ABOUT_TURN);
             }
             
             actionsequence.add(RobotAction.FORWARD);
             orientations.add(mapdirection);
+            lOrientation = mapdirection;
         }
         
         moveRobotStream(actionsequence, orientations);
@@ -487,7 +485,10 @@ public abstract class RobotBase {
     		}
     	}
     	
-    	System.out.println("Completed moving in map direction " + mapdirection);
+    	System.out.print("Completed moving in map direction " + mapdirection + " with actions ");
+    	for(RobotAction action: actions)
+    		System.out.print(action + " ");
+    	System.out.println();
     	
         for (RobotActionListener listener : new ArrayList<>(listeners))
             SwingUtilities.invokeLater(() -> listener.onRobotActionCompleted(mapdirection, actions));

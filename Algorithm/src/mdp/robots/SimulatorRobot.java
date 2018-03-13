@@ -108,20 +108,16 @@ public class SimulatorRobot extends RobotBase {
         int orientationIndex = 0;
         
         for (int i = 0; i < actions.size(); i++) {
-            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
-                NotifyTask task = new NotifyTask(null, new RobotAction[] {actions.get(i)});
-                taskqueue.offer(task);
-                if (taskqueue.size() == 1) {
-                    this.getScheduler().schedule(task, delay);
-                }
-            }
-            else{
-                NotifyTask task = new NotifyTask(orientations.get(orientationIndex++), new RobotAction[] {actions.get(i)});
-                taskqueue.offer(task);
-                if (taskqueue.size() == 1) {
-                    this.getScheduler().schedule(task, delay);
-                }
-            }
+        	NotifyTask task;
+        	
+            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT || actions.get(i) == RobotAction.ABOUT_TURN)
+                task = new NotifyTask(null, actions.get(i));
+            else
+                task = new NotifyTask(orientations.get(orientationIndex++), actions.get(i));
+        
+            taskqueue.offer(task);
+            if (taskqueue.size() == 1)
+                this.getScheduler().schedule(task, delay);
         }
         
     }
@@ -198,7 +194,7 @@ public class SimulatorRobot extends RobotBase {
         private Direction mapdirection;
         private RobotAction[] actions;
 
-        public NotifyTask(Direction mapdirection, RobotAction[] actions) {
+        public NotifyTask(Direction mapdirection, RobotAction... actions) {
             this.mapdirection = mapdirection;
             this.actions = actions;
         }

@@ -129,12 +129,6 @@ public class PhysicalRobot extends RobotBase {
 
 	@Override
 	protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-
-		System.out.println("Starting fastest path");
-		for (int i = 0; i < actions.size(); i++) {
-			System.out.println(actions.get(i));
-		}
-
 		synchronized (commandqueue) {
 			Command command = new Command(orientations, actions, false);
 			commandqueue.add(command);
@@ -238,7 +232,7 @@ public class PhysicalRobot extends RobotBase {
 					for (int i = command.completedactions; i < command.actions.size(); i++) {
 						RobotAction action = command.actions.get(i);
 
-						if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
+						if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.ABOUT_TURN) {
 							this.notify(null, action);
 						} else {
 							this.notify(command.mapdirections.get(orientationIndex++), action);

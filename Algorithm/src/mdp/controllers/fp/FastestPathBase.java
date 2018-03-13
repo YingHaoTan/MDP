@@ -73,9 +73,8 @@ public abstract class FastestPathBase implements RobotActionListener {
                 }
                 
                 if(streamDirections.size() > 0) {
+                	reset();
                     robot.moveStream(streamDirections);
-                    reset();
-                    next();
                 }
                 else {
                     complete();
@@ -95,13 +94,16 @@ public abstract class FastestPathBase implements RobotActionListener {
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-        Direction mdirection = next();
-
-        if (!faststream && mdirection != null) {
-            robot.move(mdirection);
-        } else {
-            complete();
-        }
+    	if(mapdirection != null) {
+	        Direction mdirection = next();
+	
+	        if (mdirection != null) {
+	        	if(!faststream)
+	            	robot.move(mdirection);
+	        } else {
+	            complete();
+	        }
+    	}
     }
 
     /**
