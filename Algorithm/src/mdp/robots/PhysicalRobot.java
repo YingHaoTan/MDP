@@ -140,16 +140,32 @@ public class PhysicalRobot extends RobotBase {
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        
+
         System.out.println("Starting fastest path");
-        for(int i = 0; i < actions.size(); i++){
+        for (int i = 0; i < actions.size(); i++) {
             System.out.println(actions.get(i));
         }
-        
+
         synchronized (commandqueue) {
             commandqueue.add(new Command(orientations, actions, false));
         }
-        
+
+        MapState mstate = getMapState();
+
+        for (Direction mapdirection : orientations) {
+            Point location = mstate.getRobotPoint();
+            
+            if (mapdirection == Direction.UP) {
+                mstate.setRobotPoint(new Point(location.x, location.y + 1));
+            } else if (mapdirection == Direction.DOWN) {
+                mstate.setRobotPoint(new Point(location.x, location.y - 1));
+            } else if (mapdirection == Direction.LEFT) {
+                mstate.setRobotPoint(new Point(location.x - 1, location.y));
+            } else if (mapdirection == Direction.RIGHT) {
+                mstate.setRobotPoint(new Point(location.x + 1, location.y));
+            }
+        }
+
         /*
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
     		if(spec.isInPosition(this)) {
@@ -157,7 +173,6 @@ public class PhysicalRobot extends RobotBase {
     			break;
     		}
     	}*/
-
         sendArduinoMessage(new ArduinoStream(actions));
     }
 

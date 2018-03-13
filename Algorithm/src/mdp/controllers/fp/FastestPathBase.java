@@ -7,6 +7,7 @@ import java.util.List;
 import mdp.models.Direction;
 import mdp.models.MapState;
 import mdp.models.RobotAction;
+import mdp.robots.CalibrationSpecification;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
 
@@ -17,6 +18,7 @@ import mdp.robots.RobotBase;
  */
 public abstract class FastestPathBase implements RobotActionListener {
 
+    private boolean faststream;
     private MapState mstate;
     private List<FastestPathCompletedListener> listeners;
     private RobotBase robot;
@@ -57,6 +59,7 @@ public abstract class FastestPathBase implements RobotActionListener {
         this.mstate = mstate.clone();
         this.robot = robot;
         this.destination = destination;
+        this.faststream = faststream;
 
         boolean success = preprocess();
 
@@ -68,7 +71,11 @@ public abstract class FastestPathBase implements RobotActionListener {
                 while ((direction = next()) != null) {
                     streamDirections.add(direction);
                 }
-                robot.moveStream(streamDirections);
+                
+                if(streamDirections.size() > 0)
+                    robot.moveStream(streamDirections);
+                else
+                    complete();
             } else {
                 Direction direction = next();
                 if (direction != null) {
@@ -85,7 +92,7 @@ public abstract class FastestPathBase implements RobotActionListener {
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
         Direction mdirection = next();
-        
+
         if (mdirection != null) {
             robot.move(mdirection);
         } else {
@@ -99,8 +106,24 @@ public abstract class FastestPathBase implements RobotActionListener {
      */
     private void complete() {
         robot.removeRobotActionListener(this);
-        for (FastestPathCompletedListener listener : listeners)
+
+        if (faststream) {
+            RobotBase robot = getRobot();
+            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+                robot.move(RobotAction.ABOUT_TURN);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+                robot.move(RobotAction.TURN_RIGHT);
+            }
+
+            robot.dispatchCalibration(spec.getCalibrationType());
+        }
+
+        for (FastestPathCompletedListener listener : listeners) {
             listener.onFastestPathCompleted();
+        }
     }
 
     /**
@@ -109,6 +132,11 @@ public abstract class FastestPathBase implements RobotActionListener {
      * @return
      */
     protected abstract Direction next();
+    
+    /**
+     * Resets the policy current state
+     */
+    protected abstract void reset();
 
     /**
      * Performs preprocessing before starting to stream actions for robot
