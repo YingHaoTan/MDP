@@ -2,7 +2,6 @@ package mdp.robots;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.List;
 
 import mdp.models.CellState;
 import mdp.models.Direction;
@@ -42,7 +41,7 @@ public class CalibrationSpecification {
             Dimension rdim = robot.getDimension();
             Point location = robot.getSensorCoordinate(sensor);
 
-            if (offsetActions != null) {
+            if (offsetActions != null && offsetActions.length > 0) {
                 Point robotloc = robot.getMapState().getRobotPoint();
 
                 for (RobotAction offsetA : offsetActions) {

@@ -87,19 +87,6 @@ public class SimulatorRobot extends RobotBase {
 
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
-    	MapState mstate = this.getMapState();
-        Point location = mstate.getRobotPoint();
-
-        if (mapdirection == Direction.UP) {
-            mstate.setRobotPoint(new Point(location.x, location.y + 1));
-        } else if (mapdirection == Direction.DOWN) {
-            mstate.setRobotPoint(new Point(location.x, location.y - 1));
-        } else if (mapdirection == Direction.LEFT) {
-            mstate.setRobotPoint(new Point(location.x - 1, location.y));
-        } else if (mapdirection == Direction.RIGHT) {
-            mstate.setRobotPoint(new Point(location.x + 1, location.y));
-        }
-
         for (RobotAction action : actions) {
             System.out.println(action);
         }
@@ -118,24 +105,7 @@ public class SimulatorRobot extends RobotBase {
 
     @Override
     protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        
-        
         int orientationIndex = 0;
-        MapState mstate = getMapState();
-
-        for (Direction mapdirection : orientations) {
-            Point location = mstate.getRobotPoint();
-            
-            if (mapdirection == Direction.UP) {
-                mstate.setRobotPoint(new Point(location.x, location.y + 1));
-            } else if (mapdirection == Direction.DOWN) {
-                mstate.setRobotPoint(new Point(location.x, location.y - 1));
-            } else if (mapdirection == Direction.LEFT) {
-                mstate.setRobotPoint(new Point(location.x - 1, location.y));
-            } else if (mapdirection == Direction.RIGHT) {
-                mstate.setRobotPoint(new Point(location.x + 1, location.y));
-            }
-        }
         
         for (int i = 0; i < actions.size(); i++) {
             if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
@@ -151,7 +121,6 @@ public class SimulatorRobot extends RobotBase {
                 if (taskqueue.size() == 1) {
                     this.getScheduler().schedule(task, delay);
                 }
-                
             }
         }
         

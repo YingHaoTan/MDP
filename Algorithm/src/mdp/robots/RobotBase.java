@@ -272,8 +272,6 @@ public abstract class RobotBase {
 
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
-        
-        setCurrentOrientation(mapdirection);
     }
 
     public void moveStream(ArrayList<Direction> streamDirections) {
@@ -321,7 +319,6 @@ public abstract class RobotBase {
             
             actionsequence.add(RobotAction.FORWARD);
             orientations.add(mapdirection);
-            setCurrentOrientation(mapdirection);
         }
         
         moveRobotStream(actionsequence, orientations);
@@ -380,7 +377,6 @@ public abstract class RobotBase {
             }
 
             move(null, action);
-            setCurrentOrientation(newDirection);
         } else {
             move(orientation, action);
         }
@@ -394,7 +390,7 @@ public abstract class RobotBase {
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
-    		if(spec.isInPosition(this, null)) {
+    		if(spec.isInPosition(this)) {
     			dispatchCalibration(spec.getCalibrationType());
     			break;
     		}
@@ -423,6 +419,76 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void notify(Direction mapdirection, RobotAction... actions) {
+    	for(RobotAction action: actions) {
+    		Direction orientation = getCurrentOrientation();
+    		
+    		if(action == RobotAction.TURN_LEFT) {
+    			switch(orientation) {
+    				case UP:
+    					setCurrentOrientation(Direction.LEFT);
+    					break;
+    				case DOWN:
+    					setCurrentOrientation(Direction.RIGHT);
+    					break;
+    				case LEFT:
+    					setCurrentOrientation(Direction.DOWN);
+    					break;
+    				default:
+    					setCurrentOrientation(Direction.UP);
+    					break;
+    			}
+    		}
+    		else if(action == RobotAction.TURN_RIGHT) {
+    			switch(orientation) {
+    				case UP:
+    					setCurrentOrientation(Direction.RIGHT);
+    					break;
+    				case DOWN:
+    					setCurrentOrientation(Direction.LEFT);
+    					break;
+    				case LEFT:
+    					setCurrentOrientation(Direction.UP);
+    					break;
+    				default:
+    					setCurrentOrientation(Direction.DOWN);
+    					break;
+    			}
+    		}
+    		else if(action == RobotAction.ABOUT_TURN) {
+    			switch(orientation) {
+    				case UP:
+    					setCurrentOrientation(Direction.DOWN);
+    					break;
+    				case DOWN:
+    					setCurrentOrientation(Direction.UP);
+    					break;
+    				case LEFT:
+    					setCurrentOrientation(Direction.RIGHT);
+    					break;
+    				default:
+    					setCurrentOrientation(Direction.LEFT);
+    					break;
+    			}
+    		}
+    		else if(action == RobotAction.FORWARD) {
+    			// Update supposed robot location
+    			MapState mstate = this.getMapState();
+    			Point location = mstate.getRobotPoint();
+    			
+    			if (mapdirection == Direction.UP) {
+    				mstate.setRobotPoint(new Point(location.x, location.y + 1));
+    			} else if (mapdirection == Direction.DOWN) {
+    				mstate.setRobotPoint(new Point(location.x, location.y - 1));
+    			} else if (mapdirection == Direction.LEFT) {
+    				mstate.setRobotPoint(new Point(location.x - 1, location.y));
+    			} else if (mapdirection == Direction.RIGHT) {
+    				mstate.setRobotPoint(new Point(location.x + 1, location.y));
+    			}
+    		}
+    	}
+    	
+    	System.out.println("Completed moving in map direction " + mapdirection);
+    	
         for (RobotActionListener listener : new ArrayList<>(listeners))
             SwingUtilities.invokeLater(() -> listener.onRobotActionCompleted(mapdirection, actions));
     }

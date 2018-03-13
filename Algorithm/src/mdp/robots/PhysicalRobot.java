@@ -114,22 +114,8 @@ public class PhysicalRobot extends RobotBase {
 			}
 		}
 
-		for (RobotAction action : actions) {
+		for (RobotAction action : actions)
 			sendArduinoMessage(new ArduinoInstruction(action, false));
-		}
-
-		// Update supposed robot location
-		MapState mstate = this.getMapState();
-		Point location = mstate.getRobotPoint();
-		if (mapdirection == Direction.UP) {
-			mstate.setRobotPoint(new Point(location.x, location.y + 1));
-		} else if (mapdirection == Direction.DOWN) {
-			mstate.setRobotPoint(new Point(location.x, location.y - 1));
-		} else if (mapdirection == Direction.LEFT) {
-			mstate.setRobotPoint(new Point(location.x - 1, location.y));
-		} else if (mapdirection == Direction.RIGHT) {
-			mstate.setRobotPoint(new Point(location.x + 1, location.y));
-		}
 	}
 
 	@Override
@@ -155,22 +141,6 @@ public class PhysicalRobot extends RobotBase {
 			if(commandqueue.size() == 1) {
 				timer = new Timer();
 				timer.scheduleAtFixedRate(new SimulationTask(command), 500, 500);
-			}
-		}
-
-		MapState mstate = getMapState();
-
-		for (Direction mapdirection : orientations) {
-			Point location = mstate.getRobotPoint();
-
-			if (mapdirection == Direction.UP) {
-				mstate.setRobotPoint(new Point(location.x, location.y + 1));
-			} else if (mapdirection == Direction.DOWN) {
-				mstate.setRobotPoint(new Point(location.x, location.y - 1));
-			} else if (mapdirection == Direction.LEFT) {
-				mstate.setRobotPoint(new Point(location.x - 1, location.y));
-			} else if (mapdirection == Direction.RIGHT) {
-				mstate.setRobotPoint(new Point(location.x + 1, location.y));
 			}
 		}
 
