@@ -39,11 +39,12 @@ public class CalibrationSpecification {
 
         for (SensorConfiguration sensor : sensors) {
             Direction direction = robot.getSensorDirection(sensor);
+            Dimension rdim = robot.getDimension();
             Point location = robot.getSensorCoordinate(sensor);
 
             if (offsetActions != null) {
                 Point robotloc = robot.getMapState().getRobotPoint();
-                
+
                 for (RobotAction offsetA : offsetActions) {
                     if (offsetA == RobotAction.TURN_RIGHT) {
                         switch (direction) {
@@ -92,7 +93,7 @@ public class CalibrationSpecification {
                                 break;
                         }
                     } else if (offsetA == RobotAction.FORWARD) {
-                        switch(direction) {
+                        switch (direction) {
                             case UP:
                                 robotloc = new Point(robotloc.x, robotloc.y + 1);
                                 break;
@@ -109,16 +110,18 @@ public class CalibrationSpecification {
                                 break;
                         }
                     }
-                    
-                    if (direction == Direction.UP) {
-                        location = new Point(robotloc.x + sensor.getCoordinate(), robotloc.y);
-                    } else if (direction == Direction.DOWN) {
-                        location = new Point(robotloc.x - sensor.getCoordinate(), robotloc.y);
-                    } else if (direction == Direction.LEFT) {
-                        location = new Point(robotloc.x, robotloc.y + sensor.getCoordinate());
-                    } else {
-                        location = new Point(robotloc.x, robotloc.y - sensor.getCoordinate());
-                    }
+
+                }
+
+                robotloc = new Point(robotloc.x + (rdim.width / 2), robotloc.y + (rdim.height / 2));
+                if (direction == Direction.UP) {
+                    location = new Point(robotloc.x + sensor.getCoordinate(), robotloc.y + rdim.height / 2);
+                } else if (direction == Direction.DOWN) {
+                    location = new Point(robotloc.x - sensor.getCoordinate(), robotloc.y - rdim.height / 2);
+                } else if (direction == Direction.LEFT) {
+                    location = new Point(robotloc.x - rdim.width / 2, robotloc.y + sensor.getCoordinate());
+                } else {
+                    location = new Point(robotloc.x + rdim.width / 2, robotloc.y - sensor.getCoordinate());
                 }
             }
 

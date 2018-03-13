@@ -99,4 +99,9 @@ public class AStarFastestPath extends FastestPathBase {
 		return path;
 	}
 
+    @Override
+    protected void reset() {
+        current = policy.get(0);
+    }
+
 }

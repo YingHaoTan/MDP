@@ -396,7 +396,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         if (currentState == States.EXPLORATION) {
             System.out.println("FP Exploration here..");
-            
+
             // Tune here depending on the map!
             // U can switch the positioning of the two for loops depending on the map
             for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
@@ -421,6 +421,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     exploringUnexplored++;
+                    if (exploringUnexplored == unexploredPoints.size()) {
+                        preComplete();
+                        return;
+                    }
                 }
 
                 //fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored));
@@ -436,39 +440,74 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onFastestPathCompleted() {
-        if (exploringUnexplored < unexploredPoints.size() && currentState != States.COMPLETED) {
-            if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
-                neighbourCounter++;
-                for (int i = neighbourCounter; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
-                    if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
-                        return;
+        if (currentState != States.COMPLETED) {
+            if (exploringUnexplored < unexploredPoints.size()) {
+                if (isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                    neighbourCounter++;
+                    for (int i = neighbourCounter; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
+                            return;
+                        }
+                    }
+
+                }
+                exploringUnexplored++;
+                neighbourCounter = 0;
+                while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                    exploringUnexplored++;
+                    if (exploringUnexplored == unexploredPoints.size()) {
+                        break;
+                        //preComplete();
+                        //return;
                     }
                 }
-
-            }
-            exploringUnexplored++;
+                while (exploringUnexplored < unexploredPoints.size() && !fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                    for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
+                            neighbourCounter = i;
+                            return;
+                        }
+                    }
+                    exploringUnexplored++;
+                }
+            } // Check again 
+            unexploredPoints = new ArrayList();
+            neighbourPoints = new ArrayList();
+            exploringUnexplored = 0;
             neighbourCounter = 0;
-            while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
-                exploringUnexplored++;
+            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
+                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
 
-                //System.out.println(unexploredPoints.get(exploringUnexplored) + " is " + isUnexplored(unexploredPoints.get(exploringUnexplored)));
-                if (exploringUnexplored == unexploredPoints.size()) {
-                    preComplete();
-                    return;
+                    Point tempPoint = new Point(x, y);
+                    if (isUnexplored(tempPoint)) {
+                        unexploredPoints.add(tempPoint);
+                        neighbourPoints.add(nearbyRobotPoints(tempPoint));
+                    }
                 }
             }
-            while (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
-                for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
-                    if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
-                        neighbourCounter = i;
+
+            if (unexploredPoints.size() > 0) {
+                currentState = States.EXPLORING;
+
+                while (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
+                    for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
+                        if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored).get(i), false)) {
+                            neighbourCounter = i;
+                            return;
+                        }
+                    }
+                    exploringUnexplored++;
+                    if (exploringUnexplored == unexploredPoints.size()) {
+                        preComplete();
                         return;
                     }
                 }
-                exploringUnexplored++;
 
             }
-        } else if (currentState != States.COMPLETED) {
-            preComplete();
+            if (currentState != States.COMPLETED) {
+                preComplete();
+            }
+
         }
 
     }
@@ -476,24 +515,22 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         getRobot().removeRobotActionListener(this);
-        
+
         RobotBase robot = getRobot();
         CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
-        if(spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)){
+        if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
             robot.move(RobotAction.ABOUT_TURN);
-        }
-        else if(spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)){
+        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
             robot.move(RobotAction.TURN_LEFT);
-        }
-        else if(spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)){
+        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
             robot.move(RobotAction.TURN_RIGHT);
         }
-        
+
         robot.dispatchCalibration(spec.getCalibrationType());
-        
+
         getRobot().stop();
         super.complete();
-        
+
     }
 
     private void preComplete() {

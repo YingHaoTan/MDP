@@ -69,7 +69,7 @@ public class Program {
         SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 5, 0.7);
         
         // SimulatorRobot
-        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.RIGHT);
+        SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.DOWN);
         srobot.install(front1);
         srobot.install(front2);
         srobot.install(front3);
@@ -90,7 +90,7 @@ public class Program {
 	        mdpTCPConnector.startThreads();
 	        
 	        // PhysicalRobot
-	        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.RIGHT, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
+	        PhysicalRobot probot = new PhysicalRobot(rdim, Direction.DOWN, mdpTCPConnector.getArduinoUpdateListenerList(), outgoingArduinoQueue, outgoingAndroidQueue, mdpTCPConnector.getOutgoingSemaphore());
 	        probot.install(front1);
 	        probot.install(front2);
 	        probot.install(front3);
