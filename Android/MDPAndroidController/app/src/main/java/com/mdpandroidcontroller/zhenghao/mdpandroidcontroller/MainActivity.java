@@ -28,6 +28,7 @@ import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.adapter.MazeGridAd
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.bluetooth.BluetoothService;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.ControllerTranslator;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.communication.MDPPersistentManager;
+import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.MapDescriptorFormat;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.map.Maze;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.CellState;
 import com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.models.Direction;
@@ -69,10 +70,17 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     //variables for Arena Portion
     private Maze maze;
+    private Button mdfButton = null;
     private Button settingsButton = null;
     private GridView mazeGridView = null;
     private MazeGridAdapter mazeGridAdapter = null;
     private TextView robotStatusTextView = null;
+
+    //variables for mdf popup
+    private Dialog mdfDialog = null;
+    private TextView mdf1Text = null;
+    private TextView mdf2Text = null;
+    private TextView mdfCloseText = null;
 
     //variables for settings popup
     private Dialog settingsDialog = null;
@@ -145,11 +153,15 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
         arenaInit(); //initialization for components within the arena portion
         controllerInit(); //initialization for components within the controller portion
+        mdfPopupInit(); //initialization for the mdf popup
         settingsPopupInit(); //initialization for the popup
         commandListPopupInit(); //initialization for the command list popup
     }
 
     private void arenaInit(){
+        mdfButton = (Button) findViewById(R.id.viewMDFButton);
+        mdfButton.setOnClickListener(mdfButtonListener);
+
         settingsButton = (Button) findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(settingsButtonListener);
 
@@ -194,6 +206,24 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         voiceControlResult = (TextView) findViewById(R.id.voiceControlResult);
         voiceCommandListButton = (Button) findViewById(R.id.voiceControlCommand);
         voiceCommandListButton.setOnClickListener(voiceCommandListButtonListener);
+    }
+
+    private void mdfPopupInit(){
+        mdfDialog = new Dialog(this);
+        mdfDialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // remove header on dialog
+        mdfDialog.setContentView(R.layout.viewmdf_popout);
+
+        mdfCloseText = (TextView) mdfDialog.findViewById(R.id.mdfClose);
+        mdfCloseText.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                mdfDialog.dismiss();
+            }
+        });
+
+        mdf1Text = (TextView) mdfDialog.findViewById(R.id.mdf1contentText);
+        mdf2Text = (TextView) mdfDialog.findViewById(R.id.mdf2contentText);
+
     }
 
     private void settingsPopupInit(){
@@ -249,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private void commandListPopupInit() {
         commandListDialog = new Dialog(this);
+        commandListDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         commandListDialog.setContentView(R.layout.command_list_popout);
 
         closeList = (TextView) findViewById(R.id.commandListClose);
@@ -398,6 +429,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             if (commandPhrasesList.contains(result.get(i))) {
                 voiceControlResult.setText(result.get(i));
                 inputPhrase = convertVoicePhraseToCommand(result.get(i));
+                updateUIFromVoiceCommand(result.get(i));
                 if (inputPhrase != null) {
                     Log.d(TAG, "voice control command to send: " + inputPhrase);
                     mBluetoothService.write(inputPhrase.getBytes());
@@ -430,6 +462,42 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             default:
                 Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
                 return null;
+        }
+    }
+
+    private void updateUIFromVoiceCommand(String phrase) {
+        // Use switch for now, ideally should use enum
+        switch (phrase) {
+            case Constants.VOICE_COMMAND_FORWARD:
+                break;
+            case Constants.VOICE_COMMAND_LEFT:
+                break;
+            case Constants.VOICE_COMMAND_RIGHT:
+                break;
+            case Constants.VOICE_COMMAND_BACKWARD:
+                break;
+            case Constants.VOICE_COMMAND_EXPLORE:
+                explorationButton.setChecked(true);
+                fastestPathButton.setChecked(false);
+                manualControlButton.setChecked(false);
+                break;
+            case Constants.VOICE_COMMAND_FATEST_PATH:
+                explorationButton.setChecked(false);
+                fastestPathButton.setChecked(true);
+                manualControlButton.setChecked(false);
+                break;
+            case Constants.VOICE_COMMAND_AUTO_UPDATE:
+                updateModeSwitch.setChecked(true);
+                updateModeTextView.setText(R.string.autoModeText);
+                updateButton.setVisibility(GONE);
+                break;
+            case Constants.VOICE_COMMAND_MANUAL_UPDATE:
+                updateModeSwitch.setChecked(false);
+                updateModeTextView.setText(R.string.manualModeText);
+                updateButton.setVisibility(VISIBLE);
+                break;
+            default:
+                Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
         }
     }
 
@@ -572,6 +640,16 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
             settingsDialog.show();
+        }
+    };
+
+    Button.OnClickListener mdfButtonListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mdfDialog.show();
+
+            mdf1Text.setText(maze.generateMDF(MapDescriptorFormat.MDF1));
+            mdf2Text.setText(maze.generateMDF(MapDescriptorFormat.MDF2));
         }
     };
 

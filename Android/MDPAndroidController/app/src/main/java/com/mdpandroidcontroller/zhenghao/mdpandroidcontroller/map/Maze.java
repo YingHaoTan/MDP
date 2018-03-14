@@ -115,6 +115,44 @@ public class Maze {
         }
     }
 
+    public String generateMDF(MapDescriptorFormat format){
+        String descriptor = new String();
+
+        int bitcount = 0;
+        for (int y = 0; y < MAZE_ROWS; y++) {
+            for (int x = 0; x < MAZE_COLS; x++) {
+                boolean explored = this.maze[x + y*MAZE_COLS] != UNEXPLORED_GRID;
+
+                if (format == MapDescriptorFormat.MDF1) {
+                    descriptor += explored ? "1" : "0";
+                } else if (explored) {
+                    descriptor += this.maze[x + y*MAZE_COLS] == OBSTACLE_GRID ? "1" : "0";
+                    bitcount++;
+                }
+            }
+        }
+
+        if (format == MapDescriptorFormat.MDF1) {
+            descriptor = "11" + descriptor + "11";
+        } else {
+            bitcount = bitcount % 8;
+            if (bitcount > 0) {
+                descriptor += TextUtils.join("", Collections.nCopies(8 - bitcount, "0"));
+            }
+        }
+
+        int expectedlength = descriptor.length() / 4;
+        if(descriptor.isEmpty()){
+            return "Map is unexplored";
+        }
+        String hexstring = new BigInteger(descriptor, 2).toString(16).toUpperCase();
+        if (expectedlength > hexstring.length()) {
+            hexstring = TextUtils.join("", Collections.nCopies(expectedlength - hexstring.length(), "0")) + hexstring;
+        }
+
+        return hexstring;
+    }
+
     /**
      * This method is for easy conversion to the actual arena GUI
      * Priority on robot first, then waypoint, then arena
