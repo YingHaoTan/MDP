@@ -76,6 +76,14 @@
                     android:layout_alignParentRight="true"
                     android:text="@string/settingsButtonText" />
 
+                <Button
+                    android:id="@+id/viewMDFButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/settingsButton"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/viewMDFButtonText" />
+
                 <GridView
                     android:id="@+id/mazeGridView"
                     android:layout_width="400dp"
