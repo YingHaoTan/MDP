@@ -220,8 +220,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     // Can also be optimized
-    private List<Point> nearbyRobotPoints(Point rPoint) {
-        List<Point> nearbyRobotPoints = new ArrayList<Point>();
+    private ArrayList<Point> nearbyRobotPoints(Point rPoint) {
+        ArrayList<Point> nearbyRobotPoints = new ArrayList<Point>();
 
         // Top of rPoint
         if (rPoint.y + 1 < getMapState().getMapSystemDimension().height) {
@@ -241,6 +241,32 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         return nearbyRobotPoints;
+    }
+
+    // Returns robot points
+    private ArrayList<Point> populateUnexploredPoints() {
+        ArrayList<Point> temp = new ArrayList();
+
+        // Use FP to get distance
+        // Then treat it as a TSP problem
+        for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
+            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+                Point tempPoint = new Point(x, y);
+                if (isUnexplored(tempPoint)) {
+                    temp.add(tempPoint);
+                }
+            }
+        }
+        return temp;
+    }
+
+    private ArrayList<List<Point>> populateNeighbourPoints(List<Point> points) {
+        ArrayList<List<Point>> temp = new ArrayList();
+        for (int i = 0; i < points.size(); i++) {
+            List<Point> neighbours = nearbyRobotPoints(points.get(i));
+            temp.add(neighbours);
+        }
+        return temp;
     }
 
     @Override
@@ -394,17 +420,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (currentState == States.EXPLORATION) {
             System.out.println("Exploration Round 2");
 
-            // Tune here depending on the map!
-            // U can switch the positioning of the two for loops depending on the map
-            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
-                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
-                    Point tempPoint = new Point(x, y);
-                    if (isUnexplored(tempPoint)) {
-                        unexploredPoints.add(tempPoint);
-                        neighbourPoints.add(nearbyRobotPoints(tempPoint));
-                    }
-                }
-            }
+            unexploredPoints = populateUnexploredPoints();
+            neighbourPoints = populateNeighbourPoints(unexploredPoints);
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
@@ -475,15 +492,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             // Tune here depending on the map!
             // U can switch the positioning of the two for loops depending on the map
-            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
-                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
-                    Point tempPoint = new Point(x, y);
-                    if (isUnexplored(tempPoint)) {
-                        unexploredPoints.add(tempPoint);
-                        neighbourPoints.add(nearbyRobotPoints(tempPoint));
-                    }
-                }
-            }
+            unexploredPoints = populateUnexploredPoints();
+            neighbourPoints = populateNeighbourPoints(unexploredPoints);
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
