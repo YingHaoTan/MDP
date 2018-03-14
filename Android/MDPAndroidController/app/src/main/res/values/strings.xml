@@ -42,6 +42,11 @@
     <string name="fastestButtonText">Fastest</string>
     <string name="manualControlButtonText">Command</string>
     <string name="goButtonText">GO!</string>
+
+    <string name="viewMDFButtonText">View MDF</string>
+    <string name="mdf1TextViewText">MDF1 : </string>
+    <string name="mdf2TextViewText">MDF2 : </string>
+
     <string name="settingsButtonText">Settings</string>
     <string name="robotStartText">Enter robot starting position: </string>
     <string name="robotRowText">Enter row(Y): </string>
