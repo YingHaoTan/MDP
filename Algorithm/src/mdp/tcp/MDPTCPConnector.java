@@ -253,6 +253,9 @@ public class MDPTCPConnector {
 	                        processed++;
                     	}
                     }
+                    else {
+                        System.out.println("Have not received acknowledgement for message " + nextExpectedID);
+                    }
                     
                     AndroidUpdate update = null;
                     if ((update = outgoingAndroidQueue.poll()) != null) {

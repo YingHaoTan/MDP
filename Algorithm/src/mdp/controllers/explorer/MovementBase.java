@@ -96,39 +96,52 @@ public abstract class MovementBase {
                 // Should also check for out-of-bounds (more applicable in physical robot)
                 switch (sDirection) {
                     case UP:
-                        incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + reading));
-                        obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y + reading)) ? true : obstacleChangedFlag;
-                        for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
-                            incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + range));
-                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y + range)) ? true : obstacleChangedFlag;
+                        if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y + reading)) != CellState.WAYPOINT){
+                            incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + reading));
+                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y + reading)) ? true : obstacleChangedFlag;
                         }
-                       
+                        for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
+                            if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y + range)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y + range));
+                                obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y + range)) ? true : obstacleChangedFlag;
+                            }
+                        }
                         break;
                     case DOWN:
-                        incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - reading));
-                        obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y - reading)) ? true : obstacleChangedFlag;
-                        for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
-                            incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - range));
-                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y - range)) ? true : obstacleChangedFlag;
+                        if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y - reading)) != CellState.WAYPOINT){
+                            incrementObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - reading));
+                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y - reading)) ? true : obstacleChangedFlag;
                         }
-                        
-                        
+                        for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
+                            if(mstate.getMapCellState(new Point(sCoordinate.x, sCoordinate.y - range)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x, sCoordinate.y - range));
+                                obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x, sCoordinate.y - range)) ? true : obstacleChangedFlag;
+                            }
+                        }
                         break;
                     case LEFT:
-                        incrementObstacleCounter(new Point(sCoordinate.x - reading, sCoordinate.y));
-                        obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x - reading, sCoordinate.y)) ? true : obstacleChangedFlag;
+                        if(mstate.getMapCellState(new Point(sCoordinate.x - reading, sCoordinate.y)) != CellState.WAYPOINT){
+                            incrementObstacleCounter(new Point(sCoordinate.x - reading, sCoordinate.y));
+                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x - reading, sCoordinate.y)) ? true : obstacleChangedFlag;
+                        }
                         for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
-                            incrementNoObstacleCounter(new Point(sCoordinate.x - range, sCoordinate.y));
-                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x - range, sCoordinate.y)) ? true : obstacleChangedFlag;
+                            if(mstate.getMapCellState(new Point(sCoordinate.x - range, sCoordinate.y)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x - range, sCoordinate.y));
+                                obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x - range, sCoordinate.y)) ? true : obstacleChangedFlag;
+                            }
                         }
                         
                         break;
                     case RIGHT:
-                        incrementObstacleCounter(new Point(sCoordinate.x + reading, sCoordinate.y));
-                        obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x + reading, sCoordinate.y)) ? true : obstacleChangedFlag;
+                        if(mstate.getMapCellState(new Point(sCoordinate.x + reading, sCoordinate.y)) != CellState.WAYPOINT){
+                            incrementObstacleCounter(new Point(sCoordinate.x + reading, sCoordinate.y));
+                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x + reading, sCoordinate.y)) ? true : obstacleChangedFlag;
+                        }
                         for (int range = sensor.getMinDistance() + 1; range < reading; range++) {
-                            incrementNoObstacleCounter(new Point(sCoordinate.x + range, sCoordinate.y));
-                            obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x + range, sCoordinate.y)) ? true : obstacleChangedFlag;
+                            if(mstate.getMapCellState(new Point(sCoordinate.x + range, sCoordinate.y)) != CellState.WAYPOINT){
+                                incrementNoObstacleCounter(new Point(sCoordinate.x + range, sCoordinate.y));
+                                obstacleChangedFlag = changeAndCheckCellState(new Point(sCoordinate.x + range, sCoordinate.y)) ? true : obstacleChangedFlag;
+                            }
                         }
                         break;
                 }
