@@ -529,6 +529,9 @@ void commWithRPI() {
                 }
 
               }
+			  sendStatusUpdate();
+              incrementID();
+              alreadyReceived = false;
               RingBuffer_erase(&usbBufferIn, payloadSize + 5);
             }
           }
