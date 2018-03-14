@@ -24,8 +24,8 @@
 #define longmodel 20150
 
 //---------------------Definitions for Motors---------------------//
-#define turnLeftTicks  //820
-#define turnRightTicks 30 //790,
+#define turnLeftTicks  0//820
+#define turnRightTicks -30 //790
 
 //---------------------Global Variables---------------------//
 //Variables used in the ISRs for the Motor Encoders

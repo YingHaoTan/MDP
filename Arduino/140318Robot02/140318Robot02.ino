@@ -40,6 +40,7 @@ void setup() {
 
   //calibrateCORNER();
   //delay(100);
+  /*
   goLEFT(90);
   delay(100);
   goLEFT(90);
@@ -56,6 +57,7 @@ void setup() {
   delay(100);
   goLEFT(90);
   delay(100);
+  */
   //goFORWARD(blockToTicks(1));
   //delay(250);
   //goFORWARD(blockToTicks(1));
@@ -141,7 +143,7 @@ void goRIGHT(int angle) {
 
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
-  while (mCounter[0] < angleToTicks(angle) - 200 && mCounter[1] < angleToTicks(angle) - 200) {
+  while (mCounter[0] < angleToTicks(angle) - turnRightTicks - 200 && mCounter[1] < angleToTicks(angle) - turnRightTicks - 200) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, 1);
       lastTime = millis();
@@ -150,7 +152,7 @@ void goRIGHT(int angle) {
   }
   int i = 0;
   lastTime = micros();
-  while (mCounter[0] < angleToTicks(angle) && mCounter[1] < angleToTicks(angle)) {
+  while (mCounter[0] < angleToTicks(angle) - turnRightTicks && mCounter[1] < angleToTicks(angle) - turnRightTicks) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(setSpdR + i, setSpdL - i);
       i++;
@@ -175,7 +177,7 @@ void goLEFT(int angle) {
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
 
-  while (mCounter[0] < angleToTicks(angle) - 200 && mCounter[1] < angleToTicks(angle) - 200) {
+  while (mCounter[0] < angleToTicks(angle) - turnLeftTicks - 200 && mCounter[1] < angleToTicks(angle) - turnLeftTicks - 200) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, -1);
       lastTime = millis();
@@ -184,7 +186,7 @@ void goLEFT(int angle) {
   }
   int i = 0;
   lastTime = micros();
-  while (mCounter[0] < angleToTicks(angle) && mCounter[1] < angleToTicks(angle)) {
+  while (mCounter[0] < angleToTicks(angle) - turnLeftTicks && mCounter[1] < angleToTicks(angle) - turnLeftTicks) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(setSpdR - i, setSpdL + i);
       i++;
