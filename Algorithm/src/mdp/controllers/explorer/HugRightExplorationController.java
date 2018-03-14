@@ -399,9 +399,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             // Tune here depending on the map!
             // U can switch the positioning of the two for loops depending on the map
-            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
-                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
-
+            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
                     Point tempPoint = new Point(x, y);
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
@@ -470,14 +469,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     }
                     exploringUnexplored++;
                 }
-            } // Check again 
+            }
+            // Check again 
             unexploredPoints = new ArrayList();
             neighbourPoints = new ArrayList();
             exploringUnexplored = 0;
             neighbourCounter = 0;
-            for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
-                for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
 
+            // Tune here depending on the map!
+            // U can switch the positioning of the two for loops depending on the map
+            for (int x = 0; x < getMapState().getRobotSystemDimension().width; x++) {
+                for (int y = 0; y < getMapState().getRobotSystemDimension().height; y++) {
                     Point tempPoint = new Point(x, y);
                     if (isUnexplored(tempPoint)) {
                         unexploredPoints.add(tempPoint);
@@ -507,9 +509,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             if (currentState != States.COMPLETED) {
                 preComplete();
             }
-
         }
-
+        if (currentState == States.COMPLETED) {
+            complete();
+        }
     }
 
     @Override

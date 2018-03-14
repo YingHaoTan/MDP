@@ -134,7 +134,8 @@ public class PhysicalRobot extends RobotBase {
         synchronized (commandqueue) {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
-
+        System.out.println("Calibration Data: " + action);
+        
         sendArduinoMessage(new ArduinoInstruction(action, false));
     }
 
@@ -166,18 +167,14 @@ public class PhysicalRobot extends RobotBase {
             }
         }
 
-        /*
-        for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
-    		if(spec.isInPosition(this)) {
-    			dispatchCalibration(spec.getCalibrationType());
-    			break;
-    		}
-    	}*/
         sendArduinoMessage(new ArduinoStream(actions));
+        Point rpoint = mstate.getRobotPoint();
+        sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
     }
 
     public void stop() {
         // Send stop message
+        System.out.println("Exploration completed");
         sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, false));
     }
 
