@@ -112,6 +112,7 @@ public class PhysicalRobot extends RobotBase {
         }
 
         for (RobotAction action : actions) {
+            System.out.println("In Physical Robot: " + action);
             sendArduinoMessage(new ArduinoInstruction(action, false));
         }
 

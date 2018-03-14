@@ -101,7 +101,7 @@ public class SimulatorRobot extends RobotBase {
         }
 
         for (RobotAction action : actions) {
-            System.out.println(action);
+            System.out.println("In Simulator Robot: " + action);
         }
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
@@ -113,7 +113,7 @@ public class SimulatorRobot extends RobotBase {
     
     @Override
 	public void dispatchCalibration(RobotAction action) {
-		System.out.println("Calibration Data: " + action);
+            System.out.println("Calibration Data: " + action);
 	}
 
     @Override
