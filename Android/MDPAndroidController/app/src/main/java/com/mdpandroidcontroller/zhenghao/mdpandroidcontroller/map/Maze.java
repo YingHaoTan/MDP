@@ -132,7 +132,9 @@ public class Maze {
             }
         }
 
-        if (format == MapDescriptorFormat.MDF2){
+        if (format == MapDescriptorFormat.MDF1) {
+            descriptor = "11" + descriptor + "11";
+        } else {
             bitcount = bitcount % 8;
             if (bitcount > 0) {
                 descriptor += TextUtils.join("", Collections.nCopies(8 - bitcount, "0"));
