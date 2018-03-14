@@ -224,9 +224,6 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         mdf1Text = (TextView) mdfDialog.findViewById(R.id.mdf1contentText);
         mdf2Text = (TextView) mdfDialog.findViewById(R.id.mdf2contentText);
 
-        mdf1Text.setText(maze.generateMDF(MapDescriptorFormat.MDF1));
-        mdf2Text.setText(maze.generateMDF(MapDescriptorFormat.MDF2));
-
     }
 
     private void settingsPopupInit(){
@@ -650,6 +647,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
         @Override
         public void onClick(View v) {
             mdfDialog.show();
+
+            mdf1Text.setText(maze.generateMDF(MapDescriptorFormat.MDF1));
+            mdf2Text.setText(maze.generateMDF(MapDescriptorFormat.MDF2));
         }
     };
 
