@@ -249,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private void commandListPopupInit() {
         commandListDialog = new Dialog(this);
+        commandListDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         commandListDialog.setContentView(R.layout.command_list_popout);
 
         closeList = (TextView) findViewById(R.id.commandListClose);
@@ -398,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             if (commandPhrasesList.contains(result.get(i))) {
                 voiceControlResult.setText(result.get(i));
                 inputPhrase = convertVoicePhraseToCommand(result.get(i));
+                updateUIFromVoiceCommand(result.get(i));
                 if (inputPhrase != null) {
                     Log.d(TAG, "voice control command to send: " + inputPhrase);
                     mBluetoothService.write(inputPhrase.getBytes());
@@ -430,6 +432,42 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             default:
                 Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
                 return null;
+        }
+    }
+
+    private void updateUIFromVoiceCommand(String phrase) {
+        // Use switch for now, ideally should use enum
+        switch (phrase) {
+            case Constants.VOICE_COMMAND_FORWARD:
+                break;
+            case Constants.VOICE_COMMAND_LEFT:
+                break;
+            case Constants.VOICE_COMMAND_RIGHT:
+                break;
+            case Constants.VOICE_COMMAND_BACKWARD:
+                break;
+            case Constants.VOICE_COMMAND_EXPLORE:
+                explorationButton.setChecked(true);
+                fastestPathButton.setChecked(false);
+                manualControlButton.setChecked(false);
+                break;
+            case Constants.VOICE_COMMAND_FATEST_PATH:
+                explorationButton.setChecked(false);
+                fastestPathButton.setChecked(true);
+                manualControlButton.setChecked(false);
+                break;
+            case Constants.VOICE_COMMAND_AUTO_UPDATE:
+                updateModeSwitch.setChecked(true);
+                updateModeTextView.setText(R.string.autoModeText);
+                updateButton.setVisibility(GONE);
+                break;
+            case Constants.VOICE_COMMAND_MANUAL_UPDATE:
+                updateModeSwitch.setChecked(false);
+                updateModeTextView.setText(R.string.manualModeText);
+                updateButton.setVisibility(VISIBLE);
+                break;
+            default:
+                Log.e(TAG, "Convert voice to phrase error, non existing phrase!");
         }
     }
 

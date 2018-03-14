@@ -55,4 +55,14 @@
     <string name="resetStringText">Reset Arena</string>
     <string name="resetDescriptionText">Are you sure you want to reset the arena?</string>
 
+    <!--command phrases, please sync with the same phrases in Constants.java-->
+    <string name="commandForward">Move forward: \'move forward\'</string>
+    <string name="commandLeft">Move left: \'turn left\'</string>
+    <string name="commandRight">Move right: \'turn right\'</string>
+    <string name="commandBackward">Move backward: \'move backward\'</string>
+    <string name="commandExplore">Execute exploration: \'explore mode\'</string>
+    <string name="commandFastestPath">Execute fastest path: \'fastest path mode\'</string>
+    <string name="commandAuto">Switch to auto update: \'auto update\'</string>
+    <string name="commandManual">Switch to manual update: \'manual update\'</string>
+
 </resources>
