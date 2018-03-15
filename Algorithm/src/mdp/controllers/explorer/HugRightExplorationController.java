@@ -71,10 +71,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
-                    //justTurnedCounter++;
                     justTurned = true;
                 } else {
-                    //justTurnedCounter = 0;
                     justTurned = false;
                 }
                 getRobot().move(action);
@@ -354,7 +352,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             }
                         }*/
 
-                        System.out.println(currentState);
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;
@@ -395,7 +392,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             getRobot().move(RobotAction.ABOUT_TURN);
         }
         if (currentState == States.EXPLORATION) {
-            System.out.println("FP Exploration here..");
+            System.out.println("Exploration Round 2");
 
             // Tune here depending on the map!
             // U can switch the positioning of the two for loops depending on the map
@@ -528,7 +525,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
             robot.move(RobotAction.TURN_RIGHT);
         }
-
         robot.dispatchCalibration(spec.getCalibrationType());
 
         getRobot().stop();
