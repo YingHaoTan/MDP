@@ -250,7 +250,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         // Update internal map state
         sensorsScan();
-
+        System.out.println(currentState);
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
             getRobot().move(RobotAction.SCAN);
             System.out.println("Rescanning..");
@@ -267,26 +267,28 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP) {
 
             // Check if you're in that weird loop
-            lastTenActions.add(actions[0]);
-            if (lastTenActions.size() > 10) {
-                lastTenActions.pop();
-            }
-            // Check if last eight actions are TR, F, TR, F, TR, F, TR, F, TR, F
-            if (lastTenActions.size() == 10) {
-                boolean flag = true;
-                for (int i = 0; i < lastTenActions.size(); i++) {
-                    if (i % 2 == 0) {
-                        if (lastTenActions.get(i) != RobotAction.TURN_RIGHT) {
+            if (actions[0] != RobotAction.SCAN) {
+                lastTenActions.add(actions[0]);
+                if (lastTenActions.size() > 10) {
+                    lastTenActions.pop();
+                }
+                // Check if last eight actions are TR, F, TR, F, TR, F, TR, F, TR, F
+                if (lastTenActions.size() == 10) {
+                    boolean flag = true;
+                    for (int i = 0; i < lastTenActions.size(); i++) {
+                        if (i % 2 == 0) {
+                            if (lastTenActions.get(i) != RobotAction.TURN_RIGHT) {
+                                flag = false;
+                                break;
+                            }
+                        } else if (lastTenActions.get(i) != RobotAction.FORWARD) {
                             flag = false;
                             break;
                         }
-                    } else if (lastTenActions.get(i) != RobotAction.FORWARD) {
-                        flag = false;
-                        break;
                     }
-                }
-                if (flag) {
-                    currentState = States.LOOPING;
+                    if (flag) {
+                        currentState = States.LOOPING;
+                    }
                 }
             }
 
@@ -386,9 +388,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 justTurned = true;
             }
             getRobot().move(RobotAction.TURN_RIGHT);*/
-            justTurned = true;
+            //justTurned = true;
+            justTurned = false;
             currentState = States.BOUNDARY;
-            // Tell Ying Hao that here confirm can send CAL_CORNER
             getRobot().move(RobotAction.ABOUT_TURN);
         }
         if (currentState == States.EXPLORATION) {

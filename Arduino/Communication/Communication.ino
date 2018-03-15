@@ -140,7 +140,7 @@ void loop() {
                 int forwardCount = 0;
                 uint8_t action = streamMsg.streamActions[i];
                 
-                /*
+                
                 switch(action){
                   case FORWARD:
                     forwardCount= 1;
@@ -154,9 +154,6 @@ void loop() {
                       }
                     }
                     //moveForward(forwardCount);
-                    sendStatusUpdate();
-                    incrementID();
-                    alreadyReceived = false;
                     break;
                   case TURN_RIGHT:
                     //turn_right();
@@ -166,13 +163,13 @@ void loop() {
                     break;
                   case TURN_LEFT:
                     //turn_left();
-                    sendStatusUpdate();
-                    incrementID();
-                    alreadyReceived = false;
                     break;   
                 } 
-                */
+                
               }
+              sendStatusUpdate();
+              incrementID();
+              alreadyReceived = false;
               RingBuffer_erase(&usbBufferIn, payloadSize + 5);
             }
           }
@@ -216,12 +213,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = 2;
-  statusPayload.front2 = 2;
-  statusPayload.front3 = 2;
+  statusPayload.front1 = 0;
+  statusPayload.front2 = 0;
+  statusPayload.front3 = 0;
   statusPayload.right1 = 0;
   statusPayload.right2 = 0;
-  statusPayload.left1 = 1;
+  statusPayload.left1 = 0;
   statusPayload.reached = 1;
 
 
