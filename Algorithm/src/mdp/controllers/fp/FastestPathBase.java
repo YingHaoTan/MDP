@@ -127,6 +127,34 @@ public abstract class FastestPathBase implements RobotActionListener {
             listener.onFastestPathCompleted();
         }
     }
+    
+    /**
+     * Number of RobotAction needed to get this robot from its current location to destination
+     * @param mstate
+     * @param robot
+     * @param destination
+     * @return -1 if unable to go to destination, else, return the number of RobotAction needed.
+     */
+    public int numberOfMoves(MapState mstate, RobotBase robot, Point destination){
+        int moves = -1;
+        this.mstate = mstate.clone();
+        this.robot = robot;
+        this.destination = destination;
+        
+        boolean success = preprocess();
+        
+        if(success){
+            moves = 0;
+            Direction direction;
+            while ((direction = next()) != null) {
+                moves++;
+            }
+            return moves;
+        }
+        
+        return moves;
+    
+    }
 
     /**
      * Gets the next map direction to move into
