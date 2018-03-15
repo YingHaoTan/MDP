@@ -23,192 +23,192 @@ import mdp.models.SensorConfiguration;
  */
 public class SimulatorRobot extends RobotBase {
 	private MapState simulationMapState;
-    private Queue<NotifyTask> taskqueue;
-    private long delay;
+	private Queue<NotifyTask> taskqueue;
+	private long delay;
 
-    /**
-     * Creates an instance of SimulatorRobot with a default delay timer of 1
-     * second
-     *
-     * @param map
-     * @param orientation
-     */
-    public SimulatorRobot(Dimension dimension, Direction orientation) {
-        super(dimension, orientation);
-        taskqueue = new LinkedList<>();
-        delay = 10;
-    }
-
-    /**
-     * Gets the delay timer specified in milliseconds
-     *
-     * @return
-     */
-    public long getDelay() {
-        return delay;
-    }
-
-    /**
-     * Sets the delay timer specified in milliseconds
-     *
-     * @param delay
-     */
-    public void setDelay(long delay) {
-        this.delay = delay;
-    }
-    
-    /**
-     * Gets the simulation map state
-     * @return
-     */
-    public MapState getSimulationMapState() {
-    	return simulationMapState;
-    }
-    
-    /**
-     * Sets the simulation map state
-     * @param mstate
-     */
-    public void setSimulationMapState(MapState mstate) {
-    	this.simulationMapState = mstate;
-    }
-
-    @Override
-    public Map<SensorConfiguration, Integer> getSensorReading() {
-        Map<SensorConfiguration, Integer> readings = new HashMap<>();
-        List<SensorConfiguration> sensors = this.getSensors();
-
-        for (SensorConfiguration sensor : sensors) {
-            readings.put(sensor, getObstacleDistance(sensor));
-        }
-
-        return readings;
-    }
-
-    @Override
-    protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
-        for (RobotAction action : actions) {
-            System.out.println("In Simulator Robot: " + action);
-        }
-
-        NotifyTask task = new NotifyTask(mapdirection, actions);
-        taskqueue.offer(task);
-        if (taskqueue.size() == 1) {
-            this.getScheduler().schedule(task, delay);
-        }
-    }
-    
-    @Override
-	public void dispatchCalibration(RobotAction action) {
-            System.out.println("Calibration Data: " + action);
+	/**
+	 * Creates an instance of SimulatorRobot with a default delay timer of 1
+	 * second
+	 *
+	 * @param map
+	 * @param orientation
+	 */
+	public SimulatorRobot(Dimension dimension, Direction orientation) {
+		super(dimension, orientation);
+		taskqueue = new LinkedList<>();
+		delay = 10;
 	}
 
-    @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
-        int orientationIndex = 0;
-        
-        for (int i = 0; i < actions.size(); i++) {
-        	NotifyTask task;
-        	
-            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT || actions.get(i) == RobotAction.ABOUT_TURN)
-                task = new NotifyTask(null, actions.get(i));
-            else
-                task = new NotifyTask(orientations.get(orientationIndex++), actions.get(i));
-        
-            taskqueue.offer(task);
-            if (taskqueue.size() == 1)
-                this.getScheduler().schedule(task, delay);
-        }
-        
-    }
+	/**
+	 * Gets the delay timer specified in milliseconds
+	 *
+	 * @return
+	 */
+	public long getDelay() {
+		return delay;
+	}
 
-    /**
-     * Gets the obstacle distance from the sensor
-     *
-     * @param sensor
-     * @return
-     */
-    private int getObstacleDistance(SensorConfiguration sensor) {
-        
-    	MapState mstate = this.getSimulationMapState();
-        Direction sdirection = this.getSensorDirection(sensor);
-        Point scoordinate = this.getSensorCoordinate(sensor);
-        Dimension mdim = mstate.getMapSystemDimension();
-        int distance = 0;
+	/**
+	 * Sets the delay timer specified in milliseconds
+	 *
+	 * @param delay
+	 */
+	public void setDelay(long delay) {
+		this.delay = delay;
+	}
 
-        if (sdirection == Direction.UP) {
-            for (int y = scoordinate.y + 1; y < mdim.height && distance == 0; y++) {
-                if (mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE) {
-                    distance = y - scoordinate.y;
-                }
-            }
-        } else if (sdirection == Direction.DOWN) {
-            for (int y = scoordinate.y - 1; y >= 0 && distance == 0; y--) {
-                if (mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE) {
-                    distance = scoordinate.y - y;
-                }
-            }
-        } else if (sdirection == Direction.LEFT) {
-            for (int x = scoordinate.x - 1; x >= 0 && distance == 0; x--) {
-                if (mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE) {
-                    distance = scoordinate.x - x;
-                }
-            }
-        } else {
-            for (int x = scoordinate.x + 1; x < mdim.width && distance == 0; x++) {
-                if (mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE) {
-                    distance = x - scoordinate.x;
-                }
-            }
-        }
+	/**
+	 * Gets the simulation map state
+	 * @return
+	 */
+	public MapState getSimulationMapState() {
+		return simulationMapState;
+	}
 
-        
-        /*
+	/**
+	 * Sets the simulation map state
+	 * @param mstate
+	 */
+	public void setSimulationMapState(MapState mstate) {
+		this.simulationMapState = mstate;
+	}
+
+	@Override
+	public Map<SensorConfiguration, Integer> getSensorReading() {
+		Map<SensorConfiguration, Integer> readings = new HashMap<>();
+		List<SensorConfiguration> sensors = this.getSensors();
+
+		for (SensorConfiguration sensor : sensors) {
+			readings.put(sensor, getObstacleDistance(sensor));
+		}
+
+		return readings;
+	}
+
+	@Override
+	protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
+		for (RobotAction action : actions) {
+			System.out.println("In Simulator Robot: " + action);
+		}
+
+		NotifyTask task = new NotifyTask(mapdirection, actions);
+		taskqueue.offer(task);
+		if (taskqueue.size() == 1) {
+			this.getScheduler().schedule(task, delay);
+		}
+	}
+
+	@Override
+	public void dispatchCalibration(RobotAction action) {
+		System.out.println("Calibration Data: " + action);
+	}
+
+	@Override
+	protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+		int orientationIndex = 0;
+
+		for (int i = 0; i < actions.size(); i++) {
+			NotifyTask task;
+
+			if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT || actions.get(i) == RobotAction.ABOUT_TURN)
+				task = new NotifyTask(null, actions.get(i));
+			else
+				task = new NotifyTask(orientations.get(orientationIndex++), actions.get(i));
+
+			taskqueue.offer(task);
+			if (taskqueue.size() == 1)
+				this.getScheduler().schedule(task, delay);
+		}
+
+	}
+
+	/**
+	 * Gets the obstacle distance from the sensor
+	 *
+	 * @param sensor
+	 * @return
+	 */
+	private int getObstacleDistance(SensorConfiguration sensor) {
+
+		MapState mstate = this.getSimulationMapState();
+		Direction sdirection = this.getSensorDirection(sensor);
+		Point scoordinate = this.getSensorCoordinate(sensor);
+		Dimension mdim = mstate.getMapSystemDimension();
+		int distance = 0;
+
+		if (sdirection == Direction.UP) {
+			for (int y = scoordinate.y + 1; y < mdim.height && distance == 0; y++) {
+				if (mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE) {
+					distance = y - scoordinate.y;
+				}
+			}
+		} else if (sdirection == Direction.DOWN) {
+			for (int y = scoordinate.y - 1; y >= 0 && distance == 0; y--) {
+				if (mstate.getMapCellState(new Point(scoordinate.x, y)) == CellState.OBSTACLE) {
+					distance = scoordinate.y - y;
+				}
+			}
+		} else if (sdirection == Direction.LEFT) {
+			for (int x = scoordinate.x - 1; x >= 0 && distance == 0; x--) {
+				if (mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE) {
+					distance = scoordinate.x - x;
+				}
+			}
+		} else {
+			for (int x = scoordinate.x + 1; x < mdim.width && distance == 0; x++) {
+				if (mstate.getMapCellState(new Point(x, scoordinate.y)) == CellState.OBSTACLE) {
+					distance = x - scoordinate.x;
+				}
+			}
+		}
+
+
+		/*
         // Simulate false readings
         double reliability = sensor.getReliability();
         double seed = Math.random();
-        
+
         // Send error readings
         if(seed > reliability && distance > 0){
             distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
             //distance = distance - 1;
         }*/
-        
-        
-        return distance;
-    }
 
-    @Override
-    public void stop() {
-        System.out.println("Simulated Robot stopped.");
-    }
 
-    /**
-     * NotifyTask is a TimerTask that notifies registered RobotActionListener on
-     * a specific robot action sequence completion
-     *
-     * @author Ying Hao
-     */
-    private class NotifyTask extends TimerTask {
+		return distance;
+	}
 
-        private Direction mapdirection;
-        private RobotAction[] actions;
+	@Override
+	public void stop() {
+		System.out.println("Simulated Robot stopped.");
+	}
 
-        public NotifyTask(Direction mapdirection, RobotAction... actions) {
-            this.mapdirection = mapdirection;
-            this.actions = actions;
-        }
+	/**
+	 * NotifyTask is a TimerTask that notifies registered RobotActionListener on
+	 * a specific robot action sequence completion
+	 *
+	 * @author Ying Hao
+	 */
+	private class NotifyTask extends TimerTask {
 
-        @Override
-        public void run() {
-            SimulatorRobot.this.notify(mapdirection, actions);
-            SimulatorRobot.this.taskqueue.poll();
+		private Direction mapdirection;
+		private RobotAction[] actions;
 
-            if (SimulatorRobot.this.taskqueue.size() > 0) {
-                SimulatorRobot.this.getScheduler().schedule(SimulatorRobot.this.taskqueue.peek(), delay);
-            }
-        }
+		public NotifyTask(Direction mapdirection, RobotAction... actions) {
+			this.mapdirection = mapdirection;
+			this.actions = actions;
+		}
 
-    }
+		@Override
+		public void run() {
+			SimulatorRobot.this.notify(mapdirection, actions);
+			SimulatorRobot.this.taskqueue.poll();
+
+			if (SimulatorRobot.this.taskqueue.size() > 0) {
+				SimulatorRobot.this.getScheduler().schedule(SimulatorRobot.this.taskqueue.peek(), delay);
+			}
+		}
+
+	}
 
 }
