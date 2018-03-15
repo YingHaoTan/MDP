@@ -67,12 +67,13 @@ void setup() {
   //goFORWARD(blockToTicks(1));
   //delay(250);
   //goFORWARD(blockToTicks(1));
+//  calibrateCORNER();
 }
 
 void loop() {
-  stringCommands();
-  delay(1500);
-//  commWithRPI();
+  //stringCommands();
+  //delay(1500);
+  commWithRPI();
 }
 
 
@@ -81,7 +82,7 @@ void loop() {
 void goFORWARD(int distance) {
   long lastTime = micros();
   int setSpdR = 300;
-  int setSpdL = 306;
+  int setSpdL = 310;
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
@@ -293,7 +294,7 @@ int angleToTicks(long angle) {
 
 int blockToTicks(int blocks) {
   if (blocks == 1)
-    return (1183 - 98) * blocks;
+    return (1183 - forwardOffsetTicks) * blocks;
   else
     return 1192 * blocks;
 }
@@ -339,14 +340,11 @@ void resetMCounters() {
 //ISR for Motor 1 (Right) Encoders
 ISR(PCINT2_vect) {
   mCounter[0]++;
-  //Serial.print(" Motor 1: ");
-  //Serial.println(mCounter[0]);
 }
 
 //ISR for Motor 2 (Left) Encoders
 ISR(PCINT0_vect) {
   mCounter[1]++;
-  //Serial.println(mCounter[1]);
 }
 
 //Standard function to enable interrupts on any pins
@@ -391,7 +389,7 @@ void commWithRPI() {
               switch (instructMsg.action) {
                 case TURN_LEFT:
                   goLEFT(90);
-                  delay(200);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -399,7 +397,7 @@ void commWithRPI() {
                   break;
                 case TURN_RIGHT:
                   goRIGHT(90);
-                  delay(200);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -407,7 +405,7 @@ void commWithRPI() {
                   break;
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
-                  delay(200);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -415,7 +413,7 @@ void commWithRPI() {
                   break;
                 case CAL_CORNER:
                   calibrateCORNER();
-                  delay(200);
+                  delay(100);
                   calCounter = 0;
                   sendStatusUpdate();
                   incrementID();
@@ -432,14 +430,14 @@ void commWithRPI() {
                     }
                   }
                   calCounter = 0;
-                  delay(200);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
                   break;
 
                 case SCAN:
-                  delay(200);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -448,7 +446,7 @@ void commWithRPI() {
 
                 case START:
                   //                  calibrateRIGHT();
-                  delay(200);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -458,7 +456,7 @@ void commWithRPI() {
                   break;
                 case TURN_ABOUT:
                   goLEFT(180);
-                  delay(200);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -508,21 +506,21 @@ void commWithRPI() {
                       }
                     }
                     goFORWARD(blockToTicks(forwardCount));
-                    delay(200);
+                    delay(100);
                     //sendStatusUpdate();
                     //incrementID();
                     //alreadyReceived = false;
                     break;
                   case TURN_RIGHT:
                     goRIGHT(90);
-                    delay(200);
+                    delay(100);
                     //sendStatusUpdate();
                     //incrementID();
                     //alreadyReceived = false;
                     break;
                   case TURN_LEFT:
                     goLEFT(90);
-                    delay(200);
+                    delay(100);
                     //sendStatusUpdate();
                     //incrementID();
                     //alreadyReceived = false;
@@ -530,7 +528,7 @@ void commWithRPI() {
                 }
 
               }
-			  sendStatusUpdate();
+			        sendStatusUpdate();
               incrementID();
               alreadyReceived = false;
               RingBuffer_erase(&usbBufferIn, payloadSize + 5);
@@ -550,7 +548,6 @@ void commWithRPI() {
 
 void stringCommands() {
   static int calCounter = 0;
-  //int commands[] = {1,1,1,1,2,1,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,3,1,2,1,1,2,1,1,1,1,2,1,2,1,1,1,3,1,1,1,1,3,1,1,1,2,0};
   //int commands[] = {4,1,4,1,4,1,4,0};
   //int commands[] = {3,3,3,3,1,1,1,0};
   //int commands[] = {2,2,2,2,1,1,1,0};
@@ -595,12 +592,12 @@ void stringCommands() {
       scanFORWARD(&irFrontReadings[0]);
       scanLEFT();
       scanRIGHT(&irRightReadings[0]);
-      Serial << "Left Forward IR: " << shortIrVal((irFrontReadings[0] - lfwdIrOS), 4, 35) << " blocks away, actual: " << irFrontReadings[0] << endl;
-      Serial << "Mid Forward IR: " << shortMidIrVal((irFrontReadings[1] - mfwdIrOS), 4, 37) << " blocks away, actual: " << irFrontReadings[1] << endl;
-      Serial << "Right Forward IR: " << shortIrVal((irFrontReadings[2] - rfwdIrOS), 4, 35) << " blocks away, actual: " << irFrontReadings[2] << endl;
-      Serial << "Front Right IR: " << shortIrVal((irRightReadings[0] - frgtIrOS), 4, 35) << " blocks away, actual: " << irRightReadings[0] << endl;
-      Serial << "Back Right IR: " << shortIrVal((irRightReadings[1] - brgtIrOS), 4, 35) << " blocks away, actual: " << irRightReadings[1] << endl;
-      Serial << "Left Long IR: " << longIrVal((irLeftReading - flftIrOS), 7, 65) << " blocks away, actual: " << irLeftReading << endl;
+      Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 4, 35, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
+      Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 4, 37, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
+      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 4, 35, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
+      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 4, 35, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
+      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 4, 35, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
+      Serial << "Left Long IR: " << longIrVal(irLeftReading, 7, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
       break;
 
     case 6:
@@ -621,29 +618,21 @@ void stringCommands() {
   }
 }
 
-uint8_t shortIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold) {
-  uint8_t newVal = val / 10;
+uint8_t shortIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold, int offset) {
+  
+  uint8_t newVal = (val - offset )/ 10;
+  if (val < 10){
+    return 1;
+  }
   if (newVal >= blockThreshold || val >= cmThreshold) {
     newVal = 0;
   }
   return newVal;
 }
 
-uint8_t shortMidIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold) {
+uint8_t longIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold, int offset) {
   uint8_t newVal = val / 10;
-  if(val + mfwdIrOS <= 10){
-    newVal = 1;
-  }
-
-  else if (newVal >= blockThreshold || val >= cmThreshold) {
-    newVal = 0;
-  }
-  return newVal;
-}
-
-uint8_t longIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold) {
-  uint8_t newVal = val / 10;
-  if(val + flftIrOS <= 20){
+  if(val <= 20){
     newVal = 1;
   }
 
@@ -683,12 +672,12 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = shortIrVal((irFrontReadings[0] - lfwdIrOS), 4, 35);
-  statusPayload.front2 = shortMidIrVal((irFrontReadings[1] - mfwdIrOS), 4, 37);
-  statusPayload.front3 = shortIrVal((irFrontReadings[2] - rfwdIrOS), 4, 35);
-  statusPayload.right1 = shortIrVal((irRightReadings[0] - frgtIrOS), 4, 35);
-  statusPayload.right2 = shortIrVal((irRightReadings[1] - brgtIrOS), 4, 35);
-  statusPayload.left1 = shortIrVal((irLeftReading - flftIrOS), 7, 65);
+  statusPayload.front1 = shortIrVal(irFrontReadings[0], 4, 35, lfwdIrOS);
+  statusPayload.front2 = shortIrVal(irFrontReadings[1], 4, 37, mfwdIrOS);
+  statusPayload.front3 = shortIrVal(irFrontReadings[2], 4, 35, rfwdIrOS);
+  statusPayload.right1 = shortIrVal(irRightReadings[0], 4, 35, frgtIrOS);
+  statusPayload.right2 = shortIrVal(irRightReadings[1], 4, 35, brgtIrOS);
+  statusPayload.left1 = longIrVal(irLeftReading , 7, 65,flftIrOS);
   statusPayload.reached = 1;
 
   // Crafts message to send
