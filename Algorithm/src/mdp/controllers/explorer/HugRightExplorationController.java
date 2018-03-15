@@ -26,8 +26,6 @@ import mdp.robots.RobotBase;
  */
 public class HugRightExplorationController extends ExplorationBase implements RobotActionListener, FastestPathCompletedListener {
 
-    
-
     enum States {
         BOUNDARY, ABOUT_TURN, LOOPING, EXITING_LOOP, EXPLORATION, EXPLORING, COMPLETED
     };
@@ -269,18 +267,18 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return temp;
     }
-    
+
     private LinkedList<Integer> orderUnexploredPoints() {
         LinkedList<Integer> temp = new LinkedList();
-        for(int i = 0; i< unexploredPoints.size(); i++){
+        for (int i = 0; i < unexploredPoints.size(); i++) {
             temp.add(i);
         }
         return temp;
-        /*
+
         // If empty, take from unexploredPoints, order and return
-        if(exploringUnexplored.isEmpty()){
+        /*if (exploringUnexplored.isEmpty()) {
             ArrayList<Integer> distances = new ArrayList();
-            for(int i = 0; i< unexploredPoints.size(); i++){
+            for (int i = 0; i < unexploredPoints.size(); i++) {
                 int distance = fastestPath.numberOfMoves(getMapState(), getRobot(), unexploredPoints.get(i));
                 distances.add(distance);
             }
@@ -289,8 +287,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             Arrays.sort(indexes, comparator);
             return (new LinkedList(Arrays.asList(indexes)));
         }
+        return null;
+         */
         //If not empty, returned a reorder of existing
-        else{
+        /*else{
             ArrayList<Integer> distances = new ArrayList();
             for(int i = 0; i< exploringUnexplored.size(); i++){
                 int distance = fastestPath.numberOfMoves(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored.get(i)));
@@ -460,7 +460,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             if (unexploredPoints.size() > 0) {
                 currentState = States.EXPLORING;
-                
+
                 while (!fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored.peek()), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored.peek()).size(); i++) {
                         if (fastestPath.move(getMapState(), getRobot(), neighbourPoints.get(exploringUnexplored.peek()).get(i), false)) {
@@ -469,7 +469,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     exploringUnexplored.remove();
-                    if(exploringUnexplored.isEmpty()){
+                    if (exploringUnexplored.isEmpty()) {
                         preComplete();
                         return;
                     }
