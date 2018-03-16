@@ -266,13 +266,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP) {
 
-            // Check if you're in that weird loop
-            if (actions[0] != RobotAction.SCAN) {
+            // Check if you're in that loop
+            if (actions[0] != RobotAction.SCAN && currentState == States.BOUNDARY) {
                 lastTenActions.add(actions[0]);
                 if (lastTenActions.size() > 10) {
                     lastTenActions.pop();
                 }
-                // Check if last eight actions are TR, F, TR, F, TR, F, TR, F, TR, F
+                // Check if last 10 actions are TR, F, TR, F, TR, F, TR, F, TR, F
                 if (lastTenActions.size() == 10) {
                     boolean flag = true;
                     for (int i = 0; i < lastTenActions.size(); i++) {
@@ -354,6 +354,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             }
                         }*/
 
+                        // If Robot cannot FORWARD
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;
@@ -364,6 +365,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         getRobot().move(action);
                         return;
                     } else if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
+                        
+                        // If Robot cannot FORWARD AND TURN_LEFT, will force to ABOUT_TURN
                         actionPriority[0] = RobotAction.TURN_RIGHT;
                         actionPriority[1] = RobotAction.FORWARD;
                         actionPriority[2] = RobotAction.TURN_LEFT;
@@ -381,14 +384,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             System.out.println("========================");
             System.out.println("About turning now");
             System.out.println("========================");
-            /*aboutTurn++;
-            if (aboutTurn == 2) {
-                currentState = States.BOUNDARY;
-                aboutTurn = 0;
-                justTurned = true;
-            }
-            getRobot().move(RobotAction.TURN_RIGHT);*/
-            //justTurned = true;
             justTurned = false;
             currentState = States.BOUNDARY;
             getRobot().move(RobotAction.ABOUT_TURN);
@@ -451,13 +446,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 }
                 exploringUnexplored++;
                 neighbourCounter = 0;
-                while (!isUnexplored(unexploredPoints.get(exploringUnexplored))) {
+                while (exploringUnexplored < unexploredPoints.size() && !isUnexplored(unexploredPoints.get(exploringUnexplored))) {
                     exploringUnexplored++;
-                    if (exploringUnexplored == unexploredPoints.size()) {
+                    /*if (exploringUnexplored == unexploredPoints.size()) {
                         break;
                         //preComplete();
                         //return;
-                    }
+                    }*/
                 }
                 while (exploringUnexplored < unexploredPoints.size() && !fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored).size(); i++) {
@@ -517,7 +512,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         getRobot().removeRobotActionListener(this);
-        fastestPath.removeFastestPathCompletedListener(this);
 
         RobotBase robot = getRobot();
         CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);

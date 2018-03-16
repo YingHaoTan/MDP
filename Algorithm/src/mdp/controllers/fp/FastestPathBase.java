@@ -73,7 +73,6 @@ public abstract class FastestPathBase implements RobotActionListener {
                 while ((direction = next()) != null) {
                     streamDirections.add(direction);
                 }
-                
                 if(streamDirections.size() > 0)
                     robot.moveStream(streamDirections);
                 else
@@ -109,7 +108,6 @@ public abstract class FastestPathBase implements RobotActionListener {
     private void complete() {
     	if(!completed) {
 	        robot.removeRobotActionListener(this);
-	        
 	        if (faststream) {
 	            System.out.println("Fastest path stream completed. Will calibrate now..");
 	            RobotBase robot = getRobot();
@@ -121,15 +119,15 @@ public abstract class FastestPathBase implements RobotActionListener {
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
 	                robot.move(RobotAction.TURN_RIGHT);
 	            }
-	
 	            robot.dispatchCalibration(spec.getCalibrationType());
+                    completed = true;
 	        }
 	
 	        for (FastestPathCompletedListener listener : listeners) {
 	            listener.onFastestPathCompleted();
 	        }
 	        
-	        completed = true;
+	        
     	}
     }
 
