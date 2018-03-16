@@ -517,6 +517,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void complete() {
         getRobot().removeRobotActionListener(this);
+        fastestPath.removeFastestPathCompletedListener(this);
 
         RobotBase robot = getRobot();
         CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
