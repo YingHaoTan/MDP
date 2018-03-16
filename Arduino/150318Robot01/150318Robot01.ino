@@ -68,11 +68,11 @@ void setup() {
   //delay(250);
   //goFORWARD(blockToTicks(1));
 //  calibrateCORNER();
+
 }
 
 void loop() {
-  //stringCommands();
-  //delay(1500);
+//  stringCommands();
   commWithRPI();
 }
 
@@ -551,8 +551,9 @@ void stringCommands() {
   //int commands[] = {4,1,4,1,4,1,4,0};
   //int commands[] = {3,3,3,3,1,1,1,0};
   //int commands[] = {2,2,2,2,1,1,1,0};
-  //  int commands[] = {4,1,0};
-  int commands[] = {5};
+//    int commands[] = {4,1,0};
+//int commands[] = {5};
+  int commands[] = {5, 6, 5, 2, 5, 1, 5, 1, 5, 2, 5, 1, 5, 3, 5, 5, 5, 5, 5, 5, 0};
   static int x;
   switch (commands[x]) {
     case 1:
@@ -611,7 +612,7 @@ void stringCommands() {
       calCounter++;
       break;
   }
-  delay(500);
+  delay(100);
 
   if (x <= sizeof(commands) / sizeof(int)) {
     x++;
@@ -665,6 +666,7 @@ void resendStatusUpdate() {
 
 void sendStatusUpdate() {
   int threshold = 35 ;
+  delay(200);
   scanFORWARD(&irFrontReadings[0]);
   scanLEFT();
   scanRIGHT(&irRightReadings[0]);
@@ -710,3 +712,5 @@ void decrementID() {
     last_sent = last_sent - 1;
   }
 }
+
+
