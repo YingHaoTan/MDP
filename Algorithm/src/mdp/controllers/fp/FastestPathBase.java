@@ -92,6 +92,11 @@ public abstract class FastestPathBase implements RobotActionListener {
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        
+        if(actions[0] == RobotAction.CAL_CORNER && actions[0] == RobotAction.CAL_SIDE){
+            return;
+        }
+        
         Direction mdirection = next();
 
         if (mdirection != null) {

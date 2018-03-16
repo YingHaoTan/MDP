@@ -65,7 +65,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         exploringUnexplored = 0;
         neighbourCounter = 0;
         aboutTurn = 0;
-        //justTurnedCounter = 0;
         justTurned = false;
 
         for (RobotAction action : actionPriority) {
@@ -245,11 +244,18 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-
+        
+        System.out.println("Robot action completed: " + actions[0]);
+        
         this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
 
         // Update internal map state
         sensorsScan();
+        
+        if(actions[0] == RobotAction.CAL_CORNER && actions[0] == RobotAction.CAL_SIDE){
+            return;
+        }
+        
         System.out.println(currentState);
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
             getRobot().move(RobotAction.SCAN);
@@ -267,7 +273,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP) {
 
             // Check if you're in that loop
-            if (actions[0] != RobotAction.SCAN && currentState == States.BOUNDARY) {
+            if (actions[0] != RobotAction.SCAN && actions[0] != RobotAction.CAL_CORNER &&  actions[0] != RobotAction.CAL_SIDE && currentState == States.BOUNDARY) {
                 lastTenActions.add(actions[0]);
                 if (lastTenActions.size() > 10) {
                     lastTenActions.pop();
