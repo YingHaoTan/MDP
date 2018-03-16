@@ -18,6 +18,7 @@ import mdp.robots.RobotBase;
  */
 public abstract class FastestPathBase implements RobotActionListener {
 
+	private boolean completed;
     private boolean faststream;
     private MapState mstate;
     private List<FastestPathCompletedListener> listeners;
@@ -60,6 +61,7 @@ public abstract class FastestPathBase implements RobotActionListener {
         this.robot = robot;
         this.destination = destination;
         this.faststream = faststream;
+        this.completed = false;
 
         boolean success = preprocess();
 
@@ -105,27 +107,30 @@ public abstract class FastestPathBase implements RobotActionListener {
      * action listener
      */
     private void complete() {
-
-        robot.removeRobotActionListener(this);
-        
-        if (faststream) {
-            System.out.println("Fastest path stream completed. Will calibrate now..");
-            RobotBase robot = getRobot();
-            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
-            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-                robot.move(RobotAction.ABOUT_TURN);
-            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-                robot.move(RobotAction.TURN_LEFT);
-            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-                robot.move(RobotAction.TURN_RIGHT);
-            }
-
-            robot.dispatchCalibration(spec.getCalibrationType());
-        }
-
-        for (FastestPathCompletedListener listener : listeners) {
-            listener.onFastestPathCompleted();
-        }
+    	if(!completed) {
+	        robot.removeRobotActionListener(this);
+	        
+	        if (faststream) {
+	            System.out.println("Fastest path stream completed. Will calibrate now..");
+	            RobotBase robot = getRobot();
+	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+	            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+	                robot.move(RobotAction.ABOUT_TURN);
+	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+	                robot.move(RobotAction.TURN_LEFT);
+	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+	                robot.move(RobotAction.TURN_RIGHT);
+	            }
+	
+	            robot.dispatchCalibration(spec.getCalibrationType());
+	        }
+	
+	        for (FastestPathCompletedListener listener : listeners) {
+	            listener.onFastestPathCompleted();
+	        }
+	        
+	        completed = true;
+    	}
     }
 
     /**
