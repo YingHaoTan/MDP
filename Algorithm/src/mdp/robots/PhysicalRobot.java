@@ -136,7 +136,7 @@ public class PhysicalRobot extends RobotBase {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
         System.out.println("Calibration Data: " + action);
-        
+
         sendArduinoMessage(new ArduinoInstruction(action, false));
     }
 
@@ -149,14 +149,14 @@ public class PhysicalRobot extends RobotBase {
         }
 
         synchronized (commandqueue) {
-            commandqueue.add(new Command(orientations, actions, false));
+            commandqueue.add(new Command(orientations, actions, true));
         }
 
         MapState mstate = getMapState();
 
         for (Direction mapdirection : orientations) {
             Point location = mstate.getRobotPoint();
-            
+
             if (mapdirection == Direction.UP) {
                 mstate.setRobotPoint(new Point(location.x, location.y + 1));
             } else if (mapdirection == Direction.DOWN) {
@@ -252,37 +252,37 @@ public class PhysicalRobot extends RobotBase {
             Command command = commandqueue.peek();
 
             if (command != null) {
-                command.completedactions++;
 
-                if (command.isComplete()) {
-                    synchronized (commandqueue) {
-                        commandqueue.poll();
-                    }
+                if (command.stream) {
+                    int orientationIndex = 0;
 
-                    if (command.actions.size() != 1 || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)) {
-                        if (command.stream) {
-                            int orientationIndex = 0;
+                    for (int i = 0; i < command.actions.size(); i++) {
+                        RobotAction action = command.actions.get(i);
 
-                            for (int i = 0; i < command.actions.size(); i++) {
-                                RobotAction action = command.actions.get(i);
-
-                                if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
-                                    this.notify(null, action);
-                                } else {
-                                    this.notify(command.mapdirections.get(orientationIndex++), action);
-                                }
-                            }
+                        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
+                            this.notify(null, action);
                         } else {
-                            this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
+                            this.notify(command.mapdirections.get(orientationIndex++), action);
                         }
                     }
+                } else {
+                    command.completedactions++;
 
-                    if (autoupdate) {
-                        MapState mstate = getMapState();
-                        Point rpoint = mstate.getRobotPoint();
+                    if (command.isComplete()) {
+                        synchronized (commandqueue) {
+                            commandqueue.poll();
+                        }
 
-                        sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotStopped()));
-                        sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
+                        if (command.actions.size() != 1)    // || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE))
+                            this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
+
+                        if (autoupdate) {
+                            MapState mstate = getMapState();
+                            Point rpoint = mstate.getRobotPoint();
+
+                            sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotStopped()));
+                            sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
+                        }
                     }
                 }
             }

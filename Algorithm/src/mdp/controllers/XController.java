@@ -60,7 +60,7 @@ public class XController {
      * @param outgoingSemaphore
      */
     public void initializeCommunication(List<Consumer<AndroidInstruction>> androidInstructionListenerList, Queue<AndroidUpdate> outgoingAndroidQueue, Semaphore outgoingSemaphore) {
-		this.communication = true;
+	this.communication = true;
     	this.outgoingAndroidQueue = outgoingAndroidQueue;
         this.outgoingSemaphore = outgoingSemaphore;
         this.androidTranslator = new AndroidCommandsTranslator();
@@ -129,7 +129,7 @@ public class XController {
      */
     public void setExplorer(ExplorationBase explorer) {
     	if(this.explorer != null)
-    		this.explorer.removeScanCompletedListener(this::onSensorScanCompleted);
+            this.explorer.removeScanCompletedListener(this::onSensorScanCompleted);
     	
         this.explorer = explorer;
         this.explorer.addScanCompletedListener(this::onSensorScanCompleted);

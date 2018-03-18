@@ -28,7 +28,7 @@ import mdp.models.RobotAction;
  */
 public class MDPTCPConnector {
 
-	private volatile byte nextExpectedID;
+    private volatile byte nextExpectedID;
     private volatile byte currentID;
     private boolean yetToReceiveAck;
     private Socket clientSocket;
@@ -252,9 +252,6 @@ public class MDPTCPConnector {
 	                        
 	                        processed++;
                     	}
-                    }
-                    else {
-                        System.out.println("Have not received acknowledgement for message " + nextExpectedID);
                     }
                     
                     AndroidUpdate update = null;

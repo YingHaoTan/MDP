@@ -68,7 +68,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         exploringUnexplored = new LinkedList<Integer>();
         neighbourCounter = 0;
         aboutTurn = 0;
-        //justTurnedCounter = 0;
         justTurned = false;
         stopped = false;
 
@@ -304,8 +303,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             Arrays.sort(indexes, comparator);
             return (new LinkedList(Arrays.asList(indexes)));
         }
-        return null;
-        /*
+        //return null;
+        
         else {
             ArrayList<Integer> distances = new ArrayList();
             for (int i = 0; i < exploringUnexplored.size(); i++) {
@@ -331,18 +330,25 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             Arrays.sort(indexes, comparator);
             return (new LinkedList(Arrays.asList(indexes)));
         }
-         */
+         
 
     }
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
-
+        
+        System.out.println("Robot action completed: " + actions[0]);
+        
         this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
 
         // Update internal map state
         sensorsScan();
-
+        
+        if(actions[0] == RobotAction.CAL_CORNER && actions[0] == RobotAction.CAL_SIDE){
+            return;
+        }
+        
+        System.out.println(currentState);
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
             getRobot().move(RobotAction.SCAN);
             System.out.println("Rescanning..");
@@ -358,27 +364,29 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP) {
 
-            // Check if you're in that weird loop
-            lastTenActions.add(actions[0]);
-            if (lastTenActions.size() > 10) {
-                lastTenActions.pop();
-            }
-            // Check if last eight actions are TR, F, TR, F, TR, F, TR, F, TR, F
-            if (lastTenActions.size() == 10) {
-                boolean flag = true;
-                for (int i = 0; i < lastTenActions.size(); i++) {
-                    if (i % 2 == 0) {
-                        if (lastTenActions.get(i) != RobotAction.TURN_RIGHT) {
+            // Check if you're in that loop
+            if (actions[0] != RobotAction.SCAN && currentState == States.BOUNDARY) {
+                lastTenActions.add(actions[0]);
+                if (lastTenActions.size() > 10) {
+                    lastTenActions.pop();
+                }
+                // Check if last 10 actions are TR, F, TR, F, TR, F, TR, F, TR, F
+                if (lastTenActions.size() == 10) {
+                    boolean flag = true;
+                    for (int i = 0; i < lastTenActions.size(); i++) {
+                        if (i % 2 == 0) {
+                            if (lastTenActions.get(i) != RobotAction.TURN_RIGHT) {
+                                flag = false;
+                                break;
+                            }
+                        } else if (lastTenActions.get(i) != RobotAction.FORWARD) {
                             flag = false;
                             break;
                         }
-                    } else if (lastTenActions.get(i) != RobotAction.FORWARD) {
-                        flag = false;
-                        break;
                     }
-                }
-                if (flag) {
-                    currentState = States.LOOPING;
+                    if (flag) {
+                        currentState = States.LOOPING;
+                    }
                 }
             }
 
@@ -444,6 +452,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             }
                         }*/
 
+                        // If Robot cannot FORWARD
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
                             actionPriority[0] = RobotAction.TURN_RIGHT;
                             actionPriority[1] = RobotAction.FORWARD;
@@ -454,6 +463,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         getRobot().move(action);
                         return;
                     } else if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
+                        
+                        // If Robot cannot FORWARD AND TURN_LEFT, will force to ABOUT_TURN
                         actionPriority[0] = RobotAction.TURN_RIGHT;
                         actionPriority[1] = RobotAction.FORWARD;
                         actionPriority[2] = RobotAction.TURN_LEFT;
@@ -471,14 +482,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             System.out.println("========================");
             System.out.println("About turning now");
             System.out.println("========================");
-            /*aboutTurn++;
-            if (aboutTurn == 2) {
-                currentState = States.BOUNDARY;
-                aboutTurn = 0;
-                justTurned = true;
-            }
-            getRobot().move(RobotAction.TURN_RIGHT);*/
-            justTurned = true;
+            justTurned = false;
             currentState = States.BOUNDARY;
             getRobot().move(RobotAction.ABOUT_TURN);
         }
@@ -533,20 +537,20 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 exploringUnexplored.remove();
                 neighbourCounter = 0;
 
-                while (!isUnexplored(unexploredPoints.get(exploringUnexplored.peek()))) {
-                    exploringUnexplored.remove();
-                    if (exploringUnexplored.isEmpty()) {
-                        break;
-                        //preComplete();
-                        //return;
-                    }
-                }
-
                 /*
                 // need to reorder unexplored points
                 if(!exploringUnexplored.isEmpty()){
                     exploringUnexplored = orderUnexploredPoints();
                 }*/
+                
+                while (!isUnexplored(unexploredPoints.get(exploringUnexplored.peek()))) {
+                    exploringUnexplored.remove();
+                    if (exploringUnexplored.isEmpty()) {
+                        break;   
+                    }
+                }
+
+                
                 //exploringUnexplored = orderUnexploredPoints();
                 while (!exploringUnexplored.isEmpty() && !fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored.peek()), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored.peek()).size(); i++) {
@@ -606,9 +610,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void complete() {
-        if (!stopped) {
+        if(!stopped){
             getRobot().removeRobotActionListener(this);
-
             RobotBase robot = getRobot();
             CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
             if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
