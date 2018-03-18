@@ -42,6 +42,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     int aboutTurn;
     //int justTurnedCounter;
     boolean justTurned;
+    boolean stopped;
     States currentState;
 
     LinkedList<RobotAction> lastTenActions;
@@ -69,6 +70,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         aboutTurn = 0;
         //justTurnedCounter = 0;
         justTurned = false;
+        stopped = false;
 
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
@@ -272,13 +274,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     private LinkedList<Integer> orderUnexploredPoints() {
         assert (unexploredPoints.size() == neighbourPoints.size());
 
-        /*
-        LinkedList<Integer> temp = new LinkedList();
+        /*LinkedList<Integer> temp = new LinkedList();
         for (int i = 0; i < unexploredPoints.size(); i++) {
             temp.add(i);
         }
-        return temp;
-         */
+        return temp;*/
         // If empty, take from unexploredPoints, order and return
         if (exploringUnexplored.isEmpty()) {
             ArrayList<Integer> distances = new ArrayList();
@@ -304,11 +304,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             Arrays.sort(indexes, comparator);
             return (new LinkedList(Arrays.asList(indexes)));
         }
-        //return null;
-        
+        return null;
+        /*
         else {
             ArrayList<Integer> distances = new ArrayList();
-            for(int i = 0; i < exploringUnexplored.size(); i++){
+            for (int i = 0; i < exploringUnexplored.size(); i++) {
                 int totalDistance = 0;
                 int count = 0;
                 for (int j = 0; j < neighbourPoints.get(exploringUnexplored.get(i)).size(); j++) {
@@ -317,8 +317,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         totalDistance += distance;
                         count++;
                     }
-                }    
-                
+                }
+
                 if (count == 0) {
                     // unreachables
                     distances.add(99);
@@ -331,8 +331,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             Arrays.sort(indexes, comparator);
             return (new LinkedList(Arrays.asList(indexes)));
         }
+         */
 
-        
     }
 
     @Override
@@ -541,13 +541,12 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         //return;
                     }
                 }
-                
+
                 /*
                 // need to reorder unexplored points
                 if(!exploringUnexplored.isEmpty()){
                     exploringUnexplored = orderUnexploredPoints();
                 }*/
-                
                 //exploringUnexplored = orderUnexploredPoints();
                 while (!exploringUnexplored.isEmpty() && !fastestPath.move(getMapState(), getRobot(), unexploredPoints.get(exploringUnexplored.peek()), false)) {
                     for (int i = 0; i < neighbourPoints.get(exploringUnexplored.peek()).size(); i++) {
@@ -557,6 +556,15 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     exploringUnexplored.remove();
+                    if (exploringUnexplored.isEmpty()) {
+                        break;
+                    }
+                    while (!isUnexplored(unexploredPoints.get(exploringUnexplored.peek()))) {
+                        exploringUnexplored.remove();
+                        if (exploringUnexplored.isEmpty()) {
+                            break;
+                        }
+                    }
                 }
             }
             // Check again 
@@ -598,21 +606,24 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void complete() {
-        getRobot().removeRobotActionListener(this);
+        if (!stopped) {
+            getRobot().removeRobotActionListener(this);
 
-        RobotBase robot = getRobot();
-        CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
-        if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-            robot.move(RobotAction.ABOUT_TURN);
-        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-            robot.move(RobotAction.TURN_LEFT);
-        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-            robot.move(RobotAction.TURN_RIGHT);
+            RobotBase robot = getRobot();
+            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+                robot.move(RobotAction.ABOUT_TURN);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+                robot.move(RobotAction.TURN_RIGHT);
+            }
+            robot.dispatchCalibration(spec.getCalibrationType());
+
+            getRobot().stop();
+            super.complete();
+            stopped = true;
         }
-        robot.dispatchCalibration(spec.getCalibrationType());
-
-        getRobot().stop();
-        super.complete();
 
     }
 
