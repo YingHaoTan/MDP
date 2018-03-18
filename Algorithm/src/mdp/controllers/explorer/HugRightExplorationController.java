@@ -40,6 +40,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     int aboutTurn;
     //int justTurnedCounter;
     boolean justTurned;
+    boolean stopped;
     States currentState;
 
     LinkedList<RobotAction> lastTenActions;
@@ -66,6 +67,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         neighbourCounter = 0;
         aboutTurn = 0;
         justTurned = false;
+        stopped = false;
 
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
@@ -517,21 +519,23 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void complete() {
-        getRobot().removeRobotActionListener(this);
+        if(!stopped){
+            getRobot().removeRobotActionListener(this);
+            RobotBase robot = getRobot();
+            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+                robot.move(RobotAction.ABOUT_TURN);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+                robot.move(RobotAction.TURN_RIGHT);
+            }
+            robot.dispatchCalibration(spec.getCalibrationType());
 
-        RobotBase robot = getRobot();
-        CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
-        if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-            robot.move(RobotAction.ABOUT_TURN);
-        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-            robot.move(RobotAction.TURN_LEFT);
-        } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-            robot.move(RobotAction.TURN_RIGHT);
+            getRobot().stop();
+            super.complete();
+            stopped = true;
         }
-        robot.dispatchCalibration(spec.getCalibrationType());
-
-        getRobot().stop();
-        super.complete();
 
     }
 
