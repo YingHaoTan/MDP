@@ -273,7 +273,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP) {
 
             // Check if you're in that loop
-            if (actions[0] != RobotAction.SCAN && actions[0] != RobotAction.CAL_CORNER &&  actions[0] != RobotAction.CAL_SIDE && currentState == States.BOUNDARY) {
+            if (actions[0] != RobotAction.SCAN && currentState == States.BOUNDARY) {
                 lastTenActions.add(actions[0]);
                 if (lastTenActions.size() > 10) {
                     lastTenActions.pop();
