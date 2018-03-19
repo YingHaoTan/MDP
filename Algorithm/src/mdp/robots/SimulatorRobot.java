@@ -100,9 +100,9 @@ public class SimulatorRobot extends RobotBase {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
 
-        for (RobotAction action : actions) {
-            System.out.println("In Simulator Robot: " + action);
-        }
+        //for (RobotAction action : actions) {
+        //    System.out.println("In Simulator Robot: " + action);
+        //}
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);
@@ -113,7 +113,7 @@ public class SimulatorRobot extends RobotBase {
     
     @Override
 	public void dispatchCalibration(RobotAction action) {
-            System.out.println("Calibration Data: " + action);
+            //System.out.println("Calibration Data: " + action);
 	}
 
     @Override

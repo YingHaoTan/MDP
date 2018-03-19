@@ -394,9 +394,9 @@ public abstract class RobotBase {
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
-            System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
+            //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
     		if(spec.isInPosition(this, null)) {
-                        System.out.println("Can send calibration data");
+                        //System.out.println("Can send calibration data");
     			dispatchCalibration(spec.getCalibrationType());
     			break;
     		}
