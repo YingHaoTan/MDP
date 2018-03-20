@@ -2,7 +2,7 @@ package mdp.robots;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.List;
+import java.util.Map;
 
 import mdp.models.CellState;
 import mdp.models.Direction;
@@ -17,11 +17,11 @@ import mdp.models.SensorConfiguration;
 public class CalibrationSpecification {
 
     private RobotAction calibrationType;
-    private SensorConfiguration[] sensors;
+    private Map<SensorConfiguration, Integer> sensorDistances;
 
-    public CalibrationSpecification(RobotAction calibrationType, SensorConfiguration... sensors) {
+    public CalibrationSpecification(RobotAction calibrationType, Map<SensorConfiguration, Integer> sensorDistances) {
         this.calibrationType = calibrationType;
-        this.sensors = sensors;
+        this.sensorDistances = sensorDistances;
     }
 
     /**
@@ -37,7 +37,7 @@ public class CalibrationSpecification {
     public boolean isInPosition(RobotBase robot, RobotAction... offsetActions) {
         boolean inPosition = true;
 
-        for (SensorConfiguration sensor : sensors) {
+        for (SensorConfiguration sensor : sensorDistances.keySet()) {
             Direction direction = robot.getSensorDirection(sensor);
             Dimension rdim = robot.getDimension();
             Point location = robot.getSensorCoordinate(sensor);
@@ -127,16 +127,16 @@ public class CalibrationSpecification {
 
             switch (direction) {
                 case UP:
-                    location = new Point(location.x, location.y + 1);
+                    location = new Point(location.x, location.y + sensorDistances.get(sensor));
                     break;
                 case DOWN:
-                    location = new Point(location.x, location.y - 1);
+                    location = new Point(location.x, location.y - sensorDistances.get(sensor));
                     break;
                 case LEFT:
-                    location = new Point(location.x - 1, location.y);
+                    location = new Point(location.x - sensorDistances.get(sensor), location.y);
                     break;
                 case RIGHT:
-                    location = new Point(location.x + 1, location.y);
+                    location = new Point(location.x + sensorDistances.get(sensor), location.y);
                     break;
                 default:
                     break;

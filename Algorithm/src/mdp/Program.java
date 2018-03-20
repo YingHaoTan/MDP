@@ -2,6 +2,7 @@ package mdp;
 
 import java.awt.Dimension;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -68,6 +69,34 @@ public class Program {
         SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 2, 0.7);
         SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.7);
         
+        CalibrationSpecification corner_spec = new CalibrationSpecification(RobotAction.CAL_CORNER, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front1, 1);
+        		this.put(front2, 1);
+        		this.put(front3, 1);
+        		this.put(right1, 1);
+        		this.put(right2, 1);
+        	}
+        });
+        CalibrationSpecification side_spec = new CalibrationSpecification(RobotAction.CAL_SIDE, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(right1, 1);
+        		this.put(right2, 1);
+        	}
+        });
+        CalibrationSpecification jieming_spec_1 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(right1, 2);
+        		this.put(right2, 1);
+        	}
+        });
+        CalibrationSpecification jieming_spec_2 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(right2, 2);
+        		this.put(right1, 1);
+        	}
+        });
+        
         // SimulatorRobot
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.DOWN);
         srobot.install(front1);
@@ -77,8 +106,10 @@ public class Program {
         srobot.install(right2);
         srobot.install(left1);      
         
-        srobot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_CORNER, front1, front2, front3, right1, right2));
-        srobot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_SIDE, right1, right2));
+        srobot.addCalibrationSpecification(corner_spec);
+        srobot.addCalibrationSpecification(side_spec);
+        srobot.addCalibrationSpecification(jieming_spec_1);
+        srobot.addCalibrationSpecification(jieming_spec_2);
         
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
@@ -98,8 +129,10 @@ public class Program {
 	        probot.install(right2);
 	        probot.install(left1);    
 	        
-	        probot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_CORNER, front1, front2, front3, right1, right2));
-	        probot.addCalibrationSpecification(new CalibrationSpecification(RobotAction.CAL_SIDE, right1, right2));
+	        probot.addCalibrationSpecification(corner_spec);
+	        probot.addCalibrationSpecification(side_spec);
+	        probot.addCalibrationSpecification(jieming_spec_1);
+	        probot.addCalibrationSpecification(jieming_spec_2);
 	        
 	        wcontroller.setPhysicalRobot(probot);
 	        xcontroller.setPhysicalRobot(probot);
