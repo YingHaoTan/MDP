@@ -1,15 +1,21 @@
 #include <Streaming.h>
 #include <SharpIR.h>
 #include <DualVNH5019MotorShield.h>
+#include "Settings.h"
 #include "communication.h"
 #include "RingBuffer.h"
-#include "Settings.h"
+RingBuffer usbBufferIn;
 
 #ifdef DEBUG
 #define D if(1)
 #else
 #define D if(0)                   //Change this: 1 = Debug mode, 0 = Disable debug prints
 #endif
+
+uint8_t last_sent = 0;
+static int lastTicks[2] = {0, 0};
+static int lastError;
+static int totalErrors;
 
 void setup() {
   Serial.begin(115200);
@@ -31,18 +37,13 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-//  calibrateRIGHTV2();
+
 }
 
-
 void loop() {
-  if(commands[0] != 0){
-    stringCommands();
-    delay(1000);
-  }
-  else{
-    commWithRPI();
-  }
+  //stringCommands();
+  delay(1500);
+//  commWithRPI();
 }
 
 
@@ -51,7 +52,7 @@ void loop() {
 void goFORWARD(int distance) {
   long lastTime = micros();
   int setSpdR = 300;
-  int setSpdL = 309;
+  int setSpdL = 310;
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
@@ -71,14 +72,16 @@ void goFORWARD(int distance) {
 
   if (distance <= 1192) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
+      //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
       if (millis() - lastTime > 100) {
-        PIDControl(&setSpdR, &setSpdL, 140, 7, 30, 0); //By block
+        PIDControl(&setSpdR, &setSpdL, 140, 7, 15, 0); //By block
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
     }
   } else {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
+      //Serial<< "mCounter[0] = " << mCounter[0] << " mCounter[1] = " << mCounter[1] <<endl;
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 100, 7, 15, 0); //Long distance
         lastTime = millis();
@@ -135,7 +138,7 @@ void goRIGHT(int angle) {
 
 void goLEFT(int angle) {
   int setSpdR = 300;              //Right motor
-  int setSpdL = -315;              //Left motor
+  int setSpdL = -306;              //Left motor
   long lastTime = millis();
   lastError = 0;
   totalErrors = 0;
@@ -197,11 +200,11 @@ void calibrateRIGHT() {
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 8;
 
-    if (abs(irRightReadings[0] - irRightReadings[1]) == 1 && abs(turnTicks) > 2) {
+    if (abs((irRightReadings[0] - irRightReadings[1]) == 1) && abs(turnTicks) > 2) {
       turnTicks -= 1;
     }
     if (turnTicks > 0) {
-      while (mCounter[0] < abs(turnTicks) *5 && mCounter[1] < abs(turnTicks) *5) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
       }
     }
@@ -219,80 +222,9 @@ void calibrateRIGHT() {
 void calibrateFRONT() {
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
-  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
+  while (irFrontReadings[2] != 9 && irFrontReadings[0] != 9) {
     resetMCounters();
-    turnTicks = (irFrontReadings[0] - 10) * 20;
-    if (turnTicks > 0) {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(200, 200);
-      }
-    }
-    else {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(-200, -200);
-      }
-    }
-    md.setBrakes(400, 400);
-    delay(100);
-    scanFORWARD(&irFrontReadings[0]);
-  }
-}
-
-void calibrateRIGHTV2() {
-  scanRIGHT(&irRightReadings[0]);
-  int turnTicks = 0;
-  Serial << "start" <<endl ;
-  while (irRightReadings[0] % 10 != irRightReadings[1] % 10 && abs(irRightReadings[0] - irRightReadings[1]) < 30) {
-    resetMCounters();
-    int Fdist = irRightReadings[0];
-    int Bdist = irRightReadings[1];
-    if(Fdist / 10 == Bdist / 10) {
-      if(Fdist < Bdist){
-        Bdist = Bdist - (1 + Fdist % 10);
-        Fdist = Fdist - (1 + Fdist % 10);
-      }
-      else {
-        Fdist = Fdist - (1 + Bdist % 10);
-        Bdist = Bdist - (1 + Bdist % 10);
-      }
-    }
-    else if (abs(Fdist / 10 - Bdist / 10) >1){
-      int cnt = 1 + 10 * (abs(Fdist / 10 - Bdist / 10) -1);
-      if(Fdist < Bdist){
-        Bdist = Bdist + (cnt - Fdist % 10);
-        Fdist = Fdist + (cnt - Fdist % 10);
-      }
-      else {
-        Fdist = Fdist + (cnt - Bdist % 10);
-        Bdist = Bdist + (cnt - Bdist % 10);
-      }
-    }
-    turnTicks = (Fdist % 10 - Bdist % 10) * 8;
-    if (abs((Fdist - Bdist) % 10) == 1 && abs(turnTicks) > 2) {
-      turnTicks -= 1;
-    }
-    if (turnTicks > 0) {
-      while (mCounter[0] < abs(turnTicks) *5 && mCounter[1] < abs(turnTicks) *5) {
-        md.setSpeeds(-150, 150);
-      }
-    }
-    else {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(150, -150);
-      }
-    }
-    md.setBrakes(400, 400);
-    delay(100);
-    scanRIGHT(&irRightReadings[0]);
-  }
-}
-
-void calibrateFRONTV2() {
-  scanFORWARD(&irFrontReadings[0]);
-  int turnTicks = 0;
-  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
-    resetMCounters();
-    turnTicks = (irFrontReadings[0] - 10) * 20;
+    turnTicks = (irFrontReadings[0] - 9) * 20;
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(200, 200);
@@ -323,12 +255,11 @@ void calibrateCORNER() {
   calibrateRIGHT();
 }
 
-
 int angleToTicks(long angle) {
   if (angle == 90)
     return 16800 * angle / 1000;
   else
-     return 17280 * angle / 1000;
+     return 17300 * angle / 1000;
 }
 
 int blockToTicks(int blocks) {
@@ -340,28 +271,31 @@ int blockToTicks(int blocks) {
 
 
 
+//------------Functions for Checklists------------//
+
+void checkDistance() {
+  scanLEFT();
+  //Serial << "Block is : " << irLeftReading / 10 * 10 << " away" << endl;
+}
+
+
+
 //------------Functions for IR Sensors------------//
 void scanFORWARD(int *pData) {
   pData[0] = lfwdIrVal.distance(); //Left
-  delay(10);
   pData[1] = mfwdIrVal.distance(); // Middle
-  delay(10);
   pData[2] = rfwdIrVal.distance(); //Right
-  delay(10);
   D Serial << "FORWARD: <- Left: " << pData[0] << " () Mid: " << pData[1] << " -> Right: " << pData[2] << " \n" << endl;
 }
 
 void scanRIGHT(int *pData) {
   pData[0] = frgtIrVal.distance(); //Right Front
-  delay(10);
   pData[1] = brgtIrVal.distance(); //Right Back
-  delay(10);
   D Serial << "RIGHT: -> Right(Short): " << pData[0] << " -> Right(Long): " << pData[1] << " \n" << endl;
 }
 
 void scanLEFT() {
   irLeftReading = flftIrVal.distance();
-  delay(10);
   D Serial << "LEFT: <- Left(Long): " << irLeftReading << " \n" << endl;
 }
 
@@ -401,6 +335,7 @@ void commWithRPI() {
     uint8_t tmpInBuffer = 0;
 
     if (usbBufferIn.count >= 6) {
+      //Serial.println("Writing to buffer");
       if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 0) == true && tmpInBuffer == '~') {
         uint8_t messageType = 0;
         if (RingBuffer_get( & usbBufferIn, & tmpInBuffer, 1) == true) {
@@ -417,12 +352,14 @@ void commWithRPI() {
               RingBuffer_get( & usbBufferIn, & instructMsg.action, 3);
               RingBuffer_get( & usbBufferIn, & instructMsg.obstacleInFront, 4);
 
+              //if (last_sent == instructMsg.id && alreadyReceived == false) {
+
               alreadyReceived = true;
               yetToReceiveAck = false;
               switch (instructMsg.action) {
                 case TURN_LEFT:
                   goLEFT(90);
-                  delay(RPIExpDelay);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -430,7 +367,7 @@ void commWithRPI() {
                   break;
                 case TURN_RIGHT:
                   goRIGHT(90);
-                  delay(RPIExpDelay);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -438,7 +375,7 @@ void commWithRPI() {
                   break;
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
-                  delay(RPIExpDelay);
+                  delay(100);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -446,7 +383,7 @@ void commWithRPI() {
                   break;
                 case CAL_CORNER:
                   calibrateCORNER();
-                  delay(RPIExpDelay);
+                  delay(100);
                   calCounter = 0;
                   sendStatusUpdate();
                   incrementID();
@@ -463,14 +400,14 @@ void commWithRPI() {
                     }
                   }
                   calCounter = 0;
-                  delay(RPIExpDelay);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
                   break;
 
                 case SCAN:
-                  delay(RPIExpDelay);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -479,7 +416,7 @@ void commWithRPI() {
 
                 case START:
                   //                  calibrateRIGHT();
-                  delay(RPIExpDelay);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -489,13 +426,14 @@ void commWithRPI() {
                   break;
                 case TURN_ABOUT:
                   goLEFT(180);
-                  delay(RPIExpDelay);
+                  delay(100);
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
                   break;
               }
               RingBuffer_erase( & usbBufferIn, 6);
+              //}
 
             } else {
               RingBuffer_pop( & usbBufferIn);
@@ -516,7 +454,10 @@ void commWithRPI() {
                 RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
               }
               memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
+              //Serial.println( payloadSize + 5);
+              //Serial.println(usbBufferIn.count);
 
+              //Serial.println(usbBufferIn.count);
               for (int i = 0; i < payloadSize; i++) {
                 int forwardCount = 0;
                 uint8_t action = streamMsg.streamActions[i];
@@ -535,17 +476,27 @@ void commWithRPI() {
                       }
                     }
                     goFORWARD(blockToTicks(forwardCount));
-                    delay(RPIFPDelay);
+                    delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
                     break;
                   case TURN_RIGHT:
                     goRIGHT(90);
-                    delay(RPIFPDelay);
+                    delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
                     break;
                   case TURN_LEFT:
                     goLEFT(90);
-                    delay(RPIFPDelay);
+                    delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
                     break;
                 }
+
               }
 			        sendStatusUpdate();
               incrementID();
@@ -567,6 +518,11 @@ void commWithRPI() {
 
 void stringCommands() {
   static int calCounter = 0;
+  //int commands[] = {4,1,4,1,4,1,4,0};
+  //int commands[] = {3,3,3,3,1,1,1,0};
+  //int commands[] = {2,2,2,2,1,1,1,0};
+  //  int commands[] = {4,1,0};
+  int commands[] = {5};
   static int x;
   switch (commands[x]) {
     case 1:
@@ -606,11 +562,11 @@ void stringCommands() {
       scanFORWARD(&irFrontReadings[0]);
       scanLEFT();
       scanRIGHT(&irRightReadings[0]);
-      Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 4, 34, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
-      Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 4, 35, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
-      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 4, 34, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
-      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 4, 34, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
-      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 4, 34, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
+      Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 4, 35, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
+      Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 4, 37, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
+      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 4, 35, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
+      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 4, 35, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
+      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 4, 35, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
       Serial << "Left Long IR: " << longIrVal(irLeftReading, 7, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
       break;
 
@@ -619,29 +575,22 @@ void stringCommands() {
       calibrateCORNER();
       calCounter = 0;
       break;
-
     case 7:
       Serial.println("About Turn");
       goLEFT(180);
       calCounter++;
       break;
-      
-    case 8:
-      Serial.println("Forward burst");
-      goFORWARD(blockToTicks(burstMovBlocks));
-      calCounter++;
-      break;
   }
-  delay(commandsDelay);
+  delay(500);
 
   if (x <= sizeof(commands) / sizeof(int)) {
     x++;
   }
 }
 
-uint8_t shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
+uint8_t shortIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold, int offset) {
   
-  int newVal = (val - offset )/ 10;
+  uint8_t newVal = (val - offset )/ 10;
   if (val < 10){
     return 1;
   }
@@ -651,7 +600,7 @@ uint8_t shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
   return newVal;
 }
 
-uint8_t longIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
+uint8_t longIrVal(uint8_t val, uint8_t blockThreshold, uint8_t cmThreshold, int offset) {
   uint8_t newVal = val / 10;
   if(val <= 20){
     newVal = 1;
@@ -686,9 +635,6 @@ void resendStatusUpdate() {
 
 void sendStatusUpdate() {
   int threshold = 35 ;
-
-  delay(200);
-
   scanFORWARD(&irFrontReadings[0]);
   scanLEFT();
   scanRIGHT(&irRightReadings[0]);
@@ -696,11 +642,11 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = shortIrVal(irFrontReadings[0], 4, 34, lfwdIrOS);
-  statusPayload.front2 = shortIrVal(irFrontReadings[1], 4, 35, mfwdIrOS);
-  statusPayload.front3 = shortIrVal(irFrontReadings[2], 4, 34, rfwdIrOS);
-  statusPayload.right1 = shortIrVal(irRightReadings[0], 4, 34, frgtIrOS);
-  statusPayload.right2 = shortIrVal(irRightReadings[1], 4, 34, brgtIrOS);
+  statusPayload.front1 = shortIrVal(irFrontReadings[0], 4, 35, lfwdIrOS);
+  statusPayload.front2 = shortIrVal(irFrontReadings[1], 4, 37, mfwdIrOS);
+  statusPayload.front3 = shortIrVal(irFrontReadings[2], 4, 35, rfwdIrOS);
+  statusPayload.right1 = shortIrVal(irRightReadings[0], 4, 35, frgtIrOS);
+  statusPayload.right2 = shortIrVal(irRightReadings[1], 4, 35, brgtIrOS);
   statusPayload.left1 = longIrVal(irLeftReading , 7, 65,flftIrOS);
   statusPayload.reached = 1;
 
@@ -734,3 +680,13 @@ void decrementID() {
     last_sent = last_sent - 1;
   }
 }
+
+//Checklist functions
+
+void outputBlock(){
+  scanLEFT();
+  return irLeftReading / 10 * 10;
+
+}
+
+

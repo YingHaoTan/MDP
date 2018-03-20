@@ -16,9 +16,9 @@
 #define mfwdIrOS -5 //Middle forward IR
 #define lfwdIrOS -4 //Left forward IR
 #define rfwdIrOS -4 //Right forward IR
-#define frgtIrOS -3 //Front right IR
+#define frgtIrOS -4 //Front right IR
 #define flftIrOS -2 //Front left IR.  The only long range IR.
-#define brgtIrOS -3 //Back right IR
+#define brgtIrOS -4 //Back right IR
 
 #define shrtmodel 1080
 #define longmodel 20150
@@ -50,8 +50,8 @@ int commandsDelay = 500;
 int burstMovBlocks = 2;
 int commands[] = 
                 {0};                        //Set to commWithRPI mode
-                //{5};                      // IR Sensors, full scan
-                //{1,1,1,1,1,1,1,1};              //Forward movement, block by block
+//                {5};                      // IR Sensors, full scan
+                {1,1,1,1,1,1,1,1};              //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,1,1,1};  //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};  //Right turns
                 //{7,7,1,1,1};              //Left turn 180
@@ -66,9 +66,9 @@ int commands[] =
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0350, 0.090);
 SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0355, 0.080);
-SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.03912, 0.06806);
+SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.086);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
-SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.076500);
+SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.065);
 
 //SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.034, 0.130);
 
