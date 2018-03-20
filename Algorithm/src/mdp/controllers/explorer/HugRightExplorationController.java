@@ -30,9 +30,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     enum States {
         BOUNDARY, ABOUT_TURN, LOOPING, EXITING_LOOP, EXPLORATION, EXPLORING, COMPLETED
     };
-
     FastestPathBase fastestPath;
-
     RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
     List<Point> unexploredPoints;
     List<List<Point>> neighbourPoints;
@@ -46,6 +44,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     States currentState;
 
     LinkedList<RobotAction> lastTenActions;
+    RobotBase prev;
+    
 
     public HugRightExplorationController(FastestPathBase fastestPath) {
         super();
@@ -58,7 +58,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     public void explore(RobotBase robot, int percentage, double timelimit) {
         super.explore(robot, percentage, timelimit);
         robot.addRobotActionListener(this);
-        sensorsScan();
+        sensorsScan(getRobot());
 
         currentState = States.BOUNDARY;
         unexploredPoints = new ArrayList<Point>();
@@ -78,6 +78,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 } else {
                     justTurned = false;
                 }
+                prev = getRobot().clone();
                 getRobot().move(action);
                 break;
             }
@@ -341,17 +342,20 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        if(actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE){
+            sensorsScan(prev);
+            return;
+        }
+        prev = getRobot().clone();
         
-        //System.out.println("Robot action completed: " + actions[0]);
+        
+        System.out.println("Robot action completed: " + actions[0]);
         
         this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
 
         // Update internal map state
-        sensorsScan();
+        sensorsScan(getRobot());
         
-        if(actions[0] == RobotAction.CAL_CORNER && actions[0] == RobotAction.CAL_SIDE){
-            return;
-        }
         
         //System.out.println(currentState);
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
@@ -403,11 +407,21 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             }
 
-            if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() > 80) {
+            // Don't do round 2
+            if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
+                currentState = States.COMPLETED;
+                complete();
+                return;
+            }
+            
+            // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
+            if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
+                System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
                 //currentState = States.COMPLETED;
                 //complete();
-            } else {
+            } 
+            else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
                     //System.out.println("========================");
@@ -621,14 +635,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             RobotBase robot = getRobot();
             CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
             if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+                System.out.println("Last:" + RobotAction.ABOUT_TURN);
                 robot.move(RobotAction.ABOUT_TURN);
             } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                System.out.println("Last:" + RobotAction.TURN_LEFT);
                 robot.move(RobotAction.TURN_LEFT);
             } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+                System.out.println("Last:" + RobotAction.TURN_RIGHT);
                 robot.move(RobotAction.TURN_RIGHT);
             }
             robot.dispatchCalibration(spec.getCalibrationType());
-
+            System.out.println("Last:" + spec.getCalibrationType());
             getRobot().stop();
             super.complete();
             stopped = true;

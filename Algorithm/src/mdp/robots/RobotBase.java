@@ -393,16 +393,17 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
+        
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
     		if(spec.isInPosition(this, null)) {
-                        //System.out.println("Can send calibration data");
+                        System.out.println("Sending : " +spec.getCalibrationType() );
     			dispatchCalibration(spec.getCalibrationType());
     			break;
     		}
     	}
-        
-    	dispatchMovement(mapdirection, actions);
+        dispatchMovement(mapdirection, actions);
+    	
     }
 
     /*
@@ -415,6 +416,14 @@ public abstract class RobotBase {
      */
     public void reset() {
         orientation = initialorientation;
+    }
+    
+    public RobotBase clone(){
+        RobotBase cloned = new SimulatorRobot(this.getDimension(), this.getCurrentOrientation());
+        cloned.mstate = this.mstate.clone();
+        cloned.sensors = new ArrayList<SensorConfiguration>(this.getSensors());
+        
+        return cloned;
     }
 
     /**

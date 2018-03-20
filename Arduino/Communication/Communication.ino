@@ -48,7 +48,7 @@ void loop() {
               RingBuffer_get(&usbBufferIn, &instructMsg.action, 3);
               RingBuffer_get(&usbBufferIn, &instructMsg.obstacleInFront, 4);
 
-              if (last_sent == instructMsg.id && alreadyReceived == false) {
+              //if (last_sent == instructMsg.id && alreadyReceived == false) {
 
                 alreadyReceived = true;
                 yetToReceiveAck = false;
@@ -107,8 +107,10 @@ void loop() {
                     break;
                 }
                 RingBuffer_erase(&usbBufferIn, 6);
+                } else {
+              RingBuffer_pop( & usbBufferIn);
               }
-            }
+              //}
           }
         } else if (messageType == ARDUINO_STREAM) {
           StreamMessage streamMsg;
@@ -118,11 +120,8 @@ void loop() {
           RingBuffer_get(&usbBufferIn, &payloadSize, 3);
 
           uint8_t tmpInBuffer;
-          if (4+payloadSize <= usbBufferIn.count) {
-
-            } else {
-              RingBuffer_pop(&usbBufferIn);
-            if(RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4+payloadSize) == true && tmpInBuffer == '!'){
+          if (4 + payloadSize <= usbBufferIn.count) {
+            if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4 + payloadSize) == true && tmpInBuffer == '!') {
               uint8_t tmpPayload[payloadSize] = {0};
               for (int i = 0; i < payloadSize; i++) {
                 RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
@@ -130,44 +129,49 @@ void loop() {
               memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
               //Serial.println( payloadSize + 5);
               //Serial.println(usbBufferIn.count);
-              
+
               //Serial.println(usbBufferIn.count);
-              for (int i = 0; i < payloadSize; i++){
-                digitalWrite(LED_BUILTIN, HIGH);
-                delay(1000);
-                digitalWrite(LED_BUILTIN, LOW);
-                delay(1000);
+              for (int i = 0; i < payloadSize; i++) {
                 int forwardCount = 0;
                 uint8_t action = streamMsg.streamActions[i];
-                
-                
-                switch(action){
+
+
+                switch (action) {
                   case FORWARD:
-                    forwardCount= 1;
-                    while(true){
-                      if((i+1) < payloadSize && streamMsg.streamActions[i+1] == FORWARD){
+                    forwardCount = 1;
+                    while (true) {
+                      if ((i + 1) < payloadSize && streamMsg.streamActions[i + 1] == FORWARD) {
                         forwardCount++;
-                        i++;        
+                        i++;
                       }
-                      else{
-                        break;  
+                      else {
+                        break;
                       }
                     }
-                    //moveForward(forwardCount);
+                    //goFORWARD(blockToTicks(forwardCount));
+                    //delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
                     break;
                   case TURN_RIGHT:
-                    //turn_right();
-                    sendStatusUpdate();
-                    incrementID();
-                    alreadyReceived = false;
+                    //goRIGHT(90);
+                    //delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
                     break;
                   case TURN_LEFT:
-                    //turn_left();
-                    break;   
-                } 
-                
+                    //goLEFT(90);
+                    //delay(100);
+                    //sendStatusUpdate();
+                    //incrementID();
+                    //alreadyReceived = false;
+                    break;
+                }
+
               }
-              sendStatusUpdate();
+        sendStatusUpdate();
               incrementID();
               alreadyReceived = false;
               RingBuffer_erase(&usbBufferIn, payloadSize + 5);

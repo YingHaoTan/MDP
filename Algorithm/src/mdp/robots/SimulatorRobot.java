@@ -87,6 +87,8 @@ public class SimulatorRobot extends RobotBase {
 
     @Override
     protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
+        
+        
     	MapState mstate = this.getMapState();
         Point location = mstate.getRobotPoint();
 

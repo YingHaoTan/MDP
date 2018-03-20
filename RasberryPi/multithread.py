@@ -10,9 +10,9 @@ import time
 class Main(object):
 
 	def __init__(self):
-		print('Opening bluetooth connection')
-		self.android = BluetoothInterface.BluetoothInterface()
-		self.android.connect()
+		#print('Opening bluetooth connection')
+		#self.android = BluetoothInterface.BluetoothInterface()
+		#self.android.connect()
 		pass
 
  
@@ -94,7 +94,7 @@ class Main(object):
 								elif (received[0] == ANDROID_UPDATE):
 									print('(ANDROID_UPDATE) to Android (INTO QUEUE): ' + str(received))
 									#print(received)
-									to_android_queue.put(received[1:])
+									#to_android_queue.put(received[1:])
 
 								message_end = False
 								received = []
@@ -202,13 +202,13 @@ class Main(object):
 			
 
 
-			read_android_thread = Thread(target=self.read_android, args=([to_pc_queue]))
-			write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
+			#read_android_thread = Thread(target=self.read_android, args=([to_pc_queue]))
+			#write_android_thread = Thread(target=self.write_android, args=([to_android_queue]))
 
 			t1.start()
 			t2.start()
-			read_android_thread.start()
-			write_android_thread.start()
+			#read_android_thread.start()
+			#write_android_thread.start()
 			
 			#t3 = Thread(target = self.Bluetooth_Thread, args = (to_android_queue, from_android_queue, '', 1))
 

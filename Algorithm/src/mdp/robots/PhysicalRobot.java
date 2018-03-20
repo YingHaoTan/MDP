@@ -136,7 +136,6 @@ public class PhysicalRobot extends RobotBase {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
         System.out.println("Calibration Data: " + action);
-
         sendArduinoMessage(new ArduinoInstruction(action, false));
     }
 
@@ -273,9 +272,14 @@ public class PhysicalRobot extends RobotBase {
                             commandqueue.poll();
                         }
 
-                        if (command.actions.size() != 1)    // || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE))
+                        /*if (command.actions.size() != 1  || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)){
                             this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
-
+                        }*/
+                        if(command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)
+                            this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
+                        else{
+                            this.notify(null, command.actions.toArray(new RobotAction[0]));
+                        }
                         if (autoupdate) {
                             MapState mstate = getMapState();
                             Point rpoint = mstate.getRobotPoint();

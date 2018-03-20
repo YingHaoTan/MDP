@@ -73,10 +73,10 @@ public abstract class MovementBase {
     /**
      * Scan area using sensors and updates cell states
      */
-    protected void sensorsScan() {
+    protected void sensorsScan(RobotBase robot) {
         
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
-        List<SensorConfiguration> sensors = getRobot().getSensors();
+        List<SensorConfiguration> sensors = robot.getSensors(); //getRobot().getSensors();
 
         for (SensorConfiguration sensor : sensors) {
 
@@ -89,8 +89,8 @@ public abstract class MovementBase {
 
             // If detects an obstacle
             if (reading > 0) {
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
+                Direction sDirection = robot.getSensorDirection(sensor);
+                Point sCoordinate = robot.getSensorCoordinate(sensor);
                 
 
                 // Should also check for out-of-bounds (more applicable in physical robot)
@@ -147,8 +147,8 @@ public abstract class MovementBase {
                 }
             } else {
                 int maxRange = sensor.getMaxDistance();
-                Direction sDirection = getRobot().getSensorDirection(sensor);
-                Point sCoordinate = getRobot().getSensorCoordinate(sensor);
+                Direction sDirection = robot.getSensorDirection(sensor);
+                Point sCoordinate = robot.getSensorCoordinate(sensor);
 
                 switch (sDirection) {
                     case UP:
@@ -197,12 +197,12 @@ public abstract class MovementBase {
                 }
             }
         }
-        /*
+        
         System.out.println("========== Obstacles Counter =============");
         printGrid(obstaclesCounter);
         System.out.println("========== No Obstacles Counter =============");
         printGrid(noObstaclesCounter);
-       */
+       
         for(Runnable listener: this.scanlisteners)
         	listener.run();
     }
