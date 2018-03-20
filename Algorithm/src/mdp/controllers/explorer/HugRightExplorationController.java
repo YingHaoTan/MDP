@@ -16,7 +16,9 @@ import mdp.controllers.fp.FastestPathBase;
 import mdp.controllers.fp.FastestPathCompletedListener;
 import mdp.models.CellState;
 import mdp.models.Direction;
+import mdp.models.MapDescriptorFormat;
 import mdp.models.RobotAction;
+import mdp.models.MDFTuple;
 import mdp.robots.CalibrationSpecification;
 import mdp.robots.RobotActionListener;
 import mdp.robots.RobotBase;
@@ -28,7 +30,7 @@ import mdp.robots.RobotBase;
 public class HugRightExplorationController extends ExplorationBase implements RobotActionListener, FastestPathCompletedListener {
 
     enum States {
-        BOUNDARY, ABOUT_TURN, LOOPING, EXITING_LOOP, EXPLORATION, EXPLORING, COMPLETED
+        BOUNDARY, ABOUT_TURN, LOOPING, EXITING_LOOP, EXITING_INDEFLOOP, EXPLORATION, EXPLORING, COMPLETED
     };
     FastestPathBase fastestPath;
     RobotAction[] actionPriority = {RobotAction.TURN_RIGHT, RobotAction.FORWARD, RobotAction.TURN_LEFT};
@@ -38,13 +40,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     LinkedList<Integer> exploringUnexplored;
     int neighbourCounter;
     int aboutTurn;
-    //int justTurnedCounter;
+    
+    int indefLoopCounter;
+    int indefThreshold = 45;
+    
     boolean justTurned;
     boolean stopped;
     States currentState;
 
     LinkedList<RobotAction> lastTenActions;
     RobotBase prev;
+    MDFTuple prevMdf;
     
 
     public HugRightExplorationController(FastestPathBase fastestPath) {
@@ -70,7 +76,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         aboutTurn = 0;
         justTurned = false;
         stopped = false;
-
+        indefLoopCounter = 0;
+        prevMdf = new MDFTuple(getMapState().toString(MapDescriptorFormat.MDF1), getMapState().toString(MapDescriptorFormat.MDF2));
+        
         for (RobotAction action : actionPriority) {
             if (canMove(actionToMapDirection(action))) {
                 if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -395,8 +403,27 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     }
                     if (flag) {
                         currentState = States.LOOPING;
+                        indefLoopCounter = 0;
                     }
                 }
+                
+               if(getMapState().toString(MapDescriptorFormat.MDF1).equals(prevMdf.mdf1) && getMapState().toString(MapDescriptorFormat.MDF2).equals(prevMdf.mdf2)){
+                    indefLoopCounter++;
+                } 
+                else{
+                    indefLoopCounter = 0;
+                }
+               prevMdf.mdf1 = getMapState().toString(MapDescriptorFormat.MDF1);
+               prevMdf.mdf2 = getMapState().toString(MapDescriptorFormat.MDF2);
+               
+               if(indefLoopCounter >= indefThreshold){
+                   currentState = States.EXITING_INDEFLOOP;
+                   indefLoopCounter = 0;
+                   fastestPath.move(getMapState(), getRobot(), getMapState().getStartPoint(), false);
+                   return;
+               }
+               
+               System.out.println("indefLoopCounter:" + indefLoopCounter);
             }
 
             if (currentState == States.LOOPING) {
@@ -408,14 +435,19 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
 
             // Don't do round 2
-            if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
+            
+            if(getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
+            
+            //if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
                 currentState = States.COMPLETED;
                 complete();
                 return;
             }
             
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
-            if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
+            if (getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
+
+                //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
                 System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
                 //currentState = States.COMPLETED;
@@ -477,6 +509,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                             actionPriority[1] = RobotAction.FORWARD;
                             actionPriority[2] = RobotAction.TURN_LEFT;
                             currentState = States.BOUNDARY;
+                            indefLoopCounter = 0;
                         }
 
                         getRobot().move(action);
@@ -488,6 +521,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         actionPriority[1] = RobotAction.FORWARD;
                         actionPriority[2] = RobotAction.TURN_LEFT;
                         currentState = States.BOUNDARY;
+                        indefLoopCounter = 0;
                     }
                 }
                 currentState = States.ABOUT_TURN;
@@ -542,8 +576,14 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onFastestPathCompleted() {
-        System.out.println("Robot is at " + getRobot().getMapState().getRobotPoint());
-        if (currentState != States.COMPLETED) {
+        if(currentState == States.EXITING_INDEFLOOP){
+            currentState = States.BOUNDARY;
+            // To go back to onRobotActionCompleted()
+            getRobot().move(RobotAction.SCAN);
+            return;
+        }
+        //System.out.println("Robot is at " + getRobot().getMapState().getRobotPoint());
+        if (currentState != States.COMPLETED && currentState != States.EXITING_INDEFLOOP) {
             if (!exploringUnexplored.isEmpty()) {
                 if (isUnexplored(unexploredPoints.get(exploringUnexplored.peek()))) {
                     neighbourCounter++;

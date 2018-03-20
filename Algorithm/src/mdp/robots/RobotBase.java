@@ -39,13 +39,14 @@ public abstract class RobotBase {
         this.cspecs = new ArrayList<>();
         this.listeners = new ArrayList<>();
     }
-    
+
     /**
      * Initializes this robot with the MapState
+     *
      * @param mstate
      */
     public void init(MapState mstate) {
-    	this.mstate = mstate;
+        this.mstate = mstate;
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class RobotBase {
     public List<SensorConfiguration> getSensors() {
         return new ArrayList<>(this.sensors);
     }
-    
+
     /**
      * Gets sensor direction in terms of map direction
      *
@@ -118,7 +119,7 @@ public abstract class RobotBase {
      * @return
      */
     public Point getSensorCoordinate(SensorConfiguration sensor) {
-    	MapState mstate = this.getMapState();
+        MapState mstate = this.getMapState();
         List<Point> points = mstate.convertRobotPointToMapPoints(mstate.getRobotPoint());
         Point location = points.get(points.size() / 2);
 
@@ -138,13 +139,14 @@ public abstract class RobotBase {
 
         return scoordinate;
     }
-    
+
     /**
      * Gets a list of calibration specifications added to this robot instance
+     *
      * @return
      */
     public List<CalibrationSpecification> getCalibrationSpecifications() {
-    	return new ArrayList<>(this.cspecs);
+        return new ArrayList<>(this.cspecs);
     }
 
     /**
@@ -164,21 +166,23 @@ public abstract class RobotBase {
     public Direction getCurrentOrientation() {
         return this.orientation;
     }
-    
+
     /**
      * Gets the scheduler
+     *
      * @return
      */
     public Timer getScheduler() {
-    	return this.scheduler;
+        return this.scheduler;
     }
-    
+
     /**
      * Gets the MapState
+     *
      * @return
      */
     public MapState getMapState() {
-    	return this.mstate;
+        return this.mstate;
     }
 
     /**
@@ -206,21 +210,23 @@ public abstract class RobotBase {
     public void removeRobotActionListener(RobotActionListener listener) {
         this.listeners.remove(listener);
     }
-    
+
     /**
      * Adds a CalibrationSpecification
+     *
      * @param spec
      */
     public void addCalibrationSpecification(CalibrationSpecification spec) {
-    	this.cspecs.add(spec);
+        this.cspecs.add(spec);
     }
-    
+
     /**
      * Removes a CalibrationSpecification
+     *
      * @param spec
      */
     public void removeCalibrationSpecification(CalibrationSpecification spec) {
-    	this.cspecs.remove(spec);
+        this.cspecs.remove(spec);
     }
 
     /**
@@ -272,12 +278,12 @@ public abstract class RobotBase {
 
         // Performs the actual moving of the robot
         move(mapdirection, actionsequence.toArray(new RobotAction[0]));
-        
+
         setCurrentOrientation(mapdirection);
     }
 
     public void moveStream(ArrayList<Direction> streamDirections) {
-        
+
         List<RobotAction> actionsequence = new ArrayList<>();
         List<Direction> orientations = new ArrayList<>();
         for (int i = 0; i < streamDirections.size(); i++) {
@@ -314,12 +320,12 @@ public abstract class RobotBase {
             } else if (mapdirection == Direction.LEFT) {
                 actionsequence.add(RobotAction.ABOUT_TURN);
             }
-            
+
             actionsequence.add(RobotAction.FORWARD);
             orientations.add(mapdirection);
             setCurrentOrientation(mapdirection);
         }
-        
+
         moveRobotStream(actionsequence, orientations);
     }
 
@@ -343,7 +349,7 @@ public abstract class RobotBase {
                         break;
 
                 }
-            } else if(action == RobotAction.TURN_LEFT){
+            } else if (action == RobotAction.TURN_LEFT) {
                 switch (getCurrentOrientation()) {
                     case UP:
                         newDirection = Direction.LEFT;
@@ -358,7 +364,7 @@ public abstract class RobotBase {
                         newDirection = Direction.UP;
                         break;
                 }
-            } else if(action == RobotAction.ABOUT_TURN){
+            } else if (action == RobotAction.ABOUT_TURN) {
                 switch (getCurrentOrientation()) {
                     case UP:
                         newDirection = Direction.DOWN;
@@ -381,7 +387,7 @@ public abstract class RobotBase {
             move(orientation, action);
         }
     }
-    
+
     /**
      * Moves the robot by performing the actions in order
      *
@@ -389,17 +395,17 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
-        
-        for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
+
+        for (CalibrationSpecification spec : this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
-    		if(spec.isInPosition(this)) {
-                System.out.println("Sending : " +spec.getCalibrationType() );
-    			dispatchCalibration(spec.getCalibrationType());
-    			break;
-    		}
-    	}
+            if (spec.isInPosition(this)) {
+                //System.out.println("Sending : " +spec.getCalibrationType());
+                dispatchCalibration(spec.getCalibrationType());
+                break;
+            }
+        }
         dispatchMovement(mapdirection, actions);
-    	
+
     }
 
     /*
@@ -413,12 +419,12 @@ public abstract class RobotBase {
     public void reset() {
         orientation = initialorientation;
     }
-    
-    public RobotBase clone(){
+
+    public RobotBase clone() {
         RobotBase cloned = new SimulatorRobot(this.getDimension(), this.getCurrentOrientation());
         cloned.mstate = this.mstate.clone();
         cloned.sensors = new ArrayList<SensorConfiguration>(this.getSensors());
-        
+
         return cloned;
     }
 
@@ -430,8 +436,9 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void notify(Direction mapdirection, RobotAction... actions) {
-        for (RobotActionListener listener : new ArrayList<>(listeners))
+        for (RobotActionListener listener : new ArrayList<>(listeners)) {
             SwingUtilities.invokeLater(() -> listener.onRobotActionCompleted(mapdirection, actions));
+        }
     }
 
     /**
@@ -443,21 +450,22 @@ public abstract class RobotBase {
      */
     public abstract Map<SensorConfiguration, Integer> getSensorReading();
 
-    
     /**
      * Have to set orientation inside here...
      */
     protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations);
-    
+
     /**
      * Dispatches a sequence of movements
+     *
      * @param direction
      * @param actions
      */
-    protected abstract void dispatchMovement(Direction direction, RobotAction...actions);
-    
+    protected abstract void dispatchMovement(Direction direction, RobotAction... actions);
+
     /**
      * Dispatches a calibration hint
+     *
      * @param action
      */
     public abstract void dispatchCalibration(RobotAction action);
