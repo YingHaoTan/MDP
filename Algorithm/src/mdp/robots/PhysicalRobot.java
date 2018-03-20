@@ -258,7 +258,7 @@ public class PhysicalRobot extends RobotBase {
                     for (int i = 0; i < command.actions.size(); i++) {
                         RobotAction action = command.actions.get(i);
 
-                        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT) {
+                        if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.ABOUT_TURN) {
                             this.notify(null, action);
                         } else {
                             this.notify(command.mapdirections.get(orientationIndex++), action);
@@ -275,7 +275,7 @@ public class PhysicalRobot extends RobotBase {
                         /*if (command.actions.size() != 1  || (command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)){
                             this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
                         }*/
-                        if(command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE)
+                        if(command.actions.get(0) != RobotAction.CAL_CORNER && command.actions.get(0) != RobotAction.CAL_SIDE && command.actions.get(0) != RobotAction.CAL_JIEMING)
                             this.notify(command.mapdirections.get(0), command.actions.toArray(new RobotAction[0]));
                         else{
                             this.notify(null, command.actions.toArray(new RobotAction[0]));

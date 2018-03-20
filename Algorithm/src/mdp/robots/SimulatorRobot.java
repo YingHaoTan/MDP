@@ -140,7 +140,7 @@ public class SimulatorRobot extends RobotBase {
         }
         
         for (int i = 0; i < actions.size(); i++) {
-            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT) {
+            if (actions.get(i) == RobotAction.TURN_LEFT || actions.get(i) == RobotAction.TURN_RIGHT || actions.get(i) == RobotAction.ABOUT_TURN) {
                 NotifyTask task = new NotifyTask(null, new RobotAction[] {actions.get(i)});
                 taskqueue.offer(task);
                 if (taskqueue.size() == 1) {

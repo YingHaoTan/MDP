@@ -289,8 +289,7 @@ public abstract class RobotBase {
                 } else if (mapdirection == Direction.RIGHT) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.DOWN) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.ABOUT_TURN);
                 }
             } else if (orientation == Direction.DOWN) {
                 if (mapdirection == Direction.RIGHT) {
@@ -298,8 +297,7 @@ public abstract class RobotBase {
                 } else if (mapdirection == Direction.LEFT) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.UP) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.ABOUT_TURN);
                 }
             } else if (orientation == Direction.LEFT) {
                 if (mapdirection == Direction.DOWN) {
@@ -307,16 +305,14 @@ public abstract class RobotBase {
                 } else if (mapdirection == Direction.UP) {
                     actionsequence.add(RobotAction.TURN_RIGHT);
                 } else if (mapdirection == Direction.RIGHT) {
-                    actionsequence.add(RobotAction.TURN_RIGHT);
-                    actionsequence.add(RobotAction.TURN_RIGHT);
+                    actionsequence.add(RobotAction.ABOUT_TURN);
                 }
             } else if (mapdirection == Direction.UP) {
                 actionsequence.add(RobotAction.TURN_LEFT);
             } else if (mapdirection == Direction.DOWN) {
                 actionsequence.add(RobotAction.TURN_RIGHT);
             } else if (mapdirection == Direction.LEFT) {
-                actionsequence.add(RobotAction.TURN_RIGHT);
-                actionsequence.add(RobotAction.TURN_RIGHT);
+                actionsequence.add(RobotAction.ABOUT_TURN);
             }
             
             actionsequence.add(RobotAction.FORWARD);
