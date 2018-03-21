@@ -25,8 +25,8 @@
 
 //---------------------Definitions for Motors---------------------//
 #define turnLeftTicks  5
-#define turnRightTicks -15
-#define forwardOffsetTicks 85
+#define turnRightTicks 13
+#define forwardOffsetTicks 155
 
 //---------------------Global Variables---------------------//
 volatile int mCounter[2] = {0, 0}; //[0]right, [1]left
@@ -45,7 +45,7 @@ int totalErrors;
 int RPIExpDelay = 20;
 int RPIFPDelay =  100;
 
-int mvmtCounter[] = {0, 0, 0}; /[0]forward, [1]left, [2]right
+int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
@@ -66,7 +66,8 @@ int commands[] =
                 //{1,1,1,1,1,1,3,1,3,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1}; //Snake movement
                 //{1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2}; //Stairs
                 //{1,1,1,1,1,1,1,1,1,1};
-
+                //{4,2,1,3,1,1,5,9,5,2,1,1,1,3,1,1,1,1,3,1,1,1};
+                //{4,2,1,3,1,1,9,2};
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);

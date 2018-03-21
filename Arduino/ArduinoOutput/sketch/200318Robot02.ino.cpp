@@ -39,37 +39,39 @@ void calibrateCORNER();
 void calibrateRIGHTV2();
 #line 317 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void calibrateFRONTV2();
-#line 340 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 339 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+void fwdCorrection();
+#line 349 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 int angleToTicks(long angle);
-#line 347 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 356 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 int blockToTicks(int blocks);
-#line 357 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 366 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void scanFORWARD(int *pData);
-#line 367 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 376 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void scanRIGHT(int *pData);
-#line 375 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
-void scanLEFT();
 #line 384 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+void scanLEFT();
+#line 393 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void resetMCounters();
-#line 400 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
-void pciSetup(byte pin);
 #line 409 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+void pciSetup(byte pin);
+#line 418 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void commWithRPI();
-#line 602 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 613 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void stringCommands();
-#line 688 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 702 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 uint8_t shortIrVal(int val, int blockThreshold, int cmThreshold, int offset);
-#line 700 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 714 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 uint8_t longIrVal(int val, int blockThreshold, int cmThreshold, int offset);
-#line 712 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 726 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void putIncomingUSBMessageToBuffer();
-#line 727 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 741 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void resendStatusUpdate();
-#line 733 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 747 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void sendStatusUpdate();
-#line 771 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 785 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void incrementID();
-#line 775 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
+#line 789 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino"
 void decrementID();
 #line 1 "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\RingBuffer.ino"
 void RingBuffer_init(RingBuffer *_this);
@@ -143,8 +145,8 @@ void emergencyBrake(){
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 300;
-  int setSpdL = 300;
+  int setSpdR = 400;                //Original: 300
+  int setSpdL = 400;                //Original: 300
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
@@ -418,6 +420,15 @@ void calibrateFRONTV2() {
   }
 }
 
+void fwdCorrection(){
+  //if(mvmtCounter[0] % 2 == 0){
+    md.setM1Speed(-394);
+    delay(6);
+    md.setBrakes(400,400);
+    resetMCounters();
+  //}
+}
+
 
 int angleToTicks(long angle) {
   if (angle == 90)
@@ -534,6 +545,8 @@ void commWithRPI() {
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
                   delay(RPIExpDelay);
+                  mvmtCounter[0]++;
+                  fwdCorrection();
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -688,6 +701,8 @@ void stringCommands() {
     case 1:
       Serial.println("Moving forward");
       goFORWARD(blockToTicks(1));
+      mvmtCounter[0]++;
+      fwdCorrection();
       calCounter++;
       break;
 
@@ -751,6 +766,7 @@ void stringCommands() {
 
     case 9:
       Serial.println("Calibrate At Any blocks");
+      scanRIGHT(&irRightReadings[0]);
       if(abs(irRightReadings[0] - irRightReadings[1]) < 20 &&abs(irRightReadings[0] - irRightReadings[1]) > 5){
                     Serial << "V2" << endl;
                     calibrateRIGHTV2();

@@ -63,8 +63,8 @@ void emergencyBrake(){
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 300;
-  int setSpdL = 300;
+  int setSpdR = 400; //Original: 300
+  int setSpdL = 400; //Original: 300
   resetMCounters();
   lastError = 0;
   totalErrors = 0;
@@ -127,7 +127,7 @@ void goRIGHT(int angle) {
 
   md.setSpeeds(setSpdR, setSpdL);
   delay(50);
-  while (mCounter[0] < angleToTicks(angle) - -15 - 200 && mCounter[1] < angleToTicks(angle) - -15 - 200) {
+  while (mCounter[0] < angleToTicks(angle) - 13 - 200 && mCounter[1] < angleToTicks(angle) - 13 - 200) {
     if (millis() - lastTime > 100) {
       PIDControl(&setSpdR, &setSpdL, 150, 6, 15, 1);
       lastTime = millis();
@@ -136,7 +136,7 @@ void goRIGHT(int angle) {
   }
   int i = 0;
   lastTime = micros();
-  while (mCounter[0] < angleToTicks(angle) - -15 && mCounter[1] < angleToTicks(angle) - -15) {
+  while (mCounter[0] < angleToTicks(angle) - 13 && mCounter[1] < angleToTicks(angle) - 13) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(setSpdR + i, setSpdL - i);
       i++;
@@ -338,6 +338,15 @@ void calibrateFRONTV2() {
   }
 }
 
+void fwdCorrection(){
+  //if(mvmtCounter[0] % 2 == 0){
+    md.setM1Speed(-394);
+    delay(6);
+    md.setBrakes(400,400);
+    resetMCounters();
+  //}
+}
+
 
 int angleToTicks(long angle) {
   if (angle == 90)
@@ -348,7 +357,7 @@ int angleToTicks(long angle) {
 
 int blockToTicks(int blocks) {
   if (blocks == 1)
-    return (1183 - 85) * blocks;
+    return (1183 - 155) * blocks;
   else
     return 1192 * blocks;
 }
@@ -454,6 +463,8 @@ void commWithRPI() {
                 case 0x05:
                   goFORWARD(blockToTicks(1));
                   delay(RPIExpDelay);
+                  mvmtCounter[0]++;
+                  fwdCorrection();
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -608,6 +619,8 @@ void stringCommands() {
     case 1:
       Serial.println("Moving forward");
       goFORWARD(blockToTicks(1));
+      mvmtCounter[0]++;
+      fwdCorrection();
       calCounter++;
       break;
 
@@ -671,6 +684,7 @@ void stringCommands() {
 
     case 9:
       Serial.println("Calibrate At Any blocks");
+      scanRIGHT(&irRightReadings[0]);
       if(((irRightReadings[0] - irRightReadings[1])>0?(irRightReadings[0] - irRightReadings[1]):-(irRightReadings[0] - irRightReadings[1])) < 20 &&((irRightReadings[0] - irRightReadings[1])>0?(irRightReadings[0] - irRightReadings[1]):-(irRightReadings[0] - irRightReadings[1])) > 5){
                     Serial << "V2" << endl;
                     calibrateRIGHTV2();
