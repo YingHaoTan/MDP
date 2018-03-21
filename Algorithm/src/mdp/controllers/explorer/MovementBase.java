@@ -198,12 +198,12 @@ public abstract class MovementBase {
             }
         }
         
-        
+        /*
         System.out.println("========== Obstacles Counter =============");
         printGrid(obstaclesCounter);
         System.out.println("========== No Obstacles Counter =============");
         printGrid(noObstaclesCounter);
-       
+       */
         for(Runnable listener: this.scanlisteners)
         	listener.run();
     }
