@@ -91,7 +91,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 break;
             }
         }
-
+        justTurned = false;
+        getRobot().move(RobotAction.ABOUT_TURN);
     }
 
     /**

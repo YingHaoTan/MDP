@@ -204,6 +204,7 @@ public abstract class MovementBase {
         System.out.println("========== No Obstacles Counter =============");
         printGrid(noObstaclesCounter);
         */
+
         for(Runnable listener: this.scanlisteners)
         	listener.run();
     }
