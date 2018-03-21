@@ -258,7 +258,7 @@ public class MDPTCPConnector {
                     if ((update = outgoingAndroidQueue.poll()) != null) {
                     	outToServer.writeBytes(new String(update.toBytes()) + "~");
                     	
-                    	System.out.println("Sending android: " + update.getMessage());
+                    	//System.out.println("Sending android: " + update.getMessage());
                     	
                     	processed++;
                     }
