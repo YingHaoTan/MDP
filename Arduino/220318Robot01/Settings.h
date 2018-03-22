@@ -26,7 +26,6 @@
 //---------------------Definitions for Motors---------------------//
 #define turnLeftTicks  3
 #define turnRightTicks -5
-#define aboutTurnOffset -35
 #define forwardOffsetTicks 155
 
 //---------------------Global Variables---------------------//
@@ -60,17 +59,15 @@ int commands[] =
                 //{7,7,7,7,1,1,1};              //Left turn 180
                 //{5,4,5};                //Calibrate side
                 //{6,0};              //Calibrate corner
-                //{9,1,1,1};             //Calibrate with any blocks
+                //{5,9,5};             //Calibrate with any blocks
                 //{3,1,3,1,3,1,3,1,1,1,1};  //Loop movement (When algorithm gets stuck)
-                //{6,7,8,0};                      //Forward burst movement
+                //{7,8,0};                      //Forward burst movement
                 //{6,2,1,1,1,3,1,2,1,3,1,2,1,3, 1,2,1,3,1,2,1,3,1,2,1};
                 //{1,1,1,1,1,1,3,1,3,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1}; //Snake movement
-                //{1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2}; //Stairs
+                //{1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2}; //Stairs
                 //{4,1,1,1,1,1,1,1,1,1,1};
                 //{6,2,1,1,1,1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,1,1,1,3,1,1,1,1,3,1,2,1,3,1,2,1,3,1,2,1,2,1,1,1,7};
-                //{1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,0};
-
-
+                // {1,1,1,1,1,1,1,1,1,0};
 //---------------------Instantiate IR and Motor objects from library---------------------//
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.090);

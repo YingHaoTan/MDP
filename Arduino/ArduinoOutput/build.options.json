@@ -1,10 +1,10 @@
 {
   "builtInLibrariesFolders": "C:\\Program Files\\Arduino\\libraries",
-  "customBuildProperties": "build.path=c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\ArduinoOutput,build.warn_data_percentage=75,runtime.tools.avr-gcc.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr,runtime.tools.avrdude.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr,runtime.tools.arduinoOTA.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr",
+  "customBuildProperties": "build.path=c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\ArduinoOutput,build.warn_data_percentage=75,runtime.tools.avrdude.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr,runtime.tools.arduinoOTA.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr,runtime.tools.avr-gcc.path=C:\\Program Files\\Arduino\\hardware\\tools\\avr",
   "fqbn": "arduino:avr:uno",
   "hardwareFolders": "C:\\Program Files\\Arduino\\hardware,C:\\Users\\Renzeydood\\AppData\\Local\\Arduino15\\packages",
   "otherLibrariesFolders": "C:\\Users\\Renzeydood\\Documents\\Arduino\\libraries",
   "runtime.ide.version": "10804",
-  "sketchLocation": "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\200318Robot02\\200318Robot02.ino",
+  "sketchLocation": "c:\\Users\\Renzeydood\\Documents\\~NTU Stuffs\\2.2\\CE3004 - MDP Multidisiplinary Project\\MDP\\Arduino\\220318Robot02\\220318Robot02.ino",
   "toolsFolders": "C:\\Program Files\\Arduino\\tools-builder,C:\\Program Files\\Arduino\\hardware\\tools\\avr,C:\\Users\\Renzeydood\\AppData\\Local\\Arduino15\\packages"
 }
