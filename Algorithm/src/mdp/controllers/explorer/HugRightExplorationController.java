@@ -88,10 +88,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 }
                 prev = getRobot().clone();
                 getRobot().move(action);
-                break;
+                return;
             }
         }
         justTurned = false;
+        prev = getRobot().clone();
         getRobot().move(RobotAction.ABOUT_TURN);
     }
 
