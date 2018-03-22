@@ -118,13 +118,13 @@ public abstract class FastestPathBase implements RobotActionListener {
 	            RobotBase robot = getRobot();
 	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
 	            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-	                robot.move(RobotAction.ABOUT_TURN);
+	                robot.move(RobotAction.UNEEDED_ABOUT_TURN);
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-	                robot.move(RobotAction.TURN_LEFT);
+	                robot.move(RobotAction.UNEEDED_TURN_LEFT);
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-	                robot.move(RobotAction.TURN_RIGHT);
+	                robot.move(RobotAction.UNEEDED_TURN_RIGHT);
 	            }
-	            robot.dispatchCalibration(spec.getCalibrationType());
+	            robot.dispatchCalibration(RobotAction.UNEEDED_CAL_CORNER);//spec.getCalibrationType());
                     completed = true;
 	        }
 	

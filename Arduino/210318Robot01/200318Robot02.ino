@@ -532,6 +532,39 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
+				case UNEEDED_TURN_LEFT:
+					// if(not within range){ turn_left(); }
+					// else { doNotAdjust = true; }
+					
+					sendStatusUpdate();
+					incrementID();
+					alreadyReceived = false;
+					break;
+				case UNEEDED_TURN_RIGHT:
+					// if(not within range){ turn_right() }
+					// else { doNotAdjust = true; }
+					
+					sendStatusUpdate();
+					incrementID();
+					alreadyReceived = false;
+					break;
+				case UNEEDED_ABOUT_TURN:
+					// if(not within range){ about_turn() }
+					// else { doNotAdjust = true; }
+					
+					sendStatusUpdate();
+					incrementID();
+					alreadyReceived = false;
+					break;
+				case UNEEDED_CAL_CORNER:
+					// if(not within range && doNotAdjust == false){ cal_corner() }
+					
+					doNotAdjust = false;
+					sendStatusUpdate();
+					incrementID();
+					alreadyReceived = false;
+					break;
+				
               }
               RingBuffer_erase( & usbBufferIn, 6);
 
@@ -571,6 +604,9 @@ void commWithRPI() {
                       else {
                         break;
                       }
+					  if(i+1 == payloadSize){
+						// minus half
+					  }
                     }
                     goFORWARD(blockToTicks(forwardCount));
                     delay(RPIFPDelay);
