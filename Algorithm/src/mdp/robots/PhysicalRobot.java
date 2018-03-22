@@ -140,7 +140,7 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove) {
 
         System.out.println("Starting fastest path");
         for (int i = 0; i < actions.size(); i++) {
@@ -165,6 +165,10 @@ public class PhysicalRobot extends RobotBase {
             } else if (mapdirection == Direction.RIGHT) {
                 mstate.setRobotPoint(new Point(location.x + 1, location.y));
             }
+        }
+        
+        if(discardLastMove){
+            actions.remove(actions.size()-1);
         }
 
         sendArduinoMessage(new ArduinoStream(actions));

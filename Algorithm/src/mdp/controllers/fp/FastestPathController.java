@@ -16,33 +16,35 @@ import mdp.models.MapState;
  */
 public class FastestPathController extends FastestPathBase {
 
-	@Override
-	protected Direction next() {
-		Direction nextd;
-		
-		MapState mstate = getMapState();
-		Point rpoint = mstate.getRobotPoint();
-		Point dpoint = this.getDestination();
-		
-		if(rpoint.x != dpoint.x) {
-			nextd = dpoint.x - rpoint.x > 0 ? Direction.RIGHT: Direction.LEFT;
-			mstate.setRobotPoint(new Point(rpoint.x + (nextd == Direction.RIGHT? 1: -1), rpoint.y));
-		}
-		else if(rpoint.y != dpoint.y) {
-			nextd = dpoint.y - rpoint.y > 0? Direction.UP: Direction.DOWN;
-			mstate.setRobotPoint(new Point(rpoint.x, rpoint.y + (nextd == Direction.UP? 1: -1)));
-		}
-		else {
-			nextd = null;
-		}
-		
-		return nextd;
-	}
+    public FastestPathController(boolean discardLastMove) {
+        super(discardLastMove);
+    }
 
-	@Override
-	protected boolean preprocess() {
-		return true;
-	}
+    @Override
+    protected Direction next() {
+        Direction nextd;
+
+        MapState mstate = getMapState();
+        Point rpoint = mstate.getRobotPoint();
+        Point dpoint = this.getDestination();
+
+        if (rpoint.x != dpoint.x) {
+            nextd = dpoint.x - rpoint.x > 0 ? Direction.RIGHT : Direction.LEFT;
+            mstate.setRobotPoint(new Point(rpoint.x + (nextd == Direction.RIGHT ? 1 : -1), rpoint.y));
+        } else if (rpoint.y != dpoint.y) {
+            nextd = dpoint.y - rpoint.y > 0 ? Direction.UP : Direction.DOWN;
+            mstate.setRobotPoint(new Point(rpoint.x, rpoint.y + (nextd == Direction.UP ? 1 : -1)));
+        } else {
+            nextd = null;
+        }
+
+        return nextd;
+    }
+
+    @Override
+    protected boolean preprocess() {
+        return true;
+    }
 
     @Override
     protected void reset() {
