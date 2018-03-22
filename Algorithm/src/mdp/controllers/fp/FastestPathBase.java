@@ -74,7 +74,7 @@ public abstract class FastestPathBase implements RobotActionListener {
                     streamDirections.add(direction);
                 }
                 if(streamDirections.size() > 0)
-                    robot.moveStream(streamDirections);
+                    robot.moveStream(streamDirections, true);
                 else
                     complete();
             } else {
@@ -114,17 +114,21 @@ public abstract class FastestPathBase implements RobotActionListener {
     	if(!completed) {
 	        robot.removeRobotActionListener(this);
 	        if (faststream) {
+                    /*
 	            System.out.println("Fastest path stream completed. Will calibrate now..");
 	            RobotBase robot = getRobot();
 	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
 	            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-	                robot.move(RobotAction.UNEEDED_ABOUT_TURN);
+	                robot.move(RobotAction.ABOUT_TURN);
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-	                robot.move(RobotAction.UNEEDED_TURN_LEFT);
+	                robot.move(RobotAction.TURN_LEFT);
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-	                robot.move(RobotAction.UNEEDED_TURN_RIGHT);
+	                robot.move(RobotAction.TURN_RIGHT);
 	            }
-	            robot.dispatchCalibration(RobotAction.UNEEDED_CAL_CORNER);//spec.getCalibrationType());
+	            robot.dispatchCalibration(RobotAction.CAL_CORNER);//spec.getCalibrationType());
+                    */
+                    
+                    robot.move(RobotAction.CAL_FORWARD);
                     completed = true;
 	        }
 	

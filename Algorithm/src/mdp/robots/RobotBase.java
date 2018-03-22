@@ -276,7 +276,7 @@ public abstract class RobotBase {
         setCurrentOrientation(mapdirection);
     }
 
-    public void moveStream(ArrayList<Direction> streamDirections) {
+    public void moveStream(ArrayList<Direction> streamDirections, boolean oneLessForward) {
         
         List<RobotAction> actionsequence = new ArrayList<>();
         List<Direction> orientations = new ArrayList<>();
@@ -319,8 +319,7 @@ public abstract class RobotBase {
             orientations.add(mapdirection);
             setCurrentOrientation(mapdirection);
         }
-        
-        moveRobotStream(actionsequence, orientations);
+        moveRobotStream(actionsequence, orientations, oneLessForward);
     }
 
     public void move(RobotAction action) {
@@ -447,7 +446,7 @@ public abstract class RobotBase {
     /**
      * Have to set orientation inside here...
      */
-    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations);
+    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean oneLessForward);
     
     /**
      * Dispatches a sequence of movements
