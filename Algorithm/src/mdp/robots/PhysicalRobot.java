@@ -140,7 +140,7 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean oneLessForward) {
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove) {
 
         System.out.println("Starting fastest path");
         for (int i = 0; i < actions.size(); i++) {
@@ -167,7 +167,7 @@ public class PhysicalRobot extends RobotBase {
             }
         }
         
-        if(oneLessForward){
+        if(discardLastMove){
             actions.remove(actions.size()-1);
         }
 

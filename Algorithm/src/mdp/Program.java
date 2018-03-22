@@ -47,8 +47,8 @@ public class Program {
         MdpWindowController wcontroller = new MdpWindowController(window);
         XController xcontroller = new XController(window.getMap().getMapState());
         MapFileHandler filehandler = new MapFileHandler();
-        ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification()));
-        FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification());
+        ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification(), false));
+        FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), true);
         
         wcontroller.setMapLoader(filehandler);
         wcontroller.setMapSaver(filehandler);

@@ -276,7 +276,7 @@ public abstract class RobotBase {
         setCurrentOrientation(mapdirection);
     }
 
-    public void moveStream(ArrayList<Direction> streamDirections, boolean oneLessForward) {
+    public void moveStream(ArrayList<Direction> streamDirections, boolean discardLastMove) {
         
         List<RobotAction> actionsequence = new ArrayList<>();
         List<Direction> orientations = new ArrayList<>();
@@ -319,7 +319,7 @@ public abstract class RobotBase {
             orientations.add(mapdirection);
             setCurrentOrientation(mapdirection);
         }
-        moveRobotStream(actionsequence, orientations, oneLessForward);
+        moveRobotStream(actionsequence, orientations, discardLastMove);
     }
 
     public void move(RobotAction action) {
@@ -388,17 +388,16 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
-        
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
-    		if(spec.isInPosition(this)) {
+                if(spec.isInPosition(this)) {
                 System.out.println("Sending : " +spec.getCalibrationType() );
-    			dispatchCalibration(spec.getCalibrationType());
-    			break;
-    		}
-    	}
+                        dispatchCalibration(spec.getCalibrationType());
+                        break;
+                }
+        }
+        
         dispatchMovement(mapdirection, actions);
-    	
     }
 
     /*
@@ -446,7 +445,7 @@ public abstract class RobotBase {
     /**
      * Have to set orientation inside here...
      */
-    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean oneLessForward);
+    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove);
     
     /**
      * Dispatches a sequence of movements
