@@ -282,8 +282,7 @@ public abstract class RobotBase {
         setCurrentOrientation(mapdirection);
     }
 
-    public void moveStream(ArrayList<Direction> streamDirections) {
-
+    public void moveStream(ArrayList<Direction> streamDirections, boolean discardLastMove) {
         List<RobotAction> actionsequence = new ArrayList<>();
         List<Direction> orientations = new ArrayList<>();
         for (int i = 0; i < streamDirections.size(); i++) {
@@ -325,8 +324,7 @@ public abstract class RobotBase {
             orientations.add(mapdirection);
             setCurrentOrientation(mapdirection);
         }
-
-        moveRobotStream(actionsequence, orientations);
+        moveRobotStream(actionsequence, orientations, discardLastMove);
     }
 
     public void move(RobotAction action) {
@@ -395,17 +393,16 @@ public abstract class RobotBase {
      * @param actions
      */
     protected void move(Direction mapdirection, RobotAction... actions) {
-
         for (CalibrationSpecification spec : this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
             if (spec.isInPosition(this)) {
-                //System.out.println("Sending : " +spec.getCalibrationType());
+                System.out.println("Sending : " + spec.getCalibrationType());
                 dispatchCalibration(spec.getCalibrationType());
                 break;
             }
         }
-        dispatchMovement(mapdirection, actions);
 
+        dispatchMovement(mapdirection, actions);
     }
 
     /*
@@ -453,7 +450,7 @@ public abstract class RobotBase {
     /**
      * Have to set orientation inside here...
      */
-    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations);
+    protected abstract void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove);
 
     /**
      * Dispatches a sequence of movements

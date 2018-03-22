@@ -22,7 +22,8 @@ public class AStarFastestPath extends FastestPathBase {
 	private PathSpecification specs;
 	private List<State> policy;
 	
-	public AStarFastestPath(PathSpecification specs) {
+	public AStarFastestPath(PathSpecification specs, boolean discardLastMove) {
+                super(discardLastMove);
 		this.specs = specs;
 	}
 

@@ -18,15 +18,17 @@ import mdp.robots.RobotBase;
  */
 public abstract class FastestPathBase implements RobotActionListener {
 
-	private boolean completed;
+    private boolean completed;
     private boolean faststream;
+    private boolean discardLastMove;
     private MapState mstate;
     private List<FastestPathCompletedListener> listeners;
     private RobotBase robot;
     private Point destination;
 
-    public FastestPathBase() {
+    public FastestPathBase(boolean discardLastMove) {
         this.listeners = new ArrayList<>();
+        this.discardLastMove = discardLastMove;
     }
 
     /**
@@ -74,7 +76,7 @@ public abstract class FastestPathBase implements RobotActionListener {
                     streamDirections.add(direction);
                 }
                 if(streamDirections.size() > 0)
-                    robot.moveStream(streamDirections);
+                    robot.moveStream(streamDirections, discardLastMove);
                 else
                     complete();
             } else {
@@ -114,6 +116,7 @@ public abstract class FastestPathBase implements RobotActionListener {
     	if(!completed) {
 	        robot.removeRobotActionListener(this);
 	        if (faststream) {
+                    
 	            System.out.println("Fastest path stream completed. Will calibrate now..");
 	            RobotBase robot = getRobot();
 	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
@@ -124,7 +127,10 @@ public abstract class FastestPathBase implements RobotActionListener {
 	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
 	                robot.move(RobotAction.TURN_RIGHT);
 	            }
-	            robot.dispatchCalibration(spec.getCalibrationType());
+	            robot.dispatchCalibration(RobotAction.CAL_CORNER);//spec.getCalibrationType());
+                    
+                    
+                    //robot.move(RobotAction.CAL_FORWARD);
                     completed = true;
 	        }
 	

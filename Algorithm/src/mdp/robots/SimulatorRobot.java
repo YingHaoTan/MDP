@@ -119,7 +119,7 @@ public class SimulatorRobot extends RobotBase {
 	}
 
     @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations) {
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove) {
         
         
         int orientationIndex = 0;

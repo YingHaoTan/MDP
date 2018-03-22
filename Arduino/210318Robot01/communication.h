@@ -13,6 +13,10 @@
 #define CAL_SIDE                                   0x09
 #define TURN_ABOUT                                 0x10
 #define CAL_ANY                                    0x11
+#define UNEEDED_TURN_LEFT						   0x12
+#define UNEEDED_TURN_RIGHT						   0x13
+#define UNEEDED_ABOUT_TURN						   0x14
+#define UNEEDED_CAL_CORNER						   0x15
 #define PAYLOAD_SIZE                               128 //As long as it's bigger than StatusMessage
 
 struct Message
@@ -57,3 +61,6 @@ bool yetToReceiveAck = false;
 bool alreadyReceived = false;
 unsigned long timer = millis();
 unsigned long timeout = 10000; // 250 milliseconds
+
+// fp flag
+bool doNotAdjust = false;
