@@ -49,8 +49,8 @@ int RPIFPDelay = 100;
 int commandsDelay = 80;
 int burstMovBlocks = 2;
 int commands[] = 
-                {0};                        //Set to commWithRPI mode
-                //{5};                      // IR Sensors, full scan
+//                {0};                        //Set to commWithRPI mode
+                {5};                      // IR Sensors, full scan
                 //{1,1,1,1,1,1,7,1,1,1,1,1,1,7,1,1,1,1,1,1,7,1,1,1,1,1,1};              //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,2,2,2,2,1,1,1};  //Left turns
                 //{3,3,3,3,3,3,3,3,3,3,3,3,1,1,1};  //Right turns
@@ -72,14 +72,13 @@ SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0355, 0.080);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.086);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
 SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.065);
-
-//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.034, 0.130);
-
-//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.034, 0.120);
-//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.035, 0.110);
-//SharpIR ir1(lfwdIr, shrtmodel, 0.0353, 0.0934);
-//SharpIR ir2(mfwdIr, shrtmodel, 0.035407, 0.133212);
-//SharpIR ir3(rfwdIr, shrtmodel, 0.032403, 0.153431);
+//
+//SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
+//SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0350, 0.090);
+//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0355, 0.080);
+//SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.086);
+//SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
+//SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.065);
 
 
 DualVNH5019MotorShield md;

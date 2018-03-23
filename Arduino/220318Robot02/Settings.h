@@ -25,7 +25,7 @@
 
 //---------------------Definitions for Motors---------------------//
 #define turnLeftTicks  3
-#define turnRightTicks -5
+#define turnRightTicks 7
 #define aboutTurnOffset -35
 #define forwardOffsetTicks 155
 
@@ -50,19 +50,19 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
-int burstMovBlocks =8;
+int burstMovBlocks = 8;
 int commands[] = 
                 {0};                        //Set to commWithRPI mode
                 //{5};                      // IR Sensors, full scan
-                //{1,1,1,1,1,1,7,1,1,1,1,1,1,7,1,1,1,1,1,1,7,1,1,1,1,1,1};              //Forward movement, block by block
-                //{2,2,2,2,2,2,2,2,1,1,1};  //Left turns
+                //{1,1,1,1,1,1,7,1,1,1,1,1,1,7};              //Forward movement, block by block
+//                {2,2,2,2,2,2,2,2,1,1,1};  //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};  //Right turns
                 //{7,7,7,7,1,1,1};              //Left turn 180
                 //{5,4,5};                //Calibrate side
                 //{6,0};              //Calibrate corner
                 //{9,1,1,1};             //Calibrate with any blocks
                 //{3,1,3,1,3,1,3,1,1,1,1};  //Loop movement (When algorithm gets stuck)
-                //{6,7,8,0};                      //Forward burst movement
+                //{8,0};                      //Forward burst movement
                 //{6,2,1,1,1,3,1,2,1,3,1,2,1,3, 1,2,1,3,1,2,1,3,1,2,1};
                 //{1,1,1,1,1,1,3,1,3,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1}; //Snake movement
                 //{1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2}; //Stairs
@@ -72,12 +72,19 @@ int commands[] =
 
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
-SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);
-SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.090);
+SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
+SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.095);
 SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0353, 0.080);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.086);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
 SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.065);
+
+//SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);
+//SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.090);
+//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0353, 0.080);
+//SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.086);
+//SharpIR flftIrVal(flftIrPin, longmodel, 0.01265, 0.16454);
+//SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.03651, 0.065);
 
 // SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 // SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0350, 0.090);
