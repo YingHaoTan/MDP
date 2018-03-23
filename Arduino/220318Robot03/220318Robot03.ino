@@ -204,7 +204,7 @@ void calibrateRIGHT() {
   scanRIGHT(&irRightReadings[0]);
   int turnTicks = 0;
   //  while (irRightReadings[0] != irRightReadings[1] && (abs(irRightReadings[0] - irRightReadings[1]) <=5)) {
-  while (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 50)) {
+  while (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
@@ -274,12 +274,12 @@ void calibrateRIGHTV2() {
     int Bdist = irRightReadings[1];
     if (Fdist / 100 == Bdist / 100) {
       if (Fdist < Bdist) {
-        Bdist = Bdist + 99 - Fdist % 100);
-        Fdist = Fdist + 99 - Fdist % 100);
+        Bdist = Bdist + 99 - Fdist % 100;
+        Fdist = Fdist + 99 - Fdist % 100;
       }
       else {
-        Fdist = Fdist + 99 - Bdist % 100);
-        Bdist = Bdist + 99 - Bdist % 100);
+        Fdist = Fdist + 99 - Bdist % 100;
+        Bdist = Bdist + 99 - Bdist % 100;
       }
     }
     else if (abs(Fdist / 100 - Bdist / 100) > 1) {
@@ -486,15 +486,16 @@ void commWithRPI() {
 
                 case CAL_SIDE:
                   if (calCounter >= 4) {
-                    //                    if ((irRightReadings[0] != irRightReadings[1]) && (abs(irRightReadings[0] - irRightReadings[1]) <= 5)) {
                     if (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 50)) {
                       calibrateRIGHT();
                       if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
                         delay(100);
                         goRIGHT(90);
+                        delay(100);
                         calibrateFRONT();
                         delay(100);
                         goLEFT(90);
+                        delay(100);
                         calibrateRIGHT();
                       }
                     }
@@ -662,9 +663,8 @@ void stringCommands() {
       Serial.println("Calibrate Right");
       
       scanRIGHT(&irRightReadings[0]);
-//      if (calCounter >= 4) {
-        //                    if ((irRightReadings[0] != irRightReadings[1]) && (abs(irRightReadings[0] - irRightReadings[1]) <= 5)) {
-        if (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 50)) {
+      if (calCounter >= 4) {
+        if (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
           calibrateRIGHT();
           if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
             delay(100);
@@ -674,8 +674,8 @@ void stringCommands() {
             goLEFT(90);
             calibrateRIGHT();
           }
-//        }
         calCounter = 0;
+        }
       }
       break;
 
