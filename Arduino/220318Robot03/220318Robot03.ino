@@ -274,12 +274,12 @@ void calibrateRIGHTV2() {
     int Bdist = irRightReadings[1];
     if (Fdist / 100 == Bdist / 100) {
       if (Fdist < Bdist) {
-        Bdist = Bdist - (1 + Fdist % 100);
-        Fdist = Fdist - (1 + Fdist % 100);
+        Bdist = Bdist + 99 - Fdist % 100);
+        Fdist = Fdist + 99 - Fdist % 100);
       }
       else {
-        Fdist = Fdist - (1 + Bdist % 100);
-        Bdist = Bdist - (1 + Bdist % 100);
+        Fdist = Fdist + 99 - Bdist % 100);
+        Bdist = Bdist + 99 - Bdist % 100);
       }
     }
     else if (abs(Fdist / 100 - Bdist / 100) > 1) {
