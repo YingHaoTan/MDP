@@ -96,13 +96,6 @@ void goFORWARD(int distance) {
         PIDControl(&setSpdR, &setSpdL, 110, 5, 15, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
-        //Collision check starts here
-        if (colCounter % CrashChkPeriod == 0) {
-          if (checkFRONT()) {
-            break;
-          }
-        }
-        colCounter++;
       }
     }
     i = 0;
@@ -114,6 +107,13 @@ void goFORWARD(int distance) {
         if (i > 100)
           i = 100;
         lastTime = micros();
+        //Collision check starts here
+        if (colCounter % CrashChkPeriod == 0) {
+          if (checkFRONT()) {
+            break;
+          }
+        }
+        colCounter++;
       }
     }
   }
