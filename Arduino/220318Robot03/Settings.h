@@ -36,6 +36,8 @@ int irFrontReadings[3] = {0, 0, 0}; //[0]left, [1]middle, [2]right
 int irRightReadings[2] = {0, 0}; //[0]front, [1]back
 int irLeftReading = 0;
 
+int CalPeriod = 4;
+int CrashChkPeriod = 5;
 uint8_t last_sent = 0;           //Variable for communication
 
 //Variables for PID to work
