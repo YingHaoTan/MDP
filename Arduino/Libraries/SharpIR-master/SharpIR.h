@@ -14,7 +14,7 @@
 #ifndef SharpIR_h
 #define SharpIR_h
 
-#define NB_SAMPLE 11
+#define NB_SAMPLE 51
 
 
 #ifdef ARDUINO

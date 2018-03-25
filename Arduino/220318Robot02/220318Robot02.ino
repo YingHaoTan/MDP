@@ -1,3 +1,4 @@
+
 #include <Streaming.h>
 #include <SharpIR.h>
 #include <DualVNH5019MotorShield.h>
@@ -88,7 +89,7 @@ void goFORWARD(int distance) {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
       if (millis() - lastTime > 100) {
         // PIDControl(&setSpdR, &setSpdL, 150, 40, 15, 0); //Long distance
-        PIDControl(&setSpdR, &setSpdL, 100, 5, 15, 0); //Long distance
+        PIDControl(&setSpdR, &setSpdL, 110, 5, 15, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
