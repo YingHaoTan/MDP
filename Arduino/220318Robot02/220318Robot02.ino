@@ -248,14 +248,39 @@ void calibrateFRONT() {
   }
 }
 
+void calibrateFRONTV2() {
+  zTicks = 0;
+  scanFORWARD(&irFrontReadings[0]);
+  int turnTicks = 0;
+  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
+    resetMCounters();
+    turnTicks = (irFrontReadings[0] - 10) * 20;
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(200, 200);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-200, -200);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanFORWARD(&irFrontReadings[0]);
+
+    zTicks += turnTicks;
+  }
+}
+
 void calibrateCORNER() {
   calibrateRIGHT();
   delay(100);
-  calibrateFRONT();
+  calibrateFRONTV2();
   delay(100);
   goRIGHT(90);
   delay(100);
-  calibrateFRONT();
+  calibrateFRONTV2();
   delay(100);
   goLEFT(90);
   delay(100);
@@ -311,45 +336,12 @@ void calibrateRIGHTV2() {
   }
 }
 
-void calibrateFRONTV2() {
-  scanFORWARD(&irFrontReadings[0]);
-  int turnTicks = 0;
-  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
-    resetMCounters();
-    turnTicks = (irFrontReadings[0] - 10) * 20;
-    if (turnTicks > 0) {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(200, 200);
-      }
-    }
-    else {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(-200, -200);
-      }
-    }
-    md.setBrakes(400, 400);
-    delay(100);
-    scanFORWARD(&irFrontReadings[0]);
-  }
-}
-
 void fwdCorrection(){
-//if(mvmtCounter[0] % 2 == 0){
     md.setM1Speed(-395);
     delay(7);
     md.setBrakes(400,400);
-    resetMCounters();
- // }
 }
 
-void fwdCorrection2(){
-  //if(mvmtCounter[0] % 2 == 0){
-    // md.setM2Speed(-394);
-    // delay(50);
-    // md.setBrakes(400,400);
-    // resetMCounters();
-  //}
-}
 
 
 int angleToTicks(long angle) {
@@ -361,7 +353,10 @@ int angleToTicks(long angle) {
 
 int blockToTicks(int blocks) {
   if (blocks == 1)
-    return (1183 - forwardOffsetTicks) * blocks;
+    if(counter > 0)
+      return (1183 - forwardOffsetTicks + (kTicks*zTicks)) * blocks;
+    else
+      return (1183 - forwardOffsetTicks) * blocks;
   else
     return 1192 * blocks;
 }
@@ -477,6 +472,7 @@ void commWithRPI() {
                   calibrateCORNER();
                   delay(RPIExpDelay);
                   calCounter = 0;
+                  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -510,7 +506,6 @@ void commWithRPI() {
                   break;
 
                 case START:
-                  //                  calibrateRIGHT();
                   delay(RPIExpDelay);
                   sendStatusUpdate();
                   incrementID();
@@ -591,7 +586,6 @@ void commWithRPI() {
                       }
                     }
                     goFORWARD(blockToTicks(forwardCount));
-                    fwdCorrection2();
                     delay(RPIFPDelay);
                     break;
 
@@ -636,7 +630,6 @@ void stringCommands() {
     case 1:
       Serial.println("Moving forward");
       goFORWARD(blockToTicks(1));
-      mvmtCounter[0]++;
       fwdCorrection();
       calCounter++;
       break;
@@ -698,8 +691,7 @@ void stringCommands() {
       
     case 8:
       Serial.println("Forward burst");
-      goFORWARD(blockToTicks(burstMovBlocks));
-      fwdCorrection2();
+      goFORWARD(blockToTicks(commands[++x]));
       calCounter++;
       break;
 
