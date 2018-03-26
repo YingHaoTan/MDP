@@ -207,6 +207,8 @@ public class MDPTCPConnector {
                 outToServer = new DataOutputStream(clientSocket.getOutputStream());
                 
                 while (true) {
+                    
+                    Thread.yield();
                     System.out.println("=============Controls===========");
                     System.out.println("1) FORWARD");
                     System.out.println("2) TURN_LEFT");
