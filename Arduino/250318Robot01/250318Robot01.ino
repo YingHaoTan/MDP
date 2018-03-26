@@ -75,11 +75,11 @@ void goFORWARD(int distance) {
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
         //Collision check starts here;
-        if (colCounter % CrashChkPeriod == 0) {
-          if (checkFRONT()) {
-            break;
-          }
-        }
+//        if (colCounter % CrashChkPeriod == 0) {
+//          if (checkFRONT()) {
+//            break;
+//          }
+//        }
         colCounter++;
       }
     }
@@ -361,7 +361,7 @@ int blockToTicks(int blocks) {
     else
       return (1183 - forwardOffsetTicks) * blocks;
   else
-    return 1192 * blocks;
+    return 1183 * blocks;
 }
 
 
@@ -371,9 +371,9 @@ void calibrateFRONTV2() {
   int zTicks = 0;
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
-  while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
+  while (irFrontReadings[2] != 100 && irFrontReadings[0] != 100) {
     resetMCounters();
-    turnTicks = (irFrontReadings[0] - 10) * 20;
+    turnTicks = (irFrontReadings[0] - 100) * 2;
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(200, 200);
@@ -389,7 +389,7 @@ void calibrateFRONTV2() {
     scanFORWARD(&irFrontReadings[0]);
     zTicks += turnTicks;
   }
-  ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0]) ;
+  ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0])/2 ;
 }
 
 
@@ -564,7 +564,7 @@ void commWithRPI() {
                   break;
 
                 case CAL_ANY:
-                  if (abs(irRightReadings[0] - irRightReadings[1]) < 20 && abs(irRightReadings[0] - irRightReadings[1]) > 5)
+                  if (abs(irRightReadings[0] - irRightReadings[1]) < 200 && abs(irRightReadings[0] - irRightReadings[1]) > 50)
                     calibrateRIGHTV2();
                   else
                     calibrateRIGHT();
@@ -576,7 +576,7 @@ void commWithRPI() {
 
                 case CAL_FORWARD:
                   scanFORWARD(&irFrontReadings[0]);
-                  if (irRightReadings[1] > 20) {
+                  if (irFrontReadings[1] > 200) {
                     goFORWARD(blockToTicks(1));
                   }
                   sendStatusUpdate();
@@ -715,7 +715,8 @@ void stringCommands() {
       Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
       Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 340, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
       Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 340, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
-      Serial << "Left Long IR: " << longIrVal(irLeftReading, 5, 650, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
+      Serial << "Left Long IR: " << longIrVal(irLeftReading, 5, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
+      delay(250);
       break;
 
     case 6:
@@ -761,19 +762,19 @@ int shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
   if (val < 100) {
     newVal = 1;
   }
-  else if (newVal >= blockThreshold || val >= cmThreshold) {
+  if (newVal >= blockThreshold || val >= cmThreshold) {
     newVal = 0;
   }
   return newVal;
 }
 
 int longIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
-  int newVal = (val - offset) / 100;
-  if (val <= 180) {
+  int newVal = (val - offset) / 10;
+  if (val <= 18) {
     newVal = 1;
   }
 
-  else if (newVal >= blockThreshold || val >= cmThreshold) {
+  if (newVal >= blockThreshold || val >= cmThreshold) {
     newVal = 0;
   }
   return newVal;
@@ -817,7 +818,7 @@ void sendStatusUpdate() {
   statusPayload.front3 = shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS);
   statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 340, frgtIrOS);
   statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 340, brgtIrOS);
-  statusPayload.left1 = longIrVal(irLeftReading , 5, 650, flftIrOS);
+  statusPayload.left1 = longIrVal(irLeftReading , 5, 65, flftIrOS);
   statusPayload.reached = 1;
 
   // Crafts message to send

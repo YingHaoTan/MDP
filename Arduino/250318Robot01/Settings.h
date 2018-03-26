@@ -17,7 +17,7 @@
 #define lfwdIrOS -40 //Left forward IR
 #define rfwdIrOS -40 //Right forward IR
 #define frgtIrOS -40 //Front right IR
-#define flftIrOS -30 //Front left IR.  The only long range IR.
+#define flftIrOS -3 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
 
 #define shrtmodel 1080
@@ -36,7 +36,7 @@ int irFrontReadings[3] = {0, 0, 0}; //[0]left, [1]middle, [2]right
 int irRightReadings[2] = {0, 0}; //[0]front, [1]back
 int irLeftReading = 0;
 
-int CalPeriod = 4;
+int CalPeriod = 0;
 int CrashChkPeriod = 5;
 
 int kTicks = 1;                  //Forward movement Constant multiplier
@@ -62,10 +62,10 @@ int commands[] =
                 {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
-                //{5};                          //IR Sensors, full scan
+//                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
-                //{1,1,1,1,1,1};                //Forward movement, block by block
+//                {1,1,1,1,1,1};                //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
