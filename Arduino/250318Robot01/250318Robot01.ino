@@ -505,10 +505,10 @@ void commWithRPI() {
 
                 case CAL_CORNER:
                   calibrateCORNER();
-				          mvmtCounter[0] = 0;
+				  mvmtCounter[0] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
-				          counter++;
+				  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;

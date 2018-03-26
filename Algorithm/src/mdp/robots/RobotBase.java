@@ -391,7 +391,7 @@ public abstract class RobotBase {
         for(CalibrationSpecification spec: this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
                 if(spec.isInPosition(this)) {
-                System.out.println("Sending : " +spec.getCalibrationType() );
+                //System.out.println("Sending : " +spec.getCalibrationType() );
                         dispatchCalibration(spec.getCalibrationType());
                         break;
                 }
