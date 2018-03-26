@@ -38,8 +38,11 @@ int irLeftReading = 0;
 
 int CalPeriod = 4;
 int CrashChkPeriod = 5;
+
 int kTicks = 1;                  //Forward movement Constant multiplier
-int zTicks = 0;                  //Forward movement ticks Error
+int ticksToMove = 1183;
+//int zTicks = 0;                  //Forward movement ticks Error
+int counter = 0;
 
 uint8_t last_sent = 0;           //Variable for communication
 

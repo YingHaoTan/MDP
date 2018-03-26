@@ -358,7 +358,7 @@ int angleToTicks(long angle) {
 int blockToTicks(int blocks) {
   if (blocks == 1)
     if(counter > 0)
-      return (1183 - forwardOffsetTicks + (kTicks*zTicks)) * blocks;
+      return (ticksToMove - forwardOffsetTicks) * blocks;
     else
       return (1183 - forwardOffsetTicks) * blocks;
   else
@@ -369,7 +369,7 @@ int blockToTicks(int blocks) {
 
 //------------Experimental------------//
 void calibrateFRONTV2() {
-  zTicks = 0;
+  int zTicks = 0;
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
   while (irFrontReadings[2] != 10 && irFrontReadings[0] != 10) {
@@ -388,9 +388,11 @@ void calibrateFRONTV2() {
     md.setBrakes(400, 400);
     delay(100);
     scanFORWARD(&irFrontReadings[0]);
-
     zTicks += turnTicks;
   }
+  
+  ticksToMove = ticksToMove + (kTicks*zTicks);
+  
 }
 
 
@@ -507,6 +509,7 @@ void commWithRPI() {
                   calibrateCORNER();
                   delay(RPIExpDelay);
                   calCounter = 0;
+				  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
