@@ -146,6 +146,8 @@ public class PhysicalRobot extends RobotBase {
         for (int i = 0; i < actions.size(); i++) {
             System.out.println(actions.get(i));
         }
+        
+        
 
         synchronized (commandqueue) {
             commandqueue.add(new Command(orientations, actions, true));
@@ -170,6 +172,8 @@ public class PhysicalRobot extends RobotBase {
         if(discardLastMove){
             actions.remove(actions.size()-1);
         }
+        
+        printStreamIntoTestString(actions);
 
         sendArduinoMessage(new ArduinoStream(actions));
         Point rpoint = mstate.getRobotPoint();

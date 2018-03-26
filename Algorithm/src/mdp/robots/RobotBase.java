@@ -419,6 +419,36 @@ public abstract class RobotBase {
         
         return cloned;
     }
+    
+    protected void printStreamIntoTestString(List<RobotAction> actions){
+        for(int i = 0; i< actions.size(); i++){
+            switch(actions.get(i)){
+                case FORWARD:
+                    System.out.print("1");
+                    break;
+                case TURN_LEFT:
+                    System.out.print("2");
+                    break;
+                case TURN_RIGHT:
+                    System.out.print("3");
+                    break;
+                case ABOUT_TURN:
+                    System.out.print("4");
+                    break;
+                case CAL_SIDE:
+                    System.out.print("5");
+                    break;
+                case CAL_CORNER:
+                    System.out.print("6");
+                    break;
+                case CAL_JIEMING:
+                    System.out.print("7");
+                    break;
+            }
+        }
+        System.out.println();
+    
+    }
 
     /**
      * Notifies all RobotActionListener instances registered to this Robot

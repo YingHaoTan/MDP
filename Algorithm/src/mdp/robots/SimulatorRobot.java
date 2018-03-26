@@ -157,6 +157,8 @@ public class SimulatorRobot extends RobotBase {
             }
         }
         
+        printStreamIntoTestString(actions);
+        
     }
 
     /**
