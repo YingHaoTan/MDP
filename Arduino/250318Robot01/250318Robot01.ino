@@ -67,8 +67,8 @@ void goFORWARD(int distance) {
   }
   lastTime = millis();
   delay(50);
-
-  if (distance <= 1192) {
+  if(true){
+  //if (distance <= 1192) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
@@ -101,11 +101,11 @@ void goFORWARD(int distance) {
           i = 100;
         lastTime = micros();
         //Collision check starts here
-        if (colCounter % CrashChkPeriod == 0) {
-          if (checkFRONT()) {
-            break;
-          }
-        }
+//        if (colCounter % CrashChkPeriod == 0) {
+//          if (checkFRONT()) {
+//            break;
+//          }
+//        }
         colCounter++;
       }
     }
@@ -389,7 +389,9 @@ void calibrateFRONTV2() {
     scanFORWARD(&irFrontReadings[0]);
     zTicks += turnTicks;
   }
-  ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0])/2 ;
+
+  if(mvmtCounter[1] <= 1 && mvmtCounter[2] <= 1)
+    ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0]);
 }
 
 
@@ -476,6 +478,7 @@ void commWithRPI() {
               switch (instructMsg.action) {
                 case TURN_LEFT:
                   goLEFT(angleToTicks(90));
+                  mvmtCounter[1]++;
                   delay(RPIExpDelay);
                   calCounter++;
                   sendStatusUpdate();
@@ -485,6 +488,7 @@ void commWithRPI() {
 
                 case TURN_RIGHT:
                   goRIGHT(angleToTicks(90));
+                  mvmtCounter[2]++;
                   delay(RPIExpDelay);
                   calCounter++;
                   sendStatusUpdate();
@@ -506,6 +510,8 @@ void commWithRPI() {
                 case CAL_CORNER:
                   calibrateCORNER();
 				          mvmtCounter[0] = 0;
+                  mvmtCounter[1] = 0;
+                  mvmtCounter[2] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
 				          counter++;
