@@ -46,7 +46,7 @@ public class WaypointPathSpecification extends BasicPathSpecification {
 
 	@Override
 	public double calculateHeuristicValue(MapState mstate, Point destination, State state) {
-		WaypointState wstate = (WaypointState) state;
+		/*WaypointState wstate = (WaypointState) state;
 		
 		if(mstate.getWayPoint() == null || wstate.isWaypointVisited())
 			return super.calculateHeuristicValue(mstate, destination, wstate);
@@ -57,7 +57,8 @@ public class WaypointPathSpecification extends BasicPathSpecification {
 			double goaldist = Math.abs(destination.x - waypoint.x) + Math.abs(destination.y - waypoint.y);
 			
 			return wpdist + goaldist;
-		}
+		}*/
+                return 0;
 	}
 	
 }

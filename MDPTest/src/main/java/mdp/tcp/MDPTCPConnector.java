@@ -248,41 +248,49 @@ public class MDPTCPConnector {
                             ins = new ArduinoInstruction(RobotAction.CAL_JIEMING, true);
                             break;
                         case 8:
+                            
                             System.out.print("Input stream (no spacing):");
                             String stream = keyboard.nextLine();
-                            String[] streamArr = stream.split("\\|");
+                            while(stream.trim().equals("")){
+                                stream = keyboard.nextLine();
+                            }
+                            
+                            char[] streamArr = stream.toCharArray();
                             
                             List<RobotAction> actions = new ArrayList();
                             for(int i = 0; i<streamArr.length; i++){
-                                switch(Integer.parseInt(streamArr[i])){
+                                switch(Integer.parseInt(String.valueOf(streamArr[i]))){
                                     case 1:
                                         actions.add(RobotAction.FORWARD);
-                                    break;
-                                case 2:
-                                    actions.add(RobotAction.TURN_LEFT);
-                                    break;
-                                case 3:
-                                    actions.add(RobotAction.TURN_RIGHT);
-                                    break;
-                                case 4:
-                                    actions.add(RobotAction.ABOUT_TURN);
-                                    break;
-                                case 5:
-                                    actions.add(RobotAction.CAL_SIDE);
-                                    break;
-                                case 6:
-                                    actions.add(RobotAction.CAL_CORNER);
-                                    break;
-                                case 7:
-                                    actions.add(RobotAction.CAL_JIEMING);
-                                    break;
+                                        break;
+                                    case 2:
+                                        actions.add(RobotAction.TURN_LEFT);
+                                        break;
+                                    case 3:
+                                        actions.add(RobotAction.TURN_RIGHT);
+                                        break;
+                                    case 4:
+                                        actions.add(RobotAction.ABOUT_TURN);
+                                        break;
+                                    case 5:
+                                        actions.add(RobotAction.CAL_SIDE);
+                                        break;
+                                    case 6:
+                                        actions.add(RobotAction.CAL_CORNER);
+                                        break;
+                                    case 7:
+                                        actions.add(RobotAction.CAL_JIEMING);
+                                        break;
                                 }
                             }
+                            
+                            for(int i = 0; i< actions.size(); i++){
+                                System.out.println(actions.get(i));
+                            }
                             ins = new ArduinoStream(actions);
+                            break;
                             
                     }
-                    
-                    
                     outgoingArduinoQueue.add(ins);
                     
                     ArduinoMessage arduinoMessage = null;
