@@ -49,8 +49,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 400;                //Original: 300
-  int setSpdL = 400;                //Original: 300
+  int setSpdR = 320;                //Original: 300
+  int setSpdL = 330;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -58,7 +58,7 @@ void goFORWARD(int distance) {
   lastTicks[0] = 0;
   lastTicks[1] = 0;
   int i = 50;
-  while (i < 401) {
+  while (i < 320) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(i, i + 10);
       i++;
@@ -67,8 +67,8 @@ void goFORWARD(int distance) {
   }
   lastTime = millis();
   delay(50);
-  if(true){
-  //if (distance <= 1192) {
+//  if(true){
+  if (distance <= 1192) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
@@ -341,7 +341,7 @@ bool checkFRONT() {
 void fwdCorrection() {
   //if(mvmtCounter[0] % 2 == 0){
   md.setM1Speed(-395);
-  delay(7);
+  delay(6);
   md.setBrakes(400, 400);
   resetMCounters();
   // }
