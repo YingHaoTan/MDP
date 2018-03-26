@@ -62,9 +62,9 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
         
-        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 3, 0.7);
+        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 2, 0.7);
         SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 0, 2, 0.7);
-        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 3, 0.7);
+        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 2, 0.7);
         SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 0, 2, 0.7);
         SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 2, 0.7);
         SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.7);
@@ -96,12 +96,12 @@ public class Program {
         		this.put(right1, 1);
         	}
         });
-        CalibrationSpecification jieming_spec_3 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
+        /*CalibrationSpecification jieming_spec_3 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
         	{
         		this.put(right2, 2);
         		this.put(right1, 2);
         	}
-        });
+        });*/
         
         // SimulatorRobot
         SimulatorRobot srobot = new SimulatorRobot(rdim, Direction.DOWN);
@@ -116,7 +116,7 @@ public class Program {
         srobot.addCalibrationSpecification(side_spec);
         srobot.addCalibrationSpecification(jieming_spec_1);
         srobot.addCalibrationSpecification(jieming_spec_2);
-        srobot.addCalibrationSpecification(jieming_spec_3);
+        //srobot.addCalibrationSpecification(jieming_spec_3);
         
         wcontroller.setSimulatorRobot(srobot);
         xcontroller.setSimulatorRobot(srobot);
@@ -140,7 +140,7 @@ public class Program {
 	        probot.addCalibrationSpecification(side_spec);
 	        probot.addCalibrationSpecification(jieming_spec_1);
 	        probot.addCalibrationSpecification(jieming_spec_2);
-                probot.addCalibrationSpecification(jieming_spec_3);
+                //probot.addCalibrationSpecification(jieming_spec_3);
 	        
 	        wcontroller.setPhysicalRobot(probot);
 	        xcontroller.setPhysicalRobot(probot);

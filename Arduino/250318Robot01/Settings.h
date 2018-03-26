@@ -39,7 +39,7 @@ int irLeftReading = 0;
 int CalPeriod = 0;
 int CrashChkPeriod = 5;
 
-int kTicks = 1;                  //Forward movement Constant multiplier
+int kTicks = 1;                    //Forward movement Constant multiplier
 int ticksToMove = 1183;
 //int zTicks = 0;                  //Forward movement ticks Error
 int counter = 0;

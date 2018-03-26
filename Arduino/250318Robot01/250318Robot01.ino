@@ -514,7 +514,7 @@ void commWithRPI() {
                   mvmtCounter[2] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
-				          counter++;
+				  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
