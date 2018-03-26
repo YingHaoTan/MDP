@@ -86,7 +86,7 @@ void goFORWARD(int distance) {
   } else {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
       if (millis() - lastTime > 100) {
-        PIDControl(&setSpdR, &setSpdL, 110, 5, 15, 0); //Long distance
+        PIDControl(&setSpdR, &setSpdL, 100, 6, 15, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }

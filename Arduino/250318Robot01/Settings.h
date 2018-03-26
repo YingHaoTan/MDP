@@ -24,10 +24,17 @@
 #define longmodel 20150
 
 //---------------------Definitions for Motors---------------------//
-#define turnLeftTicks  5
-#define turnRightTicks 5
-#define aboutTurnOffset 5
-#define forwardOffsetTicks 110
+// Voltage: 6.224, overextend during turns
+
+//#define turnLeftTicks  5
+//#define turnRightTicks 5
+//#define aboutTurnOffset 5
+//#define forwardOffsetTicks 120
+
+#define turnLeftTicks  18
+#define turnRightTicks 16
+#define aboutTurnOffset 17
+#define forwardOffsetTicks 120
 
 //---------------------Global Variables---------------------//
 volatile int mCounter[2] = {0, 0}; //[0]right, [1]left
@@ -52,7 +59,7 @@ int lastError;
 int totalErrors;
 
 int RPIExpDelay = 20;
-int RPIFPDelay =  100;
+int RPIFPDelay =  200;
 
 int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 
