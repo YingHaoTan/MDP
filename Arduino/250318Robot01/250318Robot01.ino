@@ -49,8 +49,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 320;                //Original: 300
-  int setSpdL = 330;                //Original: 300
+  int setSpdR = 400;                //Original: 300
+  int setSpdL = 400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -58,7 +58,7 @@ void goFORWARD(int distance) {
   lastTicks[0] = 0;
   lastTicks[1] = 0;
   int i = 50;
-  while (i < 320) {
+  while (i < 401) {
     if (micros() - lastTime > 50) {
       md.setSpeeds(i, i + 10);
       i++;
@@ -67,19 +67,19 @@ void goFORWARD(int distance) {
   }
   lastTime = millis();
   delay(50);
-//  if(true){
-  if (distance <= 1192) {
+  if (true) {
+    //if (distance <= 1192) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
         //Collision check starts here;
-//        if (colCounter % CrashChkPeriod == 0) {
-//          if (checkFRONT()) {
-//            break;
-//          }
-//        }
+        //        if (colCounter % CrashChkPeriod == 0) {
+        //          if (checkFRONT()) {
+        //            break;
+        //          }
+        //        }
         colCounter++;
       }
     }
@@ -101,11 +101,11 @@ void goFORWARD(int distance) {
           i = 100;
         lastTime = micros();
         //Collision check starts here
-//        if (colCounter % CrashChkPeriod == 0) {
-//          if (checkFRONT()) {
-//            break;
-//          }
-//        }
+        //        if (colCounter % CrashChkPeriod == 0) {
+        //          if (checkFRONT()) {
+        //            break;
+        //          }
+        //        }
         colCounter++;
       }
     }
@@ -211,12 +211,12 @@ void calibrateRIGHT() {
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
-    
+
     //Tick Reduction
     if ((abs(irRightReadings[0] - irRightReadings[1]) == 10) && abs(turnTicks) > 20) {
       turnTicks -= 1;
     }
-    
+
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -303,7 +303,7 @@ void calibrateRIGHTV2() {
     if (abs((Fdist - Bdist) % 100) == 1 && abs(turnTicks) > 20) {
       turnTicks -= 1;
     }
-    
+
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -341,7 +341,7 @@ bool checkFRONT() {
 void fwdCorrection() {
   //if(mvmtCounter[0] % 2 == 0){
   md.setM1Speed(-395);
-  delay(6);
+  delay(7);
   md.setBrakes(400, 400);
   resetMCounters();
   // }
@@ -356,7 +356,7 @@ int angleToTicks(long angle) {
 
 int blockToTicks(int blocks) {
   if (blocks == 1)
-    if(counter > 0)
+    if (counter > 0)
       return (ticksToMove - forwardOffsetTicks) * blocks;
     else
       return (1183 - forwardOffsetTicks) * blocks;
@@ -390,8 +390,8 @@ void calibrateFRONTV2() {
     zTicks += turnTicks;
   }
 
-  if(mvmtCounter[1] <= 1 && mvmtCounter[2] <= 1)
-    ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0]);
+  //if (mvmtCounter[1] <= 1 && mvmtCounter[2] <= 1)
+    ticksToMove = ticksToMove + (kTicks * zTicks / mvmtCounter[0]);
 }
 
 
@@ -498,7 +498,7 @@ void commWithRPI() {
 
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
-				          mvmtCounter[0]++;
+                  mvmtCounter[0]++;
                   delay(RPIExpDelay);
                   fwdCorrection();
                   calCounter++;
@@ -509,12 +509,12 @@ void commWithRPI() {
 
                 case CAL_CORNER:
                   calibrateCORNER();
-				          mvmtCounter[0] = 0;
+                  mvmtCounter[0] = 0;
                   mvmtCounter[1] = 0;
                   mvmtCounter[2] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
-				  counter++;
+                  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -524,16 +524,16 @@ void commWithRPI() {
                   if (calCounter >= CalPeriod) {
                     if (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 50)) {
                       calibrateRIGHT();
-                      if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
-                        delay(100);
-                        goRIGHT(angleToTicks(90));
-                        delay(100);
-                        calibrateFRONT();
-                        delay(100);
-                        goLEFT(angleToTicks(90));
-                        delay(100);
-                        calibrateRIGHT();
-                      }
+                    }
+                    if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
+                      delay(100);
+                      goRIGHT(angleToTicks(90));
+                      delay(100);
+                      calibrateFRONT();
+                      delay(100);
+                      goLEFT(angleToTicks(90));
+                      delay(100);
+                      calibrateRIGHT();
                     }
                     calCounter = 0;
                   }
@@ -596,8 +596,8 @@ void commWithRPI() {
               RingBuffer_pop( & usbBufferIn);
             }
           }
-        } 
-        
+        }
+
         else if (messageType == ARDUINO_STREAM) {
           StreamMessage streamMsg;
           uint8_t payloadSize = 0;
@@ -698,16 +698,20 @@ void stringCommands() {
       if (calCounter >= CalPeriod) {
         if (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
           calibrateRIGHT();
-          if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
-            delay(100);
-            goRIGHT(angleToTicks(90));
-            calibrateFRONT();
-            delay(100);
-            goLEFT(angleToTicks(90));
-            calibrateRIGHT();
-          }
-          calCounter = 0;
+
+
         }
+        if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 110)) {
+          delay(100);
+          goRIGHT(angleToTicks(90));
+          delay(100);
+          calibrateFRONT();
+          delay(100);
+          goLEFT(angleToTicks(90));
+          delay(100);
+          calibrateRIGHT();
+        }
+        calCounter = 0;
       }
       break;
 

@@ -27,7 +27,7 @@
 #define turnLeftTicks  5
 #define turnRightTicks 5
 #define aboutTurnOffset 5
-#define forwardOffsetTicks 75
+#define forwardOffsetTicks 110
 
 //---------------------Global Variables---------------------//
 volatile int mCounter[2] = {0, 0}; //[0]right, [1]left
@@ -65,7 +65,7 @@ int commands[] =
 //                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
-//                {1,1,1,1,1,1};                //Forward movement, block by block
+                //{1,1,1,1,1,1};                //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
