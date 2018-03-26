@@ -391,7 +391,7 @@ void calibrateFRONTV2() {
     zTicks += turnTicks;
   }
   
-  ticksToMove = ticksToMove + (kTicks*zTicks);
+  ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0])) ;
   
 }
 
@@ -497,6 +497,7 @@ void commWithRPI() {
 
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
+				  mvmtCounter[0]++;
                   delay(RPIExpDelay);
                   fwdCorrection();
                   calCounter++;
@@ -507,6 +508,7 @@ void commWithRPI() {
 
                 case CAL_CORNER:
                   calibrateCORNER();
+				  mvmtCounter[0] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
 				  counter++;
