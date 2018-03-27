@@ -84,7 +84,7 @@ public class Program {
         		this.put(right2, 1);
         	}
         });
-        CalibrationSpecification jieming_spec_1 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
+        /*CalibrationSpecification jieming_spec_1 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
         	{
         		this.put(right1, 2);
         		this.put(right2, 1);
@@ -96,7 +96,7 @@ public class Program {
         		this.put(right1, 1);
         	}
         });
-        /*CalibrationSpecification jieming_spec_3 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
+        CalibrationSpecification jieming_spec_3 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
         	{
         		this.put(right2, 2);
         		this.put(right1, 2);
@@ -114,8 +114,8 @@ public class Program {
         
         srobot.addCalibrationSpecification(corner_spec);
         srobot.addCalibrationSpecification(side_spec);
-        srobot.addCalibrationSpecification(jieming_spec_1);
-        srobot.addCalibrationSpecification(jieming_spec_2);
+        //srobot.addCalibrationSpecification(jieming_spec_1);
+        //srobot.addCalibrationSpecification(jieming_spec_2);
         //srobot.addCalibrationSpecification(jieming_spec_3);
         
         wcontroller.setSimulatorRobot(srobot);
@@ -138,8 +138,8 @@ public class Program {
 	        
 	        probot.addCalibrationSpecification(corner_spec);
 	        probot.addCalibrationSpecification(side_spec);
-	        probot.addCalibrationSpecification(jieming_spec_1);
-	        probot.addCalibrationSpecification(jieming_spec_2);
+	        //probot.addCalibrationSpecification(jieming_spec_1);
+	        //probot.addCalibrationSpecification(jieming_spec_2);
                 //probot.addCalibrationSpecification(jieming_spec_3);
 	        
 	        wcontroller.setPhysicalRobot(probot);

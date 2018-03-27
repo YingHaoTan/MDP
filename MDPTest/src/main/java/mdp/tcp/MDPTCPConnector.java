@@ -142,6 +142,13 @@ public class MDPTCPConnector {
                                 break;
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
+                                                        
+                                System.out.println("front1:" + (int) arduinoUpdate.getFront1());
+                                System.out.println("front2:" + (int) arduinoUpdate.getFront2());
+                                System.out.println("front3:" + (int) arduinoUpdate.getFront3());
+                                System.out.println("left1:" + (int) arduinoUpdate.getLeft1());
+                                System.out.println("right1:" + (int) arduinoUpdate.getRight1());
+                                System.out.println("right2:" + (int) arduinoUpdate.getRight2());
                                 
                                 break;
                             default:
