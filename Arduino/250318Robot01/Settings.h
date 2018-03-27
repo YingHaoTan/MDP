@@ -31,9 +31,13 @@
 //#define aboutTurnOffset 5
 //#define forwardOffsetTicks 120
 
-#define turnLeftTicks  18
-#define turnRightTicks 16
-#define aboutTurnOffset 17
+
+int turnLeftTicks = 18;
+int turnRightTicks = 16;
+int aboutTurnOffset = 17;
+//#define turnLeftTicks  18
+//#define turnRightTicks 16
+//#define aboutTurnOffset 17
 #define forwardOffsetTicks 120
 
 //---------------------Global Variables---------------------//
