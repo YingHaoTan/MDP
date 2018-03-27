@@ -244,14 +244,14 @@ public class PhysicalRobot extends RobotBase {
     }
 
     private void handleArduinoUpdate(ArduinoUpdate update) {
-        /*
+        
         System.out.println("front1:" + (int) update.getFront1());
         System.out.println("front2:" + (int) update.getFront2());
         System.out.println("front3:" + (int) update.getFront3());
         System.out.println("left1:" + (int) update.getLeft1());
         System.out.println("right1:" + (int) update.getRight1());
         System.out.println("right2:" + (int) update.getRight2());
-        */
+        
         setArduinoSensorReadings(update);
 
         if (initializing) {

@@ -31,9 +31,7 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-
   calibrationPhase();
-
 }
 
 

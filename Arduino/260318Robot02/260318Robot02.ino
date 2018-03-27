@@ -4,6 +4,7 @@
 #include "communication.h"
 #include "RingBuffer.h"
 #include "Settings.h"
+#include <Math.h>
 
 #ifdef DEBUG
 #define D if(1)
@@ -31,10 +32,14 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-
-//    calibrationPhase1();
-//    calibrationPhase2();
-//  calibrateFRONTV2();
+  /*scanFORWARD(&irFrontReadings[0]);
+  scanRIGHT(&irRightReadings[0]);
+  scanLEFT();
+ */
+  calibrationPhase1();
+  delay(2000);
+  //calibrationPhase2();
+  //calibrateFRONTV2();
 }
 
 
@@ -79,11 +84,11 @@ void goFORWARD(int distance) {
         md.setSpeeds(setSpdR, setSpdL);
         //Collision check starts here;
         /*
-        if (colCounter % CrashChkPeriod == 0) {
+          if (colCounter % CrashChkPeriod == 0) {
           if (checkFRONT()) {
             break;
           }
-        }*/
+          }*/
         colCounter++;
       }
     }
@@ -106,16 +111,16 @@ void goFORWARD(int distance) {
         lastTime = micros();
         //Collision check starts here
         /*
-        if (colCounter % CrashChkPeriod == 0) {
+          if (colCounter % CrashChkPeriod == 0) {
           if (checkFRONT()) {
             break;
           }
-        }*/
+          }*/
         colCounter++;
       }
     }
   }
-  
+
   md.setBrakes(400, 400);
   resetMCounters();
   delay(100);
@@ -219,12 +224,12 @@ void calibrateRIGHT() {
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
-    
+
     //Tick Reduction
     if ((abs(irRightReadings[0] - irRightReadings[1]) == 10) && abs(turnTicks) > 20) {
       turnTicks -= 1;
     }
-    
+
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -244,7 +249,7 @@ void calibrateRIGHT() {
 void calibrateFRONT() {
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
-  while (abs(irFrontReadings[2] - 100) > 5 && abs(irFrontReadings[0]- 100) > 5) {
+  while (abs(irFrontReadings[2] - 100) > 5 && abs(irFrontReadings[0] - 100) > 5) {
     resetMCounters();
     turnTicks = (irFrontReadings[0] - 100) * 2; // old multiplier is 20
     if (turnTicks > 0) {
@@ -257,7 +262,9 @@ void calibrateFRONT() {
         md.setSpeeds(-200, -200);
       }
     }
-//    Serial << "irfrontreadings[0] V1" << irFrontReadings[0] << endl;
+
+    //Serial.println("irfrontreadings[0] V1");
+    //Serial.println(irFrontReadings[0]);
     md.setBrakes(400, 400);
     delay(100);
     scanFORWARD(&irFrontReadings[0]);
@@ -281,7 +288,7 @@ void calibrateCORNER() {
 void calibrateRIGHTV2() {
   scanRIGHT(&irRightReadings[0]);
   int turnTicks = 0;
-//  Serial << "start" << endl ;
+  //  Serial << "start" << endl ;
   while (abs(irRightReadings[0] % 100 - irRightReadings[1] % 100) > 5 && abs(irRightReadings[0] - irRightReadings[1]) < 200) {
     resetMCounters();
     int Fdist = irRightReadings[0];
@@ -312,7 +319,7 @@ void calibrateRIGHTV2() {
     if (abs((Fdist - Bdist) % 100) == 1 && abs(turnTicks) > 20) {
       turnTicks -= 1;
     }
-    
+
     if (turnTicks > 0) {
       while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
         md.setSpeeds(-150, 150);
@@ -348,12 +355,16 @@ bool checkFRONT() {
 }
 
 void fwdCorrection() {
-  int start = mCounter[0];
-  int correction = 1.2 * (start - mCounter[1]);
-  
-  while (mCounter[0] - start < correction){
-    md.setM1Speed(-300);
-  }
+  //  int start = mCounter[0];
+  //  int correction = 1.2 * (start - mCounter[1]);
+  //
+  //  while (mCounter[0] - start < correction){
+  //    md.setM1Speed(-300);
+  //  }
+  //  md.setBrakes(400, 400);
+  //  resetMCounters();
+  md.setM1Speed(-395);
+  delay(7);
   md.setBrakes(400, 400);
   resetMCounters();
 }
@@ -368,7 +379,7 @@ int angleToTicks(long angle) {
 
 int blockToTicks(int blocks) {
   if (blocks == 1)
-    if(counter > 0)
+    if (counter > 0)
       return (ticksToMove - forwardOffsetTicks) * blocks;
     else
       return (1183 - forwardOffsetTicks) * blocks;
@@ -383,7 +394,7 @@ void calibrateFRONTV2() {
   int zTicks = 0;
   scanFORWARD(&irFrontReadings[0]);
   int turnTicks = 0;
-  while (abs(irFrontReadings[2] - 100) > 5 && abs(irFrontReadings[0]- 100) > 5) {
+  while (abs(irFrontReadings[2] - 100) > 5 && abs(irFrontReadings[0] - 100) > 5) {
     resetMCounters();
     turnTicks = (irFrontReadings[0] - 100) * 2;
     if (turnTicks > 0) {
@@ -399,64 +410,71 @@ void calibrateFRONTV2() {
     md.setBrakes(400, 400);
     delay(100);
     scanFORWARD(&irFrontReadings[0]);
-//    Serial << "irfrontreadings[0] V2" << irFrontReadings[0] << endl;
+    //Serial.println("irfrontreadings[0] V2");
+    //Serial.println(irFrontReadings[0]);
     zTicks += turnTicks;
   }
-  ticksToMove = ticksToMove + (kTicks*zTicks/mvmtCounter[0]) ;
+  if(mvmtCounter[0] == 0){
+    ticksToMove = ticksToMove + (kTicks * zTicks / mvmtCounter[0]);
+  }
 }
 
-void calibrationPhase1(){
+void calibrationPhase1() {
 
   calibrateCORNER();
-  
+
+  delay(200);
   int cycle = 8;
-  for(int i = 0; i < cycle; i++){
+  /*
+  for (int i = 0; i < cycle; i++) {
     goLEFT(angleToTicks(90));
     delay(200);
   }
-  calibrateOffset(0, cycle);
+  calibrateLeftTurnOffset(cycle);
   delay(200);
-
-  for(int i = 0; i < cycle; i++){
+  
+  for (int i = 0; i < cycle; i++) {
     goRIGHT(angleToTicks(90));
     delay(200);
   }
-  calibrateOffset(1, cycle);
+  calibrateRightTurnOffset(cycle);
   delay(200);
-  
-  for(int i = 0; i < cycle; i++){
+  */
+
+  for (int i = 0; i < cycle; i++) {
     goLEFT(angleToTicks(180));
     delay(200);
   }
-  calibrateOffset(2, cycle);
+  calibrateAboutTurnOffset(cycle);
   delay(200);
+  
 }
 
-void calibrationPhase2(){
-    int cycle = 8;
+void calibrationPhase2() {/*
+  int cycle = 8;
 
-    goLEFT(angleToTicks(90));
-    delay(200);
+  goLEFT(angleToTicks(90));
+  delay(200);
 
-    calibrateRIGHT();
-    delay(200);
-    
-    scanRIGHT(&irRightReadings[0]);
-    
-    for(int i = 0; i< cycle; i++){
-        goFORWARD(blockToTicks(1));
-        delay(200);
-    }    
-    calibrateOffset(3, cycle);
-    
-    goLEFT(angleToTicks(180));
-    delay(200);
+  calibrateRIGHT();
+  delay(200);
 
-    for(int i = 0; i < cycle; i++){
-        goFORWARD(blockToTicks(1));
-        delay(200);
-    }
-    /*
+  scanRIGHT(&irRightReadings[0]);
+
+  for (int i = 0; i < cycle; i++) {
+    goFORWARD(blockToTicks(1));
+    delay(200);
+  }
+  calibrateOffset(3, cycle);
+
+  goLEFT(angleToTicks(180));
+  delay(200);
+
+  for (int i = 0; i < cycle; i++) {
+    goFORWARD(blockToTicks(1));
+    delay(200);
+  }
+  
     goLEFT(angleToTicks(180));
     delay(200);
 
@@ -464,29 +482,29 @@ void calibrationPhase2(){
     delay(200);
 
     for(int i = 0; i < cycle/2; i++){
-        goFORWARD(blockToTicks(1));
-        delay(200);
+      goFORWARD(blockToTicks(1));
+      delay(200);
     }
 
     goLEFT(angleToTicks(180));
     delay(200);
 
     for(int i = 0; i < cycle/2; i++){
-        goFORWARD(blockToTicks(1));
-        delay(200);
+      goFORWARD(blockToTicks(1));
+      delay(200);
     }
-    */
+  
 
-    goLEFT(angleToTicks(90));
-    delay(200);
+  goLEFT(angleToTicks(90));
+  delay(200);*/
 }
 
 // flag = 0: LEFT offset, 1: RIGHT offset, 2: ABOUT_TURN offset, 3: FORWARD pull-pull back ticks
-void calibrateOffset(int flag, int cycle){
+void calibrateAboutTurnOffset(int cycle) {
 
   int frontRight = irRightReadings[0];
   int backRight = irRightReadings[1];
-  
+
   int offset = 0;
 
   scanRIGHT(&irRightReadings[0]);
@@ -495,12 +513,12 @@ void calibrateOffset(int flag, int cycle){
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
-    
+
     //Tick Reduction
     if ((abs(irRightReadings[0] - irRightReadings[1]) == 10) && abs(turnTicks) > 20) {
       turnTicks -= 1;
     }
-    
+
     offset += turnTicks;
 
     if (turnTicks > 0) {
@@ -518,35 +536,163 @@ void calibrateOffset(int flag, int cycle){
     scanRIGHT(&irRightReadings[0]);
   }
 
-  
-  switch(flag){
-    // LEFT
-    case 0:
-      turnLeftTicks = turnLeftTicks + (offset/cycle);
-      break;
-    // RIGHT
-    case 1:
-      turnRightTicks = turnRightTicks - (offset/cycle);
-      break;
-    
-    // ABOUT_TURN
-    case 2:
-      aboutTurnOffset = aboutTurnOffset + (offset/cycle);
-      break;
-    case 3:
-      pullBackTicks = pullBackTicks + ((offset - (frontRight - irRightReadings[0]) * 1.5 ) /cycle);
-      break;
-  }
-  
-
+  delay(200);
+  aboutTurnOffset = aboutTurnOffset + (offset / cycle);
 }
 
-void fwdCorrectionV2(){
+
+
+// flag = 0: LEFT offset, 1: RIGHT offset, 2: ABOUT_TURN offset, 3: FORWARD pull-pull back ticks
+void calibrateLeftTurnOffset(int cycle) {
+
+  int frontRight = irRightReadings[0];
+  int backRight = irRightReadings[1];
+
+  int offset = 0;
+
+  scanRIGHT(&irRightReadings[0]);
+  int turnTicks = 0;
+  while (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+    resetMCounters();
+
+    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
+
+    //Tick Reduction
+    if ((abs(irRightReadings[0] - irRightReadings[1]) == 10) && abs(turnTicks) > 20) {
+      turnTicks -= 1;
+    }
+
+    offset += turnTicks;
+
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-150, 150);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(150, -150);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanRIGHT(&irRightReadings[0]);
+  }
+
+  delay(200);
+  turnLeftTicks = turnLeftTicks + (offset / cycle);
+}
+
+
+// flag = 0: LEFT offset, 1: RIGHT offset, 2: ABOUT_TURN offset, 3: FORWARD pull-pull back ticks
+void calibrateRightTurnOffset(int cycle) {
+
+  int frontRight = irRightReadings[0];
+  int backRight = irRightReadings[1];
+
+  int offset = 0;
+
+  scanRIGHT(&irRightReadings[0]);
+  int turnTicks = 0;
+  while (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+    resetMCounters();
+
+    turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
+
+    //Tick Reduction
+    if ((abs(irRightReadings[0] - irRightReadings[1]) == 10) && abs(turnTicks) > 20) {
+      turnTicks -= 1;
+    }
+
+    offset += turnTicks;
+
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-150, 150);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(150, -150);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanRIGHT(&irRightReadings[0]);
+  }
+
+  delay(200);
+  turnRightTicks = turnRightTicks - (offset / cycle);    
+}
+   /*
+  if(flag == 0){
+    turnLeftTicks = turnLeftTicks + (offset / cycle);
+  }
+  delay(200);
+  
+  if(flag == 1){
+    turnRightTicks = turnRightTicks - (offset / cycle);    
+  }
+  delay(200);
+  */
+/*
+  if(flag == 3){
+    double o = ((frontRight - irRightReadings[0]) + (backRight - irRightReadings[1])) / 2;
+      double a = 1183 * cycle;
+      double angleDeg = atan(o / a) * 180 / 3.141593;
+      int ticks = 16800 * angleDeg / 1000;
+      if (angleDeg > 0) {
+        pullBackTicks = pullBackTicks - ticks;
+      }
+      else {
+        // more pull back
+        pullBackTicks = pullBackTicks + ticks;
+      } 
+  }*/
+
+
+  /*
+  switch (flag) {
+    // LEFT
+    
+    case 0:
+      turnLeftTicks = turnLeftTicks + (offset / cycle);
+      break;
+    
+    // RIGHT
+    case 1:
+      turnRightTicks = turnRightTicks - (offset / cycle);
+      break;
+    // ABOUT_TURN
+    case 2:
+      aboutTurnOffset = aboutTurnOffset + (offset / cycle);
+      break;
+
+      
+    case 3:
+      double o = ((frontRight - irRightReadings[0]) + (backRight - irRightReadings[1])) / 2;
+      double a = 1183 * cycle;
+      double angleDeg = atan(o / a) * 180 / 3.141593;
+      int ticks = 16800 * angleDeg / 1000;
+      if (angleDeg > 0) {
+        pullBackTicks = pullBackTicks - ticks;
+      }
+      else {
+        // more pull back
+        pullBackTicks = pullBackTicks + ticks;
+      }
+      //Serial << "Pull back ticks:" << pullBackTicks;
+      //pullBackTicks = pullBackTicks + ((offset - (frontRight - irRightReadings[0]) * 1.5 ) /cycle);
+      break;
+       
+  }*/
+
+void fwdCorrectionV2() {
   resetMCounters();
-  int toMove = pullBackTicks * 2;
-  if(toMove!=0){
+  int toMove = pullBackTicks;
+  if (toMove != 0) {
     // Robot need to pull back right wheel more
-    if(toMove > 0){
+    if (toMove > 0) {
       while (mCounter[0] < abs(toMove)) {
         md.setM1Speed(-300);
       }
@@ -558,15 +704,15 @@ void fwdCorrectionV2(){
       }
     }
   }
-  md.setBrakes(400,400);
+  md.setBrakes(400, 400);
   delay(100);
-    /*turnTicks = (irFrontReadings[0] - 100) * 2;
+  /*turnTicks = (irFrontReadings[0] - 100) * 2;
     if (turnTicks > 0) {
-      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-        md.setSpeeds(200, 200);
-      }
+    while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+      md.setSpeeds(200, 200);
+    }
     }*/
-  
+
 }
 
 
@@ -671,10 +817,10 @@ void commWithRPI() {
 
                 case FORWARD:
                   goFORWARD(blockToTicks(1));
-				          mvmtCounter[0]++;
+                  mvmtCounter[0]++;
                   delay(RPIExpDelay);
-                  //fwdCorrection();
-                  fwdCorrectionV2();
+                  fwdCorrection();
+//                  fwdCorrectionV2();
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -683,10 +829,10 @@ void commWithRPI() {
 
                 case CAL_CORNER:
                   calibrateCORNER();
-				          mvmtCounter[0] = 0;
+                  mvmtCounter[0] = 0;
                   delay(RPIExpDelay);
                   calCounter = 0;
-				          counter++;
+                  counter++;
                   sendStatusUpdate();
                   incrementID();
                   alreadyReceived = false;
@@ -768,8 +914,8 @@ void commWithRPI() {
               RingBuffer_pop( & usbBufferIn);
             }
           }
-        } 
-        
+        }
+
         else if (messageType == ARDUINO_STREAM) {
           StreamMessage streamMsg;
           uint8_t payloadSize = 0;
@@ -939,7 +1085,7 @@ int shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
   if (val < 100) {
     newVal = 1;
   }
-  else if (newVal >= blockThreshold || val >= cmThreshold) {
+  if (newVal >= blockThreshold || val >= cmThreshold || val <= 0) {
     newVal = 0;
   }
   return newVal;
@@ -951,7 +1097,7 @@ int longIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
     newVal = 1;
   }
 
-  else if (newVal >= blockThreshold || val >= cmThreshold) {
+ if (newVal >= blockThreshold || val >= cmThreshold) {
     newVal = 0;
   }
   return newVal;
@@ -970,6 +1116,8 @@ void putIncomingUSBMessageToBuffer() {
       RingBuffer_push(&usbBufferIn, tmpBuffer[i]);
     }
   }
+
+  delay(1);
 }
 
 void resendStatusUpdate() {
@@ -979,8 +1127,6 @@ void resendStatusUpdate() {
 }
 
 void sendStatusUpdate() {
-  int threshold = 35 ;
-
   delay(200);
 
   scanFORWARD(&irFrontReadings[0]);
