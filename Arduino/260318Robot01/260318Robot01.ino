@@ -87,8 +87,8 @@ void goFORWARD(int distance) {
   } else {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
       if (millis() - lastTime > 100) {
-        //        PIDControl(&setSpdR, &setSpdL, 100, 6, 15, 0); //Long distance
-        PIDControl(&setSpdR, &setSpdL, 65, 6, 10, 0); //Long distance
+        //        PIDControl(&setSpdR, &setSpdL, 100, 6, 15, 0); //Long distance for PID 1
+        PIDControl(&setSpdR, &setSpdL, 30, 6, 60, 0); //Long distance for PID 2
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
@@ -190,7 +190,7 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
   lastError = error;
   lastTicks[0] = mCounter[0];
   lastTicks[1] = mCounter[1];
-  totalErrors += error + 2;                                                       //Add up total number of errors (for Ki)                                                        //if error exists
+  totalErrors += error - 1;                                                       //Add up total number of errors (for Ki)                                                        //if error exists
   adjustment = ((kP * error) + (kI * totalErrors) + (kD * errorRate)) / 100;
   if (dr == 1 || dr == -1) {
     *setSpdR += -adjustment * dr;
@@ -200,6 +200,10 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
     *setSpdR += adjustment;
     *setSpdL -= adjustment;
   }
+
+  Serial << "error: " << error << " total error: " << totalErrors << " error Rate: " << errorRate << endl;
+  Serial << "adjusment " << adjustment << endl;
+  Serial << "right: " << *setSpdR << " left: " << *setSpdL << endl;
 }
 
 void calibrateRIGHT() {
