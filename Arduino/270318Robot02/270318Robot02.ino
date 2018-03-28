@@ -5,6 +5,7 @@
 #include "RingBuffer.h"
 #include "Settings.h"
 #include <Math.h>
+//#include <CustomMotorLib.h>
 
 #ifdef DEBUG
 #define D if(1)
@@ -33,8 +34,8 @@ void setup() {
   delay(2000);
   D Serial.println("Initializations Done");
 
-  calibrationPhase1();
-  delay(2000);
+    calibrationPhase1();
+  //  delay(2000);
   //calibrationPhase2();
 }
 
@@ -91,7 +92,7 @@ void goFORWARD(int distance) {
   } else {
     while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
       if (millis() - lastTime > 100) {
-        PIDControl(&setSpdR, &setSpdL, 110, 5, 15, 0); //Long distance
+        PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
@@ -209,6 +210,14 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
     else {
       *setSpdR += adjustment;
       *setSpdL -= adjustment;
+
+      if (*setSpdR > 400) {
+        *setSpdR = 400;
+      }
+      if (*setSpdL > 400) {
+        *setSpdL = 400;
+      }
+
     }
   }
 }
@@ -410,7 +419,7 @@ void calibrateFRONTV2() {
     //Serial.println(irFrontReadings[0]);
     zTicks += turnTicks;
   }
-  if(mvmtCounter[0] != 0 && forwardOffsetCounter > 0){
+  if (mvmtCounter[0] != 0 && forwardOffsetCounter > 0) {
     ticksToMove = ticksToMove + (kTicks * zTicks / mvmtCounter[0]);
   }
 }
@@ -421,29 +430,29 @@ void calibrationPhase1() {
 
   delay(200);
   int cycle = 8;
-  
+
   for (int i = 0; i < cycle; i++) {
     goLEFT(angleToTicks(90));
     delay(200);
   }
   calibrateOffset(cycle, 0);
   delay(200);
-  
+
   for (int i = 0; i < cycle; i++) {
     goRIGHT(angleToTicks(90));
     delay(200);
   }
   calibrateOffset(cycle, 1);
   delay(200);
-  
+
 
   for (int i = 0; i < cycle; i++) {
     goLEFT(angleToTicks(180));
     delay(200);
   }
-  calibrateOffset(cycle,2);
+  calibrateOffset(cycle, 2);
   delay(200);
-  
+
 }
 
 // flag = 0: LEFT offset, 1: RIGHT offset, 2: ABOUT_TURN offset, 3: FORWARD pull-pull back ticks
@@ -482,20 +491,20 @@ void calibrateOffset(int cycle, int flag) {
     delay(100);
     scanRIGHT(&irRightReadings[0]);
   }
-  
+
   delay(200);
-  
-  switch(flag){
-	case 0:
-		turnLeftTicks = turnLeftTicks + (offset / cycle);
-		break;
-	case 1:
-		turnRightTicks = turnRightTicks - (offset / cycle);    
-		break;
-	
-	case 2:
-		aboutTurnOffset = aboutTurnOffset + (offset / cycle);
-		break;
+
+  switch (flag) {
+    case 0:
+      turnLeftTicks = turnLeftTicks + (offset / cycle);
+      break;
+    case 1:
+      turnRightTicks = turnRightTicks - (offset / cycle);
+      break;
+
+    case 2:
+      aboutTurnOffset = aboutTurnOffset + (offset / cycle);
+      break;
   }
 
 }
@@ -910,7 +919,7 @@ int longIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
     newVal = 1;
   }
 
- if (newVal >= blockThreshold || val >= cmThreshold) {
+  if (newVal >= blockThreshold || val >= cmThreshold) {
     newVal = 0;
   }
   return newVal;

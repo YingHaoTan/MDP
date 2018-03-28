@@ -48,7 +48,8 @@ public class Program {
         XController xcontroller = new XController(window.getMap().getMapState());
         MapFileHandler filehandler = new MapFileHandler();
         ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification(), false));
-        FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), true);
+        //FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), true);
+        FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), false);
         
         wcontroller.setMapLoader(filehandler);
         wcontroller.setMapSaver(filehandler);
