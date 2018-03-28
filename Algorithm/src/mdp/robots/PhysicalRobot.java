@@ -146,6 +146,8 @@ public class PhysicalRobot extends RobotBase {
         for (int i = 0; i < actions.size(); i++) {
             System.out.println(actions.get(i));
         }
+        
+        
 
         synchronized (commandqueue) {
             commandqueue.add(new Command(orientations, actions, true));
@@ -170,6 +172,8 @@ public class PhysicalRobot extends RobotBase {
         if(discardLastMove){
             actions.remove(actions.size()-1);
         }
+        
+        printStreamIntoTestString(actions);
 
         sendArduinoMessage(new ArduinoStream(actions));
         Point rpoint = mstate.getRobotPoint();
@@ -241,11 +245,16 @@ public class PhysicalRobot extends RobotBase {
 
     private void handleArduinoUpdate(ArduinoUpdate update) {
         /*System.out.println("front1:" + (int) update.getFront1());
+=======
+        
+        System.out.println("front1:" + (int) update.getFront1());
+>>>>>>> stairs-skipping
         System.out.println("front2:" + (int) update.getFront2());
         System.out.println("front3:" + (int) update.getFront3());
         System.out.println("left1:" + (int) update.getLeft1());
         System.out.println("right1:" + (int) update.getRight1());
         System.out.println("right2:" + (int) update.getRight2());
+<<<<<<< HEAD
         */
         setArduinoSensorReadings(update);
 
