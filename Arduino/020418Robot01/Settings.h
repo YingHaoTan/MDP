@@ -74,7 +74,7 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
 int commands[] = 
-                //{0};                            //Set to commWithRPI mode
+                {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
 //                {5};                          //IR Sensors, full scan
@@ -84,7 +84,7 @@ int commands[] =
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
-                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
+//                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
                 //{4,1,1,1};                    //Calibrate side
@@ -99,13 +99,21 @@ int commands[] =
                 //{7,8,7,3,8,4,2,8,9,3,8,8,2,1};
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
-//Battery 1 (Strong Battery, max charge)
+
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
-SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0350, 0.080);
-SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.070);
+SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.080);
+SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0366, 0.068);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
-SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0360, 0.070);
+SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.073);
+
+//Battery 1 (Strong Battery, max charge)
+//SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
+//SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
+//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0350, 0.080);
+//SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.070);
+//SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
+//SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0360, 0.070);
 
 //SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);
 //SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.090);

@@ -34,7 +34,7 @@ void setup() {
   delay(2000);
   D Serial.println("Initializations Done");
 
-  //  calibrationPhase1();
+  calibrationPhase1();
   //  delay(2000);
   //calibrationPhase2();
 }
@@ -43,6 +43,7 @@ void setup() {
 void loop() {
   if (commands[0] != 0) {
     stringCommands();
+    delay(500);
   }
   else {
     commWithRPI();
@@ -54,8 +55,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 400;//400;                //Original: 300
-  int setSpdL = 400;//400;                //Original: 300
+  int setSpdR = 370;//400;                //Original: 300
+  int setSpdL = 350;//400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -85,20 +86,19 @@ void goFORWARD(int distance) {
     scanFORWARD(&irFrontReadings[0]);
     //while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
     while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
+      if((irFrontReadings[0] < (breakDist+20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist+20))){
+        mCounter[0] =  distance - 445;
+        mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
+        break;
+      }
       scanFORWARD(&irFrontReadings[0]);
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
-     if((irFrontReadings[0] < (breakDist+20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist+20))){
-        //distance = 0;
-        mCounter[0] =  distance - 445;
-        mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
-        break;
-      }
     }
-    /*
+    
     i = 0;
     lastTime = micros();
     while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -107,11 +107,9 @@ void goFORWARD(int distance) {
         i++;
         if (i > 100)
           i = 100;
-        lastTime = micros();
-        
+        lastTime = micros();    
       }
     }
-    */
   }
 
   md.setBrakes(400, 400);
@@ -637,7 +635,7 @@ void commWithRPI() {
                   goFORWARD(blockToTicks(1));
                   mvmtCounter[0]++;
                   delay(RPIExpDelay);
-                  fwdCorrection();
+                  //fwdCorrection();
                   //fwdCorrectionV2();
                   calCounter++;
                   sendStatusUpdate();
@@ -855,8 +853,8 @@ void stringCommands() {
       Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 3, 340, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
       Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
       Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
-      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 340, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
-      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 340, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
+      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 360, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
+      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 360, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
       Serial << "Left Long IR: " << longIrVal(irLeftReading, 5, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
       break;
 
@@ -903,7 +901,7 @@ int shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
   if (val < 100) {
     newVal = 1;
   }
-  if (newVal >= blockThreshold || val >= cmThreshold || val <= 0) {
+  if (newVal > blockThreshold || val >= cmThreshold || val <= 0) {
     newVal = 0;
   }
   return newVal;
@@ -957,8 +955,8 @@ void sendStatusUpdate() {
   statusPayload.front1 = shortIrVal(irFrontReadings[0], 3, 340, lfwdIrOS);
   statusPayload.front2 = shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS);
   statusPayload.front3 = shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS);
-  statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 340, frgtIrOS);
-  statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 340, brgtIrOS);
+  statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 360, frgtIrOS);
+  statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 360, brgtIrOS);
   statusPayload.left1 = longIrVal(irLeftReading, 5, 65, flftIrOS);
   statusPayload.reached = 1;
 
