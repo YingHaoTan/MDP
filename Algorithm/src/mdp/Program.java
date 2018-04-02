@@ -63,9 +63,9 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
         
-        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 3, 0.7);
+        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 2, 0.7);
         SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 0, 2, 0.7);
-        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 3, 0.7);
+        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 2, 0.7);
         SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 0, 2, 0.7);
         SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 2, 0.7);
         SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.7);
