@@ -34,7 +34,7 @@ void setup() {
   delay(2000);
   D Serial.println("Initializations Done");
 
-    calibrationPhase1();
+  calibrationPhase1();
   //  delay(2000);
   //calibrationPhase2();
 }
@@ -49,16 +49,13 @@ void loop() {
   }
 }
 
-void emergencyBreak(){
-
-}
 
 
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 400;//400;                //Original: 300
-  int setSpdL = 400;//400;                //Original: 300
+  int setSpdR = 370;//400;                //Original: 300
+  int setSpdL = 350;//400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -82,29 +79,26 @@ void goFORWARD(int distance) {
         PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
-        //Collision check starts here;
-        /*
-          if (colCounter % CrashChkPeriod == 0) {
-          if (checkFRONT()) {
-            break;
-          }
-          }*/
-        colCounter++;
       }
     }
   } else {
-    scanFORWARD();
-    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445)) && (irFrontReadings[0] > 80)){
-      scanFORWARD();
+    scanFORWARD(&irFrontReadings[0]);
+    //while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
+    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
+      if((irFrontReadings[0] < (breakDist+20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist+20))){
+        mCounter[0] =  distance - 445;
+        mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
+        break;
+      }
+      scanFORWARD(&irFrontReadings[0]);
       if (millis() - lastTime > 100) {
         PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //Long distance
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
       }
-      if(irFrontReadings[0] < 80){
-        distance = 0;                                 //Ends the forward movement and prevents the deleration in belows code
-      }
+     
     }
+    
     i = 0;
     lastTime = micros();
     while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -113,15 +107,7 @@ void goFORWARD(int distance) {
         i++;
         if (i > 100)
           i = 100;
-        lastTime = micros();
-        //Collision check starts here
-        /*
-          if (colCounter % CrashChkPeriod == 0) {
-          if (checkFRONT()) {
-            break;
-          }
-          }*/
-        colCounter++;
+        lastTime = micros();    
       }
     }
   }
@@ -649,7 +635,7 @@ void commWithRPI() {
                   goFORWARD(blockToTicks(1));
                   mvmtCounter[0]++;
                   delay(RPIExpDelay);
-                  fwdCorrection();
+                  //fwdCorrection();
                   //fwdCorrectionV2();
                   calCounter++;
                   sendStatusUpdate();
