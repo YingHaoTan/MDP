@@ -99,13 +99,21 @@ int commands[] =
                 //{7,8,7,3,8,4,2,8,9,3,8,8,2,1};
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
-//Battery 1 (Strong Battery, max charge)
+
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
-SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0350, 0.080);
-SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.070);
+SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.080);
+SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0366, 0.068);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
-SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0360, 0.070);
+SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.073);
+
+//Battery 1 (Strong Battery, max charge)
+//SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
+//SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
+//SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0350, 0.080);
+//SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0363, 0.070);
+//SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
+//SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0360, 0.070);
 
 //SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0360, 0.060);
 //SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0340, 0.090);
