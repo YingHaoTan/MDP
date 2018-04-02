@@ -55,7 +55,7 @@ int CalPeriod = 0;
 int CrashChkPeriod = 5;
 
 int kTicks = 1;                    //Forward movement Constant multiplier
-int ticksToMove = 1183;
+int ticksToMove = 1200;
 //int zTicks = 0;                  //Forward movement ticks Error
 int forwardOffsetCounter = 0;
 
@@ -97,12 +97,13 @@ int commands[] =
                 //{1,3,1,2,1,3,1,2,1,3,1,2,1,3,1,2}; //Stairs
 
                 //{7,8,7,3,8,4,2,8,9,3,8,8,2,1};
+                
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
 
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
-SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.080);
+SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.090);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0366, 0.068);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
 SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.073);
