@@ -34,8 +34,8 @@ void setup() {
   delay(2000);
   D Serial.println("Initializations Done");
 
-  calibrationPhase1();
-  //  delay(2000);
+  //calibrationPhase1();
+  //delay(2000);
   //calibrationPhase2();
 }
 
@@ -54,8 +54,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 400;//400;                //Original: 300
-  int setSpdL = 400;//400;                //Original: 300
+  int setSpdR = 370;//400;                //Original: 300
+  int setSpdL = 350;//400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -363,7 +363,7 @@ void fwdCorrection() {
   //  md.setBrakes(400, 400);
   //  resetMCounters();
   md.setM1Speed(-395);
-  delay(7);
+  delay(7); // 7
   md.setBrakes(400, 400);
   resetMCounters();
 }
@@ -635,7 +635,7 @@ void commWithRPI() {
                   goFORWARD(blockToTicks(1));
                   mvmtCounter[0]++;
                   delay(RPIExpDelay);
-                  fwdCorrection();
+                  //fwdCorrection();
                   //fwdCorrectionV2();
                   calCounter++;
                   sendStatusUpdate();
@@ -850,9 +850,9 @@ void stringCommands() {
       scanFORWARD(&irFrontReadings[0]);
       scanLEFT();
       scanRIGHT(&irRightReadings[0]);
-      Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 3, 340, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
+      Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 4, 340, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
       Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
-      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
+      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 4, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
       Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 340, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
       Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 340, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
       Serial << "Left Long IR: " << longIrVal(irLeftReading, 5, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
@@ -952,9 +952,9 @@ void sendStatusUpdate() {
   // Put sensor readings here
   StatusMessage statusPayload;
   statusPayload.id = last_sent;
-  statusPayload.front1 = shortIrVal(irFrontReadings[0], 3, 340, lfwdIrOS);
+  statusPayload.front1 = shortIrVal(irFrontReadings[0], 4, 340, lfwdIrOS);
   statusPayload.front2 = shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS);
-  statusPayload.front3 = shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS);
+  statusPayload.front3 = shortIrVal(irFrontReadings[2], 4, 340, rfwdIrOS);
   statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 340, frgtIrOS);
   statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 340, brgtIrOS);
   statusPayload.left1 = longIrVal(irLeftReading, 5, 65, flftIrOS);
