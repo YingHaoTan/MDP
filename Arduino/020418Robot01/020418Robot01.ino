@@ -54,8 +54,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 400;//400;                //Original: 300
-  int setSpdL = 400;//400;                //Original: 300
+  int setSpdR = 370;//400;                //Original: 300
+  int setSpdL = 350;//400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -635,7 +635,7 @@ void commWithRPI() {
                   goFORWARD(blockToTicks(1));
                   mvmtCounter[0]++;
                   delay(RPIExpDelay);
-                  fwdCorrection();
+                  //fwdCorrection();
                   //fwdCorrectionV2();
                   calCounter++;
                   sendStatusUpdate();
