@@ -499,6 +499,28 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     stairsToMove = 0;
                     stairsPhase1Counter = 0;
                     stairsPhase2Counter = 0;
+                    
+                    for (int i = 1; i < actionPriority.length; i++) {
+                        RobotAction action = actionPriority[i];
+                        if (canMove(actionToMapDirection(action))) {
+                        // Do not turn twice in a row while exploring boundary
+                            if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
+                                if (justTurned) {
+                                    continue;
+                                } else {
+                                    justTurned = true;
+                                }
+                            } else {
+                                justTurned = false;
+                            }
+
+                            getRobot().move(action);
+                            return;
+                        }
+                    }
+                    justTurned = false;
+                    getRobot().move(RobotAction.ABOUT_TURN);
+                    return;
                 }
             }
 
