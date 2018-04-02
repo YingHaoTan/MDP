@@ -47,7 +47,7 @@ public class Program {
         MdpWindowController wcontroller = new MdpWindowController(window);
         XController xcontroller = new XController(window.getMap().getMapState());
         MapFileHandler filehandler = new MapFileHandler();
-        ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification(), false));
+            ExplorationBase explorer = new HugRightExplorationController(new AStarFastestPath(new BasicPathSpecification(), false));
         //FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), true);
         FastestPathBase fastestpath = new AStarFastestPath(new WaypointPathSpecification(), false);
         
@@ -63,12 +63,12 @@ public class Program {
         xcontroller.setExplorer(explorer);
         xcontroller.setWindowController(wcontroller);
         
-        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 3, 0.7);
-        SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 0, 2, 0.7);
-        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 3, 0.7);
-        SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 0, 2, 0.7);
-        SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 2, 0.7);
-        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.7);
+        SensorConfiguration front1 = new SensorConfiguration(Direction.UP, -1, 0, 3, 0.95);
+        SensorConfiguration front2 = new SensorConfiguration(Direction.UP, 0, 0, 2, 0.95);
+        SensorConfiguration front3 = new SensorConfiguration(Direction.UP, 1, 0, 3, 0.95);
+        SensorConfiguration right1 = new SensorConfiguration(Direction.RIGHT, -1, 0, 2, 0.95);
+        SensorConfiguration right2 = new SensorConfiguration(Direction.RIGHT, 1, 0, 2, 0.95);
+        SensorConfiguration left1 = new SensorConfiguration(Direction.LEFT, 1, 0, 4, 0.95);
         
         CalibrationSpecification corner_spec = new CalibrationSpecification(RobotAction.CAL_CORNER, new HashMap<SensorConfiguration, Integer>() {
         	{
