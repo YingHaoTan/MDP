@@ -332,8 +332,9 @@ void DualVNH5019MotorShield::setBrakes(int m1Brake, int m2Brake)
   OCR1B = m2Brake;
   OCR1A = m1Brake;
   #else
-  analogWrite(_PWM1,brake * 51 / 80); // default to using analogWrite, mapping 400 to 255
   analogWrite(_PWM2,brake * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  analogWrite(_PWM1,brake * 51 / 80); // default to using analogWrite, mapping 400 to 255
+  
   #endif
 }
 

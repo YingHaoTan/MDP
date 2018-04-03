@@ -4,7 +4,6 @@
 #include "communication.h"
 #include "RingBuffer.h"
 #include "Settings.h"
-#include <Math.h>
 //#include <CustomMotorLib.h>
 
 #ifdef DEBUG
@@ -41,7 +40,6 @@ void setup() {
 void loop() {
   if (commands[0] != 0) {
     stringCommands();
-
   }
   else {
     commWithRPI();
@@ -53,8 +51,8 @@ void loop() {
 //------------Functions for robot movements------------//
 void goFORWARD(int distance) {
   long lastTime = micros();
-  int setSpdR = 380;//400;                //Original: 300
-  int setSpdL = 380;//400;                //Original: 300
+  int setSpdR = 350;//400;                //Original: 300
+  int setSpdL = 350;//400;                //Original: 300
   int colCounter = 0;
   resetMCounters();
   lastError = 0;
@@ -63,7 +61,7 @@ void goFORWARD(int distance) {
   lastTicks[1] = 0;
   if (!(rfwdIrVal.distance() < 130 || lfwdIrVal.distance() < 130 || mfwdIrVal.distance() < 120)) {
     int i = 50;
-    while (i < 391) {
+    /*while (i < 391) {
       if (micros() - lastTime > 50) {
         md.setSpeeds(i, i);
         i++;
@@ -71,7 +69,10 @@ void goFORWARD(int distance) {
       }
     }
     lastTime = millis();
-//      delay(50);
+    delay(50);*/
+
+    md.setSpeeds(setSpdR, setSpdL);
+    lastTime = millis(); 
 
     if (distance <= 1500) {
       while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -79,7 +80,7 @@ void goFORWARD(int distance) {
           if (checkFRONT()) {
             break;
           }
-          PIDControl(&setSpdR, &setSpdL, 40, 7, 80, 0); //By block
+          PIDControl(&setSpdR, &setSpdL, 40, 10, 40, 0); //By block 40, 0, 80, 0
           lastTime = millis();
           md.setSpeeds(setSpdR, setSpdL);
 
@@ -88,20 +89,20 @@ void goFORWARD(int distance) {
     } else {
       scanFORWARD(&irFrontReadings[0]);
       //    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
-      while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
+      while (mCounter[0] < distance && mCounter[1] < distance) {
         if ((irFrontReadings[0] < (breakDist + 20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist + 20))) {
-          mCounter[0] =  distance - 445;
-          mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
+//          mCounter[0] =  distance - 445;
+//          mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
           break;
         }
         scanFORWARD(&irFrontReadings[0]);
         if (millis() - lastTime > 100) {
-          PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //Long distance
+          PIDControl(&setSpdR, &setSpdL, 30, 5, 60, 0); //Long distance 40, 5, 80
           lastTime = millis();
           md.setSpeeds(setSpdR, setSpdL);
         }
       }
-
+      /*
       i = 0;
       lastTime = micros();
       while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -112,7 +113,7 @@ void goFORWARD(int distance) {
             i = 100;
           lastTime = micros();
         }
-      }
+      }*/
     }
 
     md.setBrakes(400, 400);
@@ -218,6 +219,8 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
 
   }
   //  }
+  Serial << "Adjustment: " << adjustment <<endl;
+  Serial << "error: " << error << " total error: " << totalErrors << " errorRate: " << errorRate << endl ;
 }
 
 void calibrateRIGHT() {

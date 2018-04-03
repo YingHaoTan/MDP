@@ -41,7 +41,7 @@ int pullBackTicks = 0;
 //#define turnRightTicks 16
 //#define aboutTurnOffset 17
 
-#define breakDist 150
+#define breakDist 140
 
 
 //---------------------Global Variables---------------------//
@@ -74,10 +74,10 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
 int commands[] = 
-//                {0};                            //Set to commWithRPI mode
+                {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
-                {5};                          //IR Sensors, full scan
+//                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
 //                {1,1,1,1,1,1,1,1,1,1,1,1,1,1};                //Forward movement, block by block
@@ -87,7 +87,7 @@ int commands[] =
 //                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
-//                {4,1,1,1};                    //Calibrate side
+//                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
                 //{6,7,1,1,1};                  //Calibrate corner
                 //{9,1,1,1};                    //Calibrate with any blocks
                 
