@@ -199,11 +199,11 @@ public abstract class MovementBase {
         }
         
         
-        /*System.out.println("========== Obstacles Counter =============");
+        System.out.println("========== Obstacles Counter =============");
         printGrid(obstaclesCounter);
         System.out.println("========== No Obstacles Counter =============");
         printGrid(noObstaclesCounter);
-        */
+        
 
         for(Runnable listener: this.scanlisteners)
         	listener.run();
@@ -237,6 +237,11 @@ public abstract class MovementBase {
         this.mstate = mstate;
         this.noObstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height];
         this.obstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height]; 
+        List<Point> startPoints = mstate.convertRobotPointToMapPoints(mstate.getStartPoint());
+        List<Point> endPoints = mstate.convertRobotPointToMapPoints(mstate.getEndPoint());
+        
+        setNoObstacleUpperLimit(startPoints);
+        setNoObstacleUpperLimit(endPoints);
     }
     
     /**

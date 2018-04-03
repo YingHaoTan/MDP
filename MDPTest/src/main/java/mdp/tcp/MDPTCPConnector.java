@@ -225,6 +225,7 @@ public class MDPTCPConnector {
                     System.out.println("6) CAL_CORNER");
                     System.out.println("7) CAL_JIEMING");
                     System.out.println("8) STREAMM");
+                    System.out.println("9) SCAN");
                     System.out.print("Input: ");
                     //Thread.yield();
                     Scanner keyboard = new Scanner(System.in);
@@ -295,6 +296,9 @@ public class MDPTCPConnector {
                                 System.out.println(actions.get(i));
                             }
                             ins = new ArduinoStream(actions);
+                            break;
+                        case 9:
+                            ins = new ArduinoInstruction(RobotAction.SCAN, true);
                             break;
                             
                     }
