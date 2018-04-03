@@ -79,7 +79,7 @@ void goFORWARD(int distance) {
           if (checkFRONT()) {
             break;
           }
-          PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //By block
+          PIDControl(&setSpdR, &setSpdL, 40, 7, 80, 0); //By block
           lastTime = millis();
           md.setSpeeds(setSpdR, setSpdL);
 
@@ -970,15 +970,9 @@ void sendStatusUpdate() {
   statusPayload.id = last_sent;
   statusPayload.front1 = shortIrVal(irFrontReadings[0], 4, 340, lfwdIrOS);
   statusPayload.front2 = shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS);
-<<<<<<< HEAD
-  statusPayload.front3 = shortIrVal(irFrontReadings[2], 4, 340, rfwdIrOS);
-  statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 340, frgtIrOS);
-  statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 340, brgtIrOS);
-=======
   statusPayload.front3 = shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS);
   statusPayload.right1 = shortIrVal(irRightReadings[0], 3, 360, frgtIrOS);
   statusPayload.right2 = shortIrVal(irRightReadings[1], 3, 360, brgtIrOS);
->>>>>>> master
   statusPayload.left1 = longIrVal(irLeftReading, 5, 65, flftIrOS);
   statusPayload.reached = 1;
 
