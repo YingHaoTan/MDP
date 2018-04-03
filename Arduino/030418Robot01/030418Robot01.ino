@@ -43,7 +43,6 @@ void setup() {
 void loop() {
   if (commands[0] != 0) {
     stringCommands();
-    delay(500);
   }
   else {
     commWithRPI();
@@ -77,19 +76,18 @@ void goFORWARD(int distance) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
       if (millis() - lastTime > 100) {
         //if(checkFRONT()){
-          //break;
+        //break;
         //}
         PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
-        
+
       }
     }
   } else {
     scanFORWARD(&irFrontReadings[0]);
-//    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
-    while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445){
-      if((irFrontReadings[0] < (breakDist+20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist+20))){
+    while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
+      if ((irFrontReadings[0] < (breakDist + 20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist + 20))) {
         mCounter[0] =  distance - 445;
         mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
         break;
@@ -101,7 +99,7 @@ void goFORWARD(int distance) {
         md.setSpeeds(setSpdR, setSpdL);
       }
     }
-    
+
     i = 0;
     lastTime = micros();
     while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -110,7 +108,7 @@ void goFORWARD(int distance) {
         i++;
         if (i > 100)
           i = 100;
-        lastTime = micros();    
+        lastTime = micros();
       }
     }
   }
@@ -195,28 +193,26 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
   lastError = error;
   lastTicks[0] = mCounter[0];
   lastTicks[1] = mCounter[1];
-  totalErrors += 2;
-//   totalErrors += error             ;                                           //Add up total number of errors (for Ki)
-//  if (error != 0) {                                                           //if error exists
-    adjustment = ((kP * error) - (kI * totalErrors) + (kD * errorRate)) / 100;
-//     adjustment = ((kP * error) + (kI * totalErrors) + (kD * errorRate)) / 100;
-    if (dr == 1 || dr == -1) {
-      *setSpdR += -adjustment * dr;
-      *setSpdL -= adjustment * dr;
-    }
-    else {
-      *setSpdR += adjustment;
-      *setSpdL -= adjustment;
+  //  totalErrors += 2;
+  totalErrors += error             ;                                           //Add up total number of errors (for Ki)
+  //    adjustment = ((kP * error) - (kI * totalErrors) + (kD * errorRate)) / 100;
+  adjustment = ((kP * error) + (kI * totalErrors) + (kD * errorRate)) / 100;
+  if (dr == 1 || dr == -1) {
+    *setSpdR += -adjustment * dr;
+    *setSpdL -= adjustment * dr;
+  }
+  else {
+    *setSpdR += adjustment;
+    *setSpdL -= adjustment;
 
-      if (*setSpdR > 400) {
-        *setSpdR = 400;
-      }
-      if (*setSpdL > 400) {
-        *setSpdL = 400;
-      }
-
+    if (*setSpdR > 400) {
+      *setSpdR = 400;
     }
-//  }
+    if (*setSpdL > 400) {
+      *setSpdL = 400;
+    }
+
+  }
 }
 
 void calibrateRIGHT() {
@@ -340,17 +336,17 @@ void calibrateRIGHTV2() {
 
 bool checkFRONT() {
   scanFORWARD(&irFrontReadings[0]);
-  int turnTicks = 0;
+  int moveTicks = 0;
   resetMCounters();
-  while (min(irFrontReadings[0], irFrontReadings[2]) < 90 || irFrontReadings[1] < 80) {
-    turnTicks = max((100 - min(irFrontReadings[0], irFrontReadings[2])), (90 - irFrontReadings[1])) * 2;
-//    while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
-//      md.setSpeeds(-200, -200);
-//    }
+  if(min(irFrontReadings[0], irFrontReadings[2]) < 100 || irFrontReadings[1] < 90) {
+    moveTicks = max(100 - min(irFrontReadings[0], irFrontReadings[2]), 90 - irFrontReadings[1]) * 2;
+    //    while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+    //      md.setSpeeds(-200, -200);
+    //    }
     md.setBrakes(400, 400);
     delay(100);
   }
-  if (turnTicks > 0) {
+  if (moveTicks > 0) {
     return true;
   }
   return false;
@@ -365,10 +361,10 @@ void fwdCorrection() {
   //  }
   //  md.setBrakes(400, 400);
   //  resetMCounters();
-//  md.setM1Speed(-395);
-//  delay(7);
-//  md.setBrakes(400, 400);
-//  resetMCounters();
+  //  md.setM1Speed(-395);
+  //  delay(7);
+  //  md.setBrakes(400, 400);
+  //  resetMCounters();
 }
 
 
