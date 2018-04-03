@@ -75,7 +75,7 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 int commandsDelay = 300;
 int commands[] = 
                 {0};                            //Set to commWithRPI mode
-
+//                {1,0};
                 //----------Step 1: Check sensors accuracy (5 mins)
 //                {5};                          //IR Sensors, full scan
 
