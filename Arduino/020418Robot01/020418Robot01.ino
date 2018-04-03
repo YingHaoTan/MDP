@@ -33,8 +33,7 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-
-    calibrationPhase1();
+  calibrationPhase1();
   delay(2000);
   //calibrationPhase2();
 }
@@ -75,13 +74,13 @@ void goFORWARD(int distance) {
     lastTime = millis();
 //      delay(50);
 
-    if (distance <= 1200) {
+    if (distance <= 1500) {
       while (mCounter[0] < distance && mCounter[1] < distance) {
         if (millis() - lastTime > 100) {
           if (checkFRONT()) {
             break;
           }
-          PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
+          PIDControl(&setSpdR, &setSpdL, 40, 5, 80, 0); //By block
           lastTime = millis();
           md.setSpeeds(setSpdR, setSpdL);
 
