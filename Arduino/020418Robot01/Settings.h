@@ -41,7 +41,7 @@ int pullBackTicks = 0;
 //#define turnRightTicks 16
 //#define aboutTurnOffset 17
 
-#define breakDist 150
+#define breakDist 140
 
 
 //---------------------Global Variables---------------------//
@@ -87,7 +87,7 @@ int commands[] =
 //                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
-//                {4,1,1,1};                    //Calibrate side
+//                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
                 //{6,7,1,1,1};                  //Calibrate corner
                 //{9,1,1,1};                    //Calibrate with any blocks
                 

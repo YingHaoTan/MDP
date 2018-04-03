@@ -141,8 +141,6 @@ void CustomMotorLib::setSpeeds(int m1Speed, int m2Speed)
 {
   setM1Speed(m1Speed);
   setM2Speed(m2Speed);
-
-
 }
 
 // Brake motor 1, brake is a number between 0 and 400
