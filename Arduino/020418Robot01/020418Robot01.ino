@@ -362,17 +362,10 @@ void fwdCorrection() {
   //  }
   //  md.setBrakes(400, 400);
   //  resetMCounters();
-<<<<<<< HEAD
-  md.setM1Speed(-395);
-  delay(7); // 7
-  md.setBrakes(400, 400);
-  resetMCounters();
-=======
   //  md.setM1Speed(-395);
   //  delay(7);
   //  md.setBrakes(400, 400);
   //  resetMCounters();
->>>>>>> master
 }
 
 
@@ -862,15 +855,9 @@ void stringCommands() {
       scanRIGHT(&irRightReadings[0]);
       Serial << "Left Forward IR: " << shortIrVal(irFrontReadings[0], 4, 340, lfwdIrOS) << " blocks away, actual: " << irFrontReadings[0] << endl;
       Serial << "Mid Forward IR: " << shortIrVal(irFrontReadings[1], 3, 350, mfwdIrOS) << " blocks away, actual: " << irFrontReadings[1] << endl;
-<<<<<<< HEAD
-      Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 4, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
-      Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 340, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
-      Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 340, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
-=======
       Serial << "Right Forward IR: " << shortIrVal(irFrontReadings[2], 3, 340, rfwdIrOS) << " blocks away, actual: " << irFrontReadings[2] << endl;
       Serial << "Front Right IR: " << shortIrVal(irRightReadings[0], 3, 360, frgtIrOS) << " blocks away, actual: " << irRightReadings[0] << endl;
       Serial << "Back Right IR: " << shortIrVal(irRightReadings[1], 3, 360, brgtIrOS) << " blocks away, actual: " << irRightReadings[1] << endl;
->>>>>>> master
       Serial << "Left Long IR: " << longIrVal(irLeftReading, 5, 65, flftIrOS) << " blocks away, actual: " << irLeftReading << endl;
       break;
 
