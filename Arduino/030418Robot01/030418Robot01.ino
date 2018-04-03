@@ -75,10 +75,11 @@ void goFORWARD(int distance) {
   if (distance <= 1200) {
     while (mCounter[0] < distance && mCounter[1] < distance) {
       if (millis() - lastTime > 100) {
-        //if(checkFRONT()){
-        //break;
-        //}
-        PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
+        if (checkFRONT()) {
+          break;
+        }
+        //        PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
+        PIDControl(&setSpdR, &setSpdL, 50, 0, 100, 0);
         lastTime = millis();
         md.setSpeeds(setSpdR, setSpdL);
 
@@ -338,7 +339,7 @@ bool checkFRONT() {
   scanFORWARD(&irFrontReadings[0]);
   int moveTicks = 0;
   resetMCounters();
-  if(min(irFrontReadings[0], irFrontReadings[2]) < 100 || irFrontReadings[1] < 90) {
+  if (min(irFrontReadings[0], irFrontReadings[2]) < 100 || irFrontReadings[1] < 90) {
     moveTicks = max(100 - min(irFrontReadings[0], irFrontReadings[2]), 90 - irFrontReadings[1]) * 2;
     //    while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
     //      md.setSpeeds(-200, -200);
