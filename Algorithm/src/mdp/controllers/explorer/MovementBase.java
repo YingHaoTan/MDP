@@ -236,6 +236,8 @@ public abstract class MovementBase {
         this.mstate = mstate;
         this.noObstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height];
         this.obstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height]; 
+        setNoObstacleUpperLimit(mstate.convertRobotPointToMapPoints(mstate.getStartPoint()));
+        setNoObstacleUpperLimit(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
     }
     
     /**
