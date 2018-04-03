@@ -34,7 +34,8 @@ void setup() {
   delay(2000);
   D Serial.println("Initializations Done");
 
-    calibrationPhase1();
+  //  calibrationPhase1();
+
   delay(2000);
   //calibrationPhase2();
 }
@@ -43,7 +44,6 @@ void setup() {
 void loop() {
   if (commands[0] != 0) {
     stringCommands();
-
   }
   else {
     commWithRPI();
@@ -67,21 +67,22 @@ void goFORWARD(int distance) {
     int i = 50;
     while (i < 391) {
       if (micros() - lastTime > 50) {
-        md.setSpeeds(i, i);
+        md.setSpeeds(i, i + 10);
         i++;
         lastTime = micros();
       }
     }
     lastTime = millis();
-//      delay(50);
-
+    //    delay(50);
     if (distance <= 1200) {
       while (mCounter[0] < distance && mCounter[1] < distance) {
+
         if (millis() - lastTime > 100) {
+          //        PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
           if (checkFRONT()) {
             break;
           }
-          PIDControl(&setSpdR, &setSpdL, 150, 7, 30, 0); //By block
+          PIDControl(&setSpdR, &setSpdL, 50, 0, 100, 0);
           lastTime = millis();
           md.setSpeeds(setSpdR, setSpdL);
 
@@ -89,7 +90,6 @@ void goFORWARD(int distance) {
       }
     } else {
       scanFORWARD(&irFrontReadings[0]);
-      //    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
       while (mCounter[0] < distance - 445 && mCounter[1] < distance - 445) {
         if ((irFrontReadings[0] < (breakDist + 20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist + 20))) {
           mCounter[0] =  distance - 445;
@@ -118,8 +118,8 @@ void goFORWARD(int distance) {
     }
 
     md.setBrakes(400, 400);
-    resetMCounters();
   }
+  resetMCounters();
   delay(100);
 }
 
@@ -198,11 +198,10 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
   lastError = error;
   lastTicks[0] = mCounter[0];
   lastTicks[1] = mCounter[1];
-  totalErrors += 2;
-  //   totalErrors += error             ;                                           //Add up total number of errors (for Ki)
-  //  if (error != 0) {                                                           //if error exists
-  adjustment = ((kP * error) - (kI * totalErrors) + (kD * errorRate)) / 100;
-  //     adjustment = ((kP * error) + (kI * totalErrors) + (kD * errorRate)) / 100;
+  //  totalErrors += 2;
+  totalErrors += error             ;                                           //Add up total number of errors (for Ki)
+  //    adjustment = ((kP * error) - (kI * totalErrors) + (kD * errorRate)) / 100;
+  adjustment = ((kP * error) + (kI * totalErrors) + (kD * errorRate)) / 100;
   if (dr == 1 || dr == -1) {
     *setSpdR += -adjustment * dr;
     *setSpdL -= adjustment * dr;
@@ -219,7 +218,6 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
     }
 
   }
-  //  }
 }
 
 void calibrateRIGHT() {
@@ -342,7 +340,7 @@ void calibrateRIGHTV2() {
 }
 
 bool checkFRONT() {
- int moveTicks = 0;
+  int moveTicks = 0;
   //  if (min(irFrontReadings[0], irFrontReadings[2]) < 140 || irFrontReadings[1] < 130) {
   if (rfwdIrVal.distance() < 110 || lfwdIrVal.distance() < 100 || mfwdIrVal.distance() < 110) {
     //    moveTicks = max(120 - min(irFrontReadings[0], irFrontReadings[2]), 110 - irFrontReadings[1]) * 2;
@@ -461,7 +459,7 @@ void calibrateOffset(int cycle, int flag) {
 
   scanRIGHT(&irRightReadings[0]);
   int turnTicks = 0;
-  while (abs(irRightReadings[0] - irRightReadings[1]) > 2 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+  while (abs(irRightReadings[0] - irRightReadings[1]) > 5 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
@@ -680,6 +678,9 @@ void commWithRPI() {
                   break;
 
                 case SCAN:
+                  Serial.println(rfwdIrVal.distance());
+                  Serial.println(lfwdIrVal.distance());
+                  Serial.println(mfwdIrVal.distance());
                   delay(RPIExpDelay);
                   sendStatusUpdate();
                   incrementID();
