@@ -13,9 +13,9 @@
 #define brgtIrPin A4 //Back right IR
 
 //---------------------Definitions for IR Sensor---------------------//
-#define mfwdIrOS -50 //Middle forward IR
-#define lfwdIrOS -40 //Left forward IR
-#define rfwdIrOS -40 //Right forward IR
+#define mfwdIrOS -50 //Middle forward IR prev:-50
+#define lfwdIrOS -40 //Left forward IR prev:-40
+#define rfwdIrOS -40 //Right forward IR prev:-40
 #define frgtIrOS -40 //Front right IR
 #define flftIrOS -3 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
@@ -31,7 +31,8 @@
 //#define aboutTurnOffset 5
 //#define forwardOffsetTicks 120
 
-#define forwardOffsetTicks 130
+#define forwardOffsetTicks 120
+#define pullBackDelay 9
 
 int turnLeftTicks = 18;
 int turnRightTicks = 16;
@@ -55,7 +56,7 @@ int CalPeriod = 0;
 int CrashChkPeriod = 5;
 
 int kTicks = 1;                    //Forward movement Constant multiplier
-int ticksToMove = 1200;
+int ticksToMove = 1192;
 //int zTicks = 0;                  //Forward movement ticks Error
 int forwardOffsetCounter = 0;
 
@@ -84,7 +85,7 @@ int commands[] =
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
-//                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
+//                {4,8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
 //                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
@@ -100,13 +101,13 @@ int commands[] =
                 
 
 //---------------------Instantiate IR and Motor objects from library---------------------//
-
+//Voltage 6.26
 SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
 SharpIR lfwdIrVal(lfwdIrPin, shrtmodel, 0.0343, 0.090);
 SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.090);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0366, 0.068);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
-SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.073);
+SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.081);
 
 //Battery 1 (Strong Battery, max charge)
 //SharpIR mfwdIrVal(mfwdIrPin, shrtmodel, 0.0365, 0.060);
