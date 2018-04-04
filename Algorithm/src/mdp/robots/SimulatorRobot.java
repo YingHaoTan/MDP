@@ -202,7 +202,7 @@ public class SimulatorRobot extends RobotBase {
         }
 
         
-        
+        /*
         // Simulate false readings
         double reliability = sensor.getReliability();
         double seed = Math.random();
@@ -211,7 +211,7 @@ public class SimulatorRobot extends RobotBase {
         if(seed > reliability && distance > 0){
             distance = (Math.random() >= 0.5) ? distance + 1 : distance - 1;
             //distance = distance - 1;
-        }
+        }*/
         
         
         return distance;

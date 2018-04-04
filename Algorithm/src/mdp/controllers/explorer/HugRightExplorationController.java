@@ -49,6 +49,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     //int justTurnedCounter;
     boolean justTurned;
     boolean stopped;
+    boolean reachedGoal;
     States currentState;
 
     LinkedList<RobotAction> lastTenActions;
@@ -82,6 +83,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         stairsToMove = 0;
         justTurned = false;
         stopped = false;
+        reachedGoal = false;
         indefLoopCounter = 0;
         prevMdf = new MDFTuple(getMapState().toString(MapDescriptorFormat.MDF1), getMapState().toString(MapDescriptorFormat.MDF2));
         
@@ -413,7 +415,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         // Update internal map state
         sensorsScan(getRobot(), 1);
 
-        //System.out.println(currentState);
+        if (getMapState().getRobotPoint().equals(getMapState().getEndPoint())){
+            reachedGoal = true;
+            
+        }
+        System.out.println("********Reached Goal = " + reachedGoal+ "*******************");
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
             getRobot().move(RobotAction.SCAN);
             //System.out.println("Rescanning..");
@@ -555,7 +561,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             // Don't do round 2
             System.out.println("Coverage");
             System.out.println(getCurrentCoveragePercentage());
-            if(getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
+            if(getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 60){
             //if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
                 currentState = States.COMPLETED;
                 complete();
@@ -563,7 +569,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
 
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
-            if (getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
+            if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 20) || !reachedGoal && getCurrentCoveragePercentage() > 20)) {
             //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
                 System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
