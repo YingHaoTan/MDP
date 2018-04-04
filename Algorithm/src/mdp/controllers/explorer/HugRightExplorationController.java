@@ -553,13 +553,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     justTurned = false;
-                    CalibrationSpecification spec = getRobot().getCalibrationSpecifications().get(0);
-                    if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-                        getRobot().move(RobotAction.TURN_LEFT);
-                    }
-                    else{
-                        getRobot().move(RobotAction.ABOUT_TURN);
-                    }
+                    getRobot().move(RobotAction.ABOUT_TURN);
                     return;
                 }
             }
