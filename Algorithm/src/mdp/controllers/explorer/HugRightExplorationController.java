@@ -419,7 +419,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             reachedGoal = true;
             
         }
-        System.out.println("********Reached Goal = " + reachedGoal+ "*******************");
+        //System.out.println("********Reached Goal = " + reachedGoal+ "*******************");
         if (currentState != States.COMPLETED && currentState != States.EXPLORING && obstaclesChanged()) {
             getRobot().move(RobotAction.SCAN);
             //System.out.println("Rescanning..");
@@ -569,7 +569,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
 
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
-            if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 20) || !reachedGoal && getCurrentCoveragePercentage() > 20)) {
+            if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
             //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
                 System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
@@ -663,12 +663,16 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         if (currentState == States.ABOUT_TURN) {
-            //System.out.println("========================");
-            //System.out.println("About turning now");
-            //System.out.println("========================");
             justTurned = false;
-            currentState = States.BOUNDARY;
-            getRobot().move(RobotAction.ABOUT_TURN);
+            CalibrationSpecification spec = getRobot().getCalibrationSpecifications().get(0);
+            if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                currentState = States.BOUNDARY;
+                getRobot().move(RobotAction.TURN_LEFT);
+            }
+            else{
+                currentState = States.BOUNDARY;
+                getRobot().move(RobotAction.ABOUT_TURN);
+            }
         }
         if (currentState == States.EXPLORATION) {
             System.out.println("Exploration Round 2");
