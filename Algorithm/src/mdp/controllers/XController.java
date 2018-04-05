@@ -34,7 +34,7 @@ import mdp.tcp.AndroidUpdate;
  * @author Ying Hao
  */
 public class XController {
-
+    private ExecutionMode mode;
     private MapState mstate;
     private SimulatorRobot srobot;
     private PhysicalRobot probot;
@@ -183,6 +183,7 @@ public class XController {
      * @param timelimit Time limit
      */
     public void explore(ExecutionMode mode, int coverage, double timelimit) {
+        this.mode = mode;
         RobotBase robot = getActiveRobot(mode);
 
         if (robot != null) {
@@ -283,7 +284,10 @@ public class XController {
     }
     
     private void onExplorationCompleted() {
-        
+        RobotBase robot = getActiveRobot(mode);
+        if (robot != null && planner != null) {
+            planner.orientate(mstate, robot, mstate.getEndPoint());
+        }
     }
     
     private void onSensorScanCompleted() {

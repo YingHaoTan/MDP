@@ -48,6 +48,53 @@ public abstract class FastestPathBase implements RobotActionListener {
     public void removeFastestPathCompletedListener(FastestPathCompletedListener listener) {
         this.listeners.remove(listener);
     }
+    
+    /**
+     * Orientates robot to the fastest path initial direction
+     * @return 
+     */
+    public void orientate(MapState mstate, RobotBase robot, Point destination) {
+        this.mstate = mstate.clone();
+        this.robot = robot;
+        this.destination = destination;
+
+        boolean success = preprocess();
+
+        Direction mapdirection = next();
+        Direction orientation = robot.getCurrentOrientation();
+        System.out.println("Re-orientate");
+        if (orientation == Direction.UP) {
+            if (mapdirection == Direction.LEFT) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.DOWN) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (orientation == Direction.DOWN) {
+            if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.LEFT) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.UP) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (orientation == Direction.LEFT) {
+            if (mapdirection == Direction.DOWN) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.UP) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (mapdirection == Direction.UP) {
+            robot.move(RobotAction.TURN_LEFT);
+        } else if (mapdirection == Direction.DOWN) {
+            robot.move(RobotAction.TURN_RIGHT);
+        } else if (mapdirection == Direction.LEFT) {
+            robot.move(RobotAction.ABOUT_TURN);
+        }
+    }
 
     /**
      * Moves to the specified destination in robot coordinate using fastest path

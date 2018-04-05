@@ -328,6 +328,7 @@ public abstract class RobotBase {
     }
 
     public void move(RobotAction action) {
+        System.out.println(action);
         if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.SCAN || action == RobotAction.ABOUT_TURN) {
             Direction newDirection = getCurrentOrientation();
 

@@ -807,15 +807,17 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             getRobot().removeRobotActionListener(this);
             RobotBase robot = getRobot();
             CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
-            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-                System.out.println("Last:" + RobotAction.ABOUT_TURN);
-                robot.move(RobotAction.ABOUT_TURN);
-            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-                System.out.println("Last:" + RobotAction.TURN_LEFT);
-                robot.move(RobotAction.TURN_LEFT);
-            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-                System.out.println("Last:" + RobotAction.TURN_RIGHT);
-                robot.move(RobotAction.TURN_RIGHT);
+            if(!spec.isInPosition(getRobot())) {
+                if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+                    System.out.println("Last:" + RobotAction.ABOUT_TURN);
+                    robot.move(RobotAction.ABOUT_TURN);
+                } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+                    System.out.println("Last:" + RobotAction.TURN_LEFT);
+                    robot.move(RobotAction.TURN_LEFT);
+                } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+                    System.out.println("Last:" + RobotAction.TURN_RIGHT);
+                    robot.move(RobotAction.TURN_RIGHT);
+                }
             }
             robot.dispatchCalibration(spec.getCalibrationType());
             System.out.println("Last:" + spec.getCalibrationType());
