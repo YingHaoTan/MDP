@@ -428,10 +428,10 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
 
         // check explorated nodes;
-        if ((reachedTimeLimit() || reachedCoveragePercentage()) && currentState != States.COMPLETED) {
+        /*if ((reachedTimeLimit() || reachedCoveragePercentage()) && currentState != States.COMPLETED) {
             preComplete();
             return;
-        }
+        }*/
 
         if (currentState == States.BOUNDARY || currentState == States.EXITING_LOOP || currentState == States.STAIRS_PHASE_ONE || currentState ==  States.STAIRS_PHASE_TWO) {
 
