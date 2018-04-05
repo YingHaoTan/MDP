@@ -362,10 +362,24 @@ bool checkFRONT() {
 }
 
 void fwdCorrection() {
+  /*
     md.setM2Speed(-395);
     delay(pullBackDelay);
     md.setBrakes(400, 400);
     resetMCounters();
+  */
+
+  int pullDist = ((mCounter[0] - mCounter[1])*1)/2;
+  //Serial << pullDist << endl;
+  resetMCounters();
+
+  if(pullDist < 0){
+    while(mCounter[1] < abs(pullDist)){
+      md.setM2Speed(-350);
+    }
+  }
+
+  md.setBrakes(400,400);
 }
 
 
@@ -695,6 +709,15 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
+                  
+                case CAL_LEFT_CORNER:
+                  goLEFT(angleToTicks(90));
+                  calibrateCORNER();
+                  goRIGHT(angleToTicks(90));
+                  sendStatusUpdate();
+                  incrementID();
+                  alreadyReceived = false;
+                  break;
 
               }
               RingBuffer_erase( & usbBufferIn, 6);
@@ -884,7 +907,7 @@ int shortIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
 
 int longIrVal(int val, int blockThreshold, int cmThreshold, int offset) {
   int newVal = (val - offset) / 10;
-  if (val <= 18) {
+  if (val <= 17) {
     newVal = 1;
   }
 

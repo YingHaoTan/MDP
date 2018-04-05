@@ -14,6 +14,7 @@
 #define TURN_ABOUT                                 0x10
 #define CAL_ANY                                    0x11
 #define CAL_FORWARD                                0x12
+#define CAL_LEFT_CORNER                            0x13
 #define PAYLOAD_SIZE                               128 //As long as it's bigger than StatusMessage
 
 struct Message
