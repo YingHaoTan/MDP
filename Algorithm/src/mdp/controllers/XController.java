@@ -128,11 +128,14 @@ public class XController {
      * @param explorer
      */
     public void setExplorer(ExplorationBase explorer) {
-    	if(this.explorer != null)
+    	if(this.explorer != null) {
             this.explorer.removeScanCompletedListener(this::onSensorScanCompleted);
+            this.explorer.removeExplorationCompletedListener(this::onExplorationCompleted);
+        }
     	
         this.explorer = explorer;
         this.explorer.addScanCompletedListener(this::onSensorScanCompleted);
+        this.explorer.addExplorationCompletedListener(this::onExplorationCompleted);
     }
 
     /**
@@ -277,6 +280,10 @@ public class XController {
         
         // can i put explorer.reset() here? to reset the sensor filter? 
         // or i can just put the reset into the MovementBase.setMapState, because you will call that everytime you press explore
+    }
+    
+    private void onExplorationCompleted() {
+        
     }
     
     private void onSensorScanCompleted() {

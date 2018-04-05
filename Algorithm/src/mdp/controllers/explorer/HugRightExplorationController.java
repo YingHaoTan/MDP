@@ -402,7 +402,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
 
     @Override
-    public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+    public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {       
         if (actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE || actions[0] == RobotAction.CAL_JIEMING) {
             sensorsScan(prev, 1.5);
             return;
@@ -506,7 +506,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                     Point lowerRight = new Point(robotPoint.x, robotPoint.y - 1);
                     stairs = checkStairs(0, lowerRight, Direction.RIGHT);
                 }
-                if (stairs > 1) {
+                if (stairs > 1 && canMove(actionToMapDirection(RobotAction.FORWARD))) {
                     currentState = States.STAIRS_PHASE_ONE;
                     stairsToMove = stairs;
                     actionPriority[0] = RobotAction.FORWARD;
@@ -553,7 +553,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     justTurned = false;
-                    getRobot().move(RobotAction.ABOUT_TURN);
+                    // after this TURN_LEFT, in the boundary state should be a TURN_LEFT too, so it'll make an ABOUT_TURN all together
+                    getRobot().move(RobotAction.TURN_LEFT);
                     return;
                 }
             }
@@ -646,7 +647,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         getRobot().move(action);
                         return;
                     } else if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
-
                         // If Robot cannot FORWARD AND TURN_LEFT, will force to ABOUT_TURN
                         actionPriority[0] = RobotAction.TURN_RIGHT;
                         actionPriority[1] = RobotAction.FORWARD;

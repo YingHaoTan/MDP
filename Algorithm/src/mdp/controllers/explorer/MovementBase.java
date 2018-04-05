@@ -73,7 +73,7 @@ public abstract class MovementBase {
     /**
      * Scan area using sensors and updates cell states
      */
-    protected void sensorsScan(RobotBase robot, double increment) {
+    protected void sensorsScan(RobotBase robot, double multiplier) {
         
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = robot.getSensors(); //getRobot().getSensors();
@@ -87,6 +87,8 @@ public abstract class MovementBase {
                 reading = 0;
             }
 
+            double increment = multiplier * sensor.getReliability();
+            
             // If detects an obstacle
             if (reading > 0) {
                 Direction sDirection = robot.getSensorDirection(sensor);
@@ -198,12 +200,12 @@ public abstract class MovementBase {
             }
         }
         
-        /*
+        
         System.out.println("========== Obstacles Counter =============");
         printGrid(obstaclesCounter);
         System.out.println("========== No Obstacles Counter =============");
         printGrid(noObstaclesCounter);
-        */
+        
 
         for(Runnable listener: this.scanlisteners)
         	listener.run();
