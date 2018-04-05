@@ -393,7 +393,7 @@ public class MapState {
     public int countUnexplored(){
         int unexploredCount = 0;
         for(int x = 0; x < cellstates.length; x++){
-            for(int y = 0; y < cellstates.length; y++){
+            for(int y = 0; y < cellstates[0].length; y++){
                 if(cellstates[x][y] == CellState.UNEXPLORED){
                     unexploredCount++;
                 }
@@ -405,7 +405,7 @@ public class MapState {
     public int countObstacles(){
         int obstaclesCount = 0;
         for(int x = 0; x < cellstates.length; x++){
-            for(int y = 0; y < cellstates.length; y++){
+            for(int y = 0; y < cellstates[0].length; y++){
                 if(cellstates[x][y] == CellState.OBSTACLE){
                     obstaclesCount++;
                 }
