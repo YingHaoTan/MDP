@@ -67,12 +67,12 @@ void goFORWARD(int distance) {
         i++;
         lastTime = micros();
       }
-    }
-    lastTime = millis();
-    delay(50);*/
+      }
+      lastTime = millis();
+      delay(50);*/
 
     md.setSpeeds(setSpdR, setSpdL);
-    lastTime = millis(); 
+    lastTime = millis();
 
     if (distance <= 1500) {
       while (mCounter[0] < distance && mCounter[1] < distance) {
@@ -82,8 +82,8 @@ void goFORWARD(int distance) {
           }
           PIDControl(&setSpdR, &setSpdL, 40, 0, 40, 0); //By block 40, 0, 80, 0
           lastTime = millis();
-          setSpdR = setSpdR-1;
-          setSpdL = setSpdL +1;
+          setSpdR = setSpdR - 1;
+          setSpdL = setSpdL + 1;
           md.setSpeeds(setSpdR, setSpdL);
 
         }
@@ -93,23 +93,23 @@ void goFORWARD(int distance) {
       //    while ((mCounter[0] < distance - 445 && mCounter[1] < distance - 445) && ((irFrontReadings[0] > breakDist) || (irFrontReadings[1] > breakDist) || (irFrontReadings[2] > breakDist))){
       while (mCounter[0] < distance && mCounter[1] < distance) {
         if ((irFrontReadings[0] < (breakDist + 20)) || (irFrontReadings[1] < breakDist) || (irFrontReadings[2] < (breakDist + 20))) {
-//          mCounter[0] =  distance - 445;
-//          mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
+          //          mCounter[0] =  distance - 445;
+          //          mCounter[1] =  distance - 445;                                 //Ends the forward movement and prevents the deleration in belows code
           break;
         }
         scanFORWARD(&irFrontReadings[0]);
         if (millis() - lastTime > 100) {
           PIDControl(&setSpdR, &setSpdL, 20, 0, 40, 0); //Current for 6.20-6.22 Long distance 30, 5, 60 prev
           lastTime = millis();
-          setSpdR = setSpdR-1;
-          setSpdL = setSpdL +1;
+          setSpdR = setSpdR - 1;
+          setSpdL = setSpdL + 1;
           md.setSpeeds(setSpdR, setSpdL);
         }
       }
       /*
-      i = 0;
-      lastTime = micros();
-      while (mCounter[0] < distance && mCounter[1] < distance) {
+        i = 0;
+        lastTime = micros();
+        while (mCounter[0] < distance && mCounter[1] < distance) {
         if (micros() - lastTime > 50) {
           md.setSpeeds(setSpdR - i, setSpdL - i);
           i++;
@@ -117,7 +117,7 @@ void goFORWARD(int distance) {
             i = 100;
           lastTime = micros();
         }
-      }*/
+        }*/
     }
 
     md.setBrakes(400, 400);
@@ -222,9 +222,9 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
     }
 
   }
-//  //  }
-//  Serial << "Adjustment: " << adjustment <<endl;
-//  Serial << "error: " << error << " total error: " << totalErrors << " errorRate: " << errorRate << endl ;
+  //  //  }
+  //  Serial << "Adjustment: " << adjustment <<endl;
+  //  Serial << "error: " << error << " total error: " << totalErrors << " errorRate: " << errorRate << endl ;
 }
 
 void calibrateRIGHT() {
@@ -351,7 +351,7 @@ void calibrateRIGHTV2() {
 }
 
 bool checkFRONT() {
- int moveTicks = 0;
+  int moveTicks = 0;
   if (rfwdIrVal.distance() < 110 || lfwdIrVal.distance() < 110 || mfwdIrVal.distance() < 100) {
     md.setBrakes(400, 400);
     return true;
@@ -362,32 +362,32 @@ bool checkFRONT() {
 void fwdCorrection() {
   static int fwdCounter = 0;
   //int pullDist = ((mCounter[0] - mCounter[1])*1)/1 + (offsetOrientation*2);
-  int pullDist = ((mCounter[0] - mCounter[1])*1)/1;
+  int pullDist = ((mCounter[0] - mCounter[1]) * 1) / 1;
   resetMCounters();
 
   scanRIGHT(&irRightReadings[0]);
 
-  
-  if(fwdCounter == 3){
-    if(pullDist > 0){
-      while(mCounter[0] < abs(pullDist)){         //Right motor pull back
+
+  if (fwdCounter == 3) {
+    if (pullDist > 0) {
+      while (mCounter[0] < abs(pullDist)) {       //Right motor pull back
         md.setM1Speed(-350);
       }
     }
 
     //if(pullDist < 0){
-      //while(mCounter[1] < abs(pullDist)){         //Left motor pull back
-        //md.setM2Speed(-350);
-      //}
+    //while(mCounter[1] < abs(pullDist)){         //Left motor pull back
+    //md.setM2Speed(-350);
+    //}
     //}
 
     fwdCounter = 0;
-  }  
+  }
   fwdCounter++;
 
-  md.setBrakes(400,400);
-  
-  
+  md.setBrakes(400, 400);
+
+
 }
 
 
@@ -512,14 +512,14 @@ void calibrateOffset(int cycle, int flag) {
 
   switch (flag) {
     case 0:
-      turnLeftTicks = turnLeftTicks + ((offset / cycle)/2);
+      turnLeftTicks = turnLeftTicks + ((offset / cycle) / 2);
       break;
     case 1:
-      turnRightTicks = turnRightTicks - ((offset / cycle)/2);
+      turnRightTicks = turnRightTicks - ((offset / cycle) / 2);
       break;
 
     case 2:
-      aboutTurnOffset = aboutTurnOffset + ((offset / cycle)/2);
+      aboutTurnOffset = aboutTurnOffset + ((offset / cycle) / 2);
       break;
   }
 
@@ -630,6 +630,23 @@ void commWithRPI() {
                   mvmtCounter[0]++;
                   delay(RPIExpDelay);
                   fwdCorrection();
+
+                  //Calibration Right After Movement
+//                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+//                    calibrateRIGHT();
+//                  }
+//
+//                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+//                    delay(100);
+//                    goRIGHT(angleToTicks(90));
+//                    delay(100);
+//                    calibrateFRONT();
+//                    delay(100);
+//                    goLEFT(angleToTicks(90));
+//                    delay(100);
+//                    calibrateRIGHT();
+//                  }
+//                  delay(RPIExpDelay);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
@@ -650,19 +667,19 @@ void commWithRPI() {
                 case CAL_SIDE:
                   if (calCounter >= CalPeriod) {
                     if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
-                      calibrateRIGHT(); 
+                      calibrateRIGHT();
                     }
 
-                    if ((irRightReadings[0] <= 90 || irRightReadings[0] >= 120) && (irRightReadings[1] <= 90 || irRightReadings[1] >= 120)) {
-                        delay(100);
-                        goRIGHT(angleToTicks(90));
-                        delay(100);
-                        calibrateFRONT();
-                        delay(100);
-                        goLEFT(angleToTicks(90));
-                        delay(100);
-                        calibrateRIGHT();
-                      }
+                    if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+                      delay(100);
+                      goRIGHT(angleToTicks(90));
+                      delay(100);
+                      calibrateFRONT();
+                      delay(100);
+                      goLEFT(angleToTicks(90));
+                      delay(100);
+                      calibrateRIGHT();
+                    }
                     calCounter = 0;
                   }
                   delay(RPIExpDelay);
@@ -717,7 +734,7 @@ void commWithRPI() {
                   incrementID();
                   alreadyReceived = false;
                   break;
-                  
+
                 case CAL_LEFT_CORNER:
                   goLEFT(angleToTicks(90));
                   calibrateCORNER();
@@ -767,9 +784,9 @@ void commWithRPI() {
                         break;
                       }
                     }
-//                    Serial.println("****fwdcount***");
-//                    Serial.println(forwardCount);
-//                    Serial.println("********");
+                    //                    Serial.println("****fwdcount***");
+                    //                    Serial.println(forwardCount);
+                    //                    Serial.println("********");
                     goFORWARD(blockToTicks(forwardCount));
                     delay(RPIFPDelay);
                     break;
