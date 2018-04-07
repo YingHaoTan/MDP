@@ -388,5 +388,40 @@ public class MapState {
 
         return mstate;
     }
+    
+    
+    public int countUnexplored(){
+        int unexploredCount = 0;
+        for(int x = 0; x < cellstates.length; x++){
+            for(int y = 0; y < cellstates[0].length; y++){
+                if(cellstates[x][y] == CellState.UNEXPLORED){
+                    unexploredCount++;
+                }
+            }
+        }
+        return unexploredCount;
+    }
+    
+    public int countObstacles(){
+        int obstaclesCount = 0;
+        for(int x = 0; x < cellstates.length; x++){
+            for(int y = 0; y < cellstates[0].length; y++){
+                if(cellstates[x][y] == CellState.OBSTACLE){
+                    obstaclesCount++;
+                }
+            }
+        }
+        return obstaclesCount;  
+    }
+    
+    public void setUnexploredAsExplored(){
+        for(int x = 0; x < cellstates.length; x++){
+            for(int y = 0; y < cellstates.length; y++){
+                if(cellstates[x][y] == CellState.UNEXPLORED){
+                    cellstates[x][y] = CellState.NORMAL;
+                }
+            }
+        }
+    }
 
 }

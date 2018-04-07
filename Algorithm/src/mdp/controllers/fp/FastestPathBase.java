@@ -163,7 +163,6 @@ public abstract class FastestPathBase implements RobotActionListener {
     	if(!completed) {
 	        robot.removeRobotActionListener(this);
 	        if (faststream) {
-                    
 	            System.out.println("Fastest path stream completed. Will calibrate now..");
 	            RobotBase robot = getRobot();
 	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
@@ -184,8 +183,6 @@ public abstract class FastestPathBase implements RobotActionListener {
 	        for (FastestPathCompletedListener listener : listeners) {
 	            listener.onFastestPathCompleted();
 	        }
-	        
-	        
     	}
     }
     

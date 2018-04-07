@@ -288,6 +288,22 @@ public class XController {
         if (robot != null && planner != null) {
             planner.orientate(mstate, robot, mstate.getEndPoint());
         }
+        
+        int obstaclesDeficit = 30 - mstate.countObstacles();
+        int unexplored = mstate.countUnexplored();
+        
+        if(obstaclesDeficit * 10 < unexplored * 2){
+            mstate.setUnexploredAsExplored();
+            // safe to put all as explored
+            
+        }
+        // if not, then leave it as it is
+        
+        
+        
+        if(communication)
+    		sendAndroidUpdate(new AndroidUpdate(androidTranslator.sendArena(mstate.toString(MapDescriptorFormat.MDF1), mstate.toString(MapDescriptorFormat.MDF2))));
+        
     }
     
     private void onSensorScanCompleted() {
