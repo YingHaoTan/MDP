@@ -47,7 +47,7 @@ public class MDPTCPConnector {
     Queue<AndroidUpdate> outgoingAndroidQueue;
 
     public MDPTCPConnector(Queue<ArduinoMessage> outgoingArduinoQueue, Queue<AndroidUpdate> outgoingAndroidQueue) throws UnknownHostException, IOException {
-        this.clientSocket = new Socket("192.168.6.6", 5000);
+        this.clientSocket = new Socket("", 5000);
         this.arduinoUpdateListeners = new ArrayList<>();
         this.androidInstructionListeners = new ArrayList<>();
         this.outgoingSemaphore = new Semaphore(0);

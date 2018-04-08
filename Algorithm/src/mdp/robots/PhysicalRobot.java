@@ -73,7 +73,7 @@ public class PhysicalRobot extends RobotBase {
         initializing = true;
 
         // Tells TCP to send START command
-        sendArduinoMessage(new ArduinoInstruction(RobotAction.START, false));
+        sendArduinoMessage(new ArduinoInstruction(RobotAction.START, null));
 
         // Block until initialization completes
         while (initializing);
@@ -98,7 +98,7 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
+    protected void dispatchMovement(Direction mapdirection, RobotAction calibration, RobotAction... actions) {
         synchronized (commandqueue) {
             commandqueue.add(new Command(Arrays.asList(mapdirection), Arrays.asList(actions), false));
         }
@@ -113,7 +113,7 @@ public class PhysicalRobot extends RobotBase {
 
         for (RobotAction action : actions) {
             //System.out.println("In Physical Robot: " + action);
-            sendArduinoMessage(new ArduinoInstruction(action, false));
+            sendArduinoMessage(new ArduinoInstruction(action, calibration));
         }
 
         // Update supposed robot location
@@ -136,7 +136,7 @@ public class PhysicalRobot extends RobotBase {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
         //System.out.println("Calibration Data: " + action);
-        sendArduinoMessage(new ArduinoInstruction(action, false));
+        sendArduinoMessage(new ArduinoInstruction(action, null));
     }
 
     @Override
@@ -183,7 +183,7 @@ public class PhysicalRobot extends RobotBase {
     public void stop() {
         // Send stop message
         System.out.println("Exploration completed");
-        sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, false));
+        sendArduinoMessage(new ArduinoInstruction(RobotAction.STOP, null));
     }
 
     private synchronized void sendArduinoMessage(ArduinoMessage message) {

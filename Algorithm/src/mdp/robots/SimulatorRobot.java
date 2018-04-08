@@ -22,7 +22,7 @@ import mdp.models.SensorConfiguration;
  * @author Ying Hao
  */
 public class SimulatorRobot extends RobotBase {
-	private MapState simulationMapState;
+    private MapState simulationMapState;
     private Queue<NotifyTask> taskqueue;
     private long delay;
 
@@ -86,7 +86,7 @@ public class SimulatorRobot extends RobotBase {
     }
 
     @Override
-    protected void dispatchMovement(Direction mapdirection, RobotAction... actions) {
+    protected void dispatchMovement(Direction mapdirection, RobotAction calibration, RobotAction... actions) {
         
         
     	MapState mstate = this.getMapState();
@@ -101,10 +101,12 @@ public class SimulatorRobot extends RobotBase {
         } else if (mapdirection == Direction.RIGHT) {
             mstate.setRobotPoint(new Point(location.x + 1, location.y));
         }
-
-        //for (RobotAction action : actions) {
-        //    System.out.println("In Simulator Robot: " + action);
-        //}
+        
+        
+        System.out.println("Calibration:" + calibration);
+        for (RobotAction action : actions) {
+            System.out.println("In Simulator Robot: " + action);
+        }
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);

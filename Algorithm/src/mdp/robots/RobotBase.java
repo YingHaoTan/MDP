@@ -397,14 +397,15 @@ public abstract class RobotBase {
         for (CalibrationSpecification spec : this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
             if (spec.isInPosition(this)) {
-                System.out.println("Sending : " + spec.getCalibrationType());
-                dispatchCalibration(spec.getCalibrationType());
-                break;
+                //System.out.println("Sending : " + spec.getCalibrationType());
+                dispatchMovement(mapdirection, spec.getCalibrationType(), actions);
+                //dispatchCalibration(spec.getCalibrationType());
+                return;
             }
 
         }
 
-        dispatchMovement(mapdirection, actions);
+        dispatchMovement(mapdirection, null, actions);
     }
 
     /*
@@ -490,7 +491,7 @@ public abstract class RobotBase {
      * @param direction
      * @param actions
      */
-    protected abstract void dispatchMovement(Direction direction, RobotAction... actions);
+    protected abstract void dispatchMovement(Direction direction, RobotAction calibration, RobotAction... actions);
 
     /**
      * Dispatches a calibration hint
