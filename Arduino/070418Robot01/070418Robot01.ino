@@ -440,6 +440,49 @@ void calibrateFRONTV2() {
   }
 }
 
+void calibrateFRONTV3(int arrangement) {
+  int zTicks = 0;
+  scanFORWARD(&irFrontReadings[0]);
+
+  int turnTicks = 0;
+  while (abs(target1 - target2) > 4 && abs(target1 - target2) < 70 ) {
+    resetMCounters();
+    
+    if (arrangement == 3) {
+      target1 = irFrontReadings[1] + 10;
+      target2 = irFrontReadings[2];
+    }
+    else if (arrangement == 5) {
+      target1 = irFrontReadings[0];
+      target2 = irFrontReadings[2];
+    }
+    else if (arrangement == 6) {
+      target1 = irFrontReadings[0];
+      target2 = irFrontReadings[1] + 10;
+    }
+
+    
+    turnTicks = (target1 - target2) * 2;
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(200, -200);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-200, 200);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanFORWARD(&irFrontReadings[0]);
+    zTicks += turnTicks;
+  }
+  if (mvmtCounter[0] != 0 && forwardOffsetCounter > 0) {
+    ticksToMove = ticksToMove + (kTicks * zTicks / mvmtCounter[0]);
+  }
+}
+
 void calibrationPhase1() {
 
   calibrateCORNER();
@@ -632,21 +675,21 @@ void commWithRPI() {
                   fwdCorrection();
 
                   //Calibration Right After Movement
-//                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
-//                    calibrateRIGHT();
-//                  }
-//
-//                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
-//                    delay(100);
-//                    goRIGHT(angleToTicks(90));
-//                    delay(100);
-//                    calibrateFRONT();
-//                    delay(100);
-//                    goLEFT(angleToTicks(90));
-//                    delay(100);
-//                    calibrateRIGHT();
-//                  }
-//                  delay(RPIExpDelay);
+                  //                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+                  //                    calibrateRIGHT();
+                  //                  }
+                  //
+                  //                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+                  //                    delay(100);
+                  //                    goRIGHT(angleToTicks(90));
+                  //                    delay(100);
+                  //                    calibrateFRONT();
+                  //                    delay(100);
+                  //                    goLEFT(angleToTicks(90));
+                  //                    delay(100);
+                  //                    calibrateRIGHT();
+                  //                  }
+                  //                  delay(RPIExpDelay);
                   calCounter++;
                   sendStatusUpdate();
                   incrementID();
