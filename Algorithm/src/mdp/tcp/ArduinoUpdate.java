@@ -18,7 +18,7 @@ public class ArduinoUpdate extends StatusMessage{
     private byte right1;
     private byte right2;
     private byte left1;
-    private byte reached;
+    private byte calibrated;
 
     public ArduinoUpdate(byte[] received) {
         super(StatusMessageType.ARDUINO_UPDATE);
@@ -30,7 +30,7 @@ public class ArduinoUpdate extends StatusMessage{
         right1 = (byte) Character.getNumericValue(received[5]);
         right2 = (byte) Character.getNumericValue(received[6]);
         left1 = (byte) Character.getNumericValue(received[7]);
-        reached = (byte) Character.getNumericValue(received[8]);
+        calibrated = (byte) Character.getNumericValue(received[8]);
     }
 
     @Override
@@ -66,8 +66,8 @@ public class ArduinoUpdate extends StatusMessage{
         return left1;
     }
 
-    public byte getReached() {
-        return reached;
+    public byte getCalibrated() {
+        return calibrated;
     }
 
     

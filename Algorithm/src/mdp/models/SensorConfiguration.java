@@ -15,6 +15,12 @@ public class SensorConfiguration {
     private int mindistance;
     private int maxdistance;
     private double reliability;
+    private double weightedReliability;
+    
+    public enum Weight{
+        NORMAL, CALIBRATED;
+    }
+    
 
     public SensorConfiguration(Direction direction, int coordinate, int mindistance, int maxdistance, double reliability) {
         this.direction = direction;
@@ -22,6 +28,7 @@ public class SensorConfiguration {
         this.mindistance = mindistance;
         this.maxdistance = maxdistance;
         this.reliability = reliability;
+        this.weightedReliability = reliability;
     }
 
     /**
@@ -63,6 +70,21 @@ public class SensorConfiguration {
      */
     public double getReliability() {
         return reliability;
+    }
+    
+    public void setWeight(Weight weight){
+        switch(weight){
+            case NORMAL:
+                weightedReliability = reliability;
+                break;
+            case CALIBRATED:
+                weightedReliability = reliability * 1.5;
+                break;
+        }
+    }
+    
+    public double getWeightedReliability(){
+        return weightedReliability;
     }
 
 }

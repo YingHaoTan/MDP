@@ -73,7 +73,7 @@ public abstract class MovementBase {
     /**
      * Scan area using sensors and updates cell states
      */
-    protected void sensorsScan(RobotBase robot, double multiplier) {
+    protected void sensorsScan(RobotBase robot) {
         
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = robot.getSensors(); //getRobot().getSensors();
@@ -87,7 +87,7 @@ public abstract class MovementBase {
                 reading = 0;
             }
 
-            double increment = multiplier * sensor.getReliability();
+            double increment = sensor.getWeightedReliability();
             
             // If detects an obstacle
             if (reading > 0) {

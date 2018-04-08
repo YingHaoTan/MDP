@@ -203,10 +203,17 @@ public class PhysicalRobot extends RobotBase {
         int right1 = (int) (arduinoUpdate.getRight1());
         int right2 = (int) (arduinoUpdate.getRight2());
         int left1 = (int) (arduinoUpdate.getLeft1());
+        boolean calibrated = (arduinoUpdate.getCalibrated() == 0x00) ? false : true;
 
         // Can this be optimized, or less hardcoded?
         List<SensorConfiguration> sensors = this.getSensors();
         for (SensorConfiguration sensor : sensors) {
+            if(calibrated){
+                sensor.setWeight(SensorConfiguration.Weight.CALIBRATED);
+            }
+            else{
+                sensor.setWeight(SensorConfiguration.Weight.NORMAL);
+            }
             switch (sensor.getDirection()) {
                 case UP:
                     switch (sensor.getCoordinate()) {

@@ -68,7 +68,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     public void explore(RobotBase robot, int percentage, double timelimit) {
         super.explore(robot, percentage, timelimit);
         robot.addRobotActionListener(this);
-        sensorsScan(getRobot(), 1);
+        sensorsScan(getRobot());
 
         currentState = States.BOUNDARY;
         unexploredPoints = new ArrayList<Point>();
@@ -404,7 +404,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {       
         if (actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE || actions[0] == RobotAction.CAL_JIEMING) {
-            sensorsScan(prev, 1.5);
+            sensorsScan(prev);
             return;
         }
         prev = getRobot().clone();
@@ -413,7 +413,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
 
         // Update internal map state
-        sensorsScan(getRobot(), 1);
+        sensorsScan(getRobot());
 
         if (getMapState().getRobotPoint().equals(getMapState().getEndPoint())){
             reachedGoal = true;
