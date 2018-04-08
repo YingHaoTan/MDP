@@ -476,10 +476,6 @@ void calibrateFRONTV3(int arrangement) {
     md.setBrakes(400, 400);
     delay(100);
     scanFORWARD(&irFrontReadings[0]);
-    zTicks += turnTicks;
-  }
-  if (mvmtCounter[0] != 0 && forwardOffsetCounter > 0) {
-    ticksToMove = ticksToMove + (kTicks * zTicks / mvmtCounter[0]);
   }
 }
 
