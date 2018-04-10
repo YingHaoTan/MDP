@@ -31,8 +31,8 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-  //    calibrationPhase1();
-  //    calibrationPhase1();
+  calibrationPhase1();
+  calibrationPhase1();
   delay(2000);
 }
 
@@ -149,7 +149,7 @@ void goLEFT(int angle) {
   resetMCounters();
 
   md.setSpeeds(setSpdR, setSpdL);
-  delay(50);
+  //  delay(50);
 
   while (mCounter[0] < angle - turnLeftTicks - 200 && mCounter[1] < angle - turnLeftTicks - 200) {
     if (millis() - lastTime > 100) {
@@ -201,9 +201,9 @@ void PIDControl(int *setSpdR, int *setSpdL, int kP, int kI, int kD, int dr) {
       *setSpdL = 400;
     }
   }
-//  Serial << "Adjustment: " << adjustment << endl;
-//  Serial << "error: " << error << " total error: " << totalErrors << " errorRate: " << errorRate << endl ;
-//  Serial << "Right Speed: " << *setSpdR << " Left Speed: " << *setSpdL << endl;
+  Serial << "Adjustment: " << adjustment << endl;
+  Serial << "error: " << error << " total error: " << totalErrors << " errorRate: " << errorRate << endl ;
+  Serial << "Right Speed: " << *setSpdR << " Left Speed: " << *setSpdL << endl;
 }
 
 void calibrateRIGHT() {
@@ -412,7 +412,7 @@ void calibrateFRONTV2() {
     scanFORWARD(&irFrontReadings[0]);
     //Serial.println("irfrontreadings[0] V2");
     //Serial.println(irFrontReadings[0]);
-    zTicks += turnTicks;
+    //    zTicks += turnTicks;
   }
   //  if (mvmtCounter[0] != 0 && forwardOffsetCounter > 0) {
   //    ticksToMove = ticksToMove + ((kTicks * zTicks / mvmtCounter[0]) / 2);
@@ -716,7 +716,7 @@ void commWithRPI() {
                   alreadyReceived = false;
                   break;
 
-                case CAL_SIDE:{
+                case CAL_SIDE:
                   if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
                     calibrateRIGHT();
                   }
