@@ -440,6 +440,48 @@ void calibrateFRONTV2() {
   }
 }
 
+void calibrateFRONTV3(int arrangement) {
+  int zTicks = 0;
+  scanFORWARD(&irFrontReadings[0]);
+
+  int turnTicks = 0;
+  int target1 = 0;
+  int target2 = 0;
+  do {
+    
+    resetMCounters();
+    
+    if (arrangement == 3) {
+      target1 = irFrontReadings[1] + 10;
+      target2 = irFrontReadings[2];
+    }
+    else if (arrangement == 5) {
+      target1 = irFrontReadings[0];
+      target2 = irFrontReadings[2];
+    }
+    else if (arrangement == 6) {
+      target1 = irFrontReadings[0];
+      target2 = irFrontReadings[1] + 10;
+    }
+
+    
+    turnTicks = (target1 - target2) * 2;
+    if (turnTicks > 0) {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(200, -200);
+      }
+    }
+    else {
+      while (mCounter[0] < abs(turnTicks) && mCounter[1] < abs(turnTicks)) {
+        md.setSpeeds(-200, 200);
+      }
+    }
+    md.setBrakes(400, 400);
+    delay(100);
+    scanFORWARD(&irFrontReadings[0]);
+  } while (abs(target1 - target2) > 4 && abs(target1 - target2) < 70 );
+}
+
 void calibrationPhase1() {
 
   calibrateCORNER();
@@ -606,10 +648,9 @@ void commWithRPI() {
 
               alreadyReceived = true;
               yetToReceiveAck = false;
-              bool calibrated  = false;
-
-              
-              switch (instructMsg.calibrateFirst){
+			  bool calibrated  = false;
+			  
+			  switch (instructMsg.calibrateFirst){
                 case CAL_CORNER:
                   calibrateCORNER();
                   mvmtCounter[0] = 0;
@@ -639,7 +680,7 @@ void commWithRPI() {
                   }
                   break;
               }
-              
+			  
               switch (instructMsg.action) {
                 case TURN_LEFT:
                   goLEFT(angleToTicks(90));
@@ -666,21 +707,21 @@ void commWithRPI() {
                   fwdCorrection();
 
                   //Calibration Right After Movement
-//                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
-//                    calibrateRIGHT();
-//                  }
-//
-//                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
-//                    delay(100);
-//                    goRIGHT(angleToTicks(90));
-//                    delay(100);
-//                    calibrateFRONT();
-//                    delay(100);
-//                    goLEFT(angleToTicks(90));
-//                    delay(100);
-//                    calibrateRIGHT();
-//                  }
-//                  delay(RPIExpDelay);
+                  //                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+                  //                    calibrateRIGHT();
+                  //                  }
+                  //
+                  //                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+                  //                    delay(100);
+                  //                    goRIGHT(angleToTicks(90));
+                  //                    delay(100);
+                  //                    calibrateFRONT();
+                  //                    delay(100);
+                  //                    goLEFT(angleToTicks(90));
+                  //                    delay(100);
+                  //                    calibrateRIGHT();
+                  //                  }
+                  //                  delay(RPIExpDelay);
                   calCounter++;
                   sendStatusUpdate(calibrated);
                   incrementID();
@@ -703,7 +744,6 @@ void commWithRPI() {
                   if (calCounter >= CalPeriod) {
                     if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
                       calibrateRIGHT();
-                      calibrated = true;
                     }
 
                     if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
@@ -715,12 +755,11 @@ void commWithRPI() {
                       goLEFT(angleToTicks(90));
                       delay(100);
                       calibrateRIGHT();
-                      calibrated = true;
                     }
                     calCounter = 0;
                   }
                   delay(RPIExpDelay);
-				  calibrated = true;
+                  calibrated = true;
                   sendStatusUpdate(calibrated);
                   incrementID();
                   alreadyReceived = false;
@@ -1028,7 +1067,6 @@ void sendStatusUpdate(bool calibrated) {
   else{
     statusPayload.calibrated = 0;
   }
-  
 
   // Crafts message to send
   Message msg;
