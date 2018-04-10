@@ -87,7 +87,7 @@ int commands[] =
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
-//                {4,8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
+//                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
 //                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
