@@ -103,10 +103,10 @@ public class SimulatorRobot extends RobotBase {
         }
         
         
-        System.out.println("Calibration:" + calibration);
-        for (RobotAction action : actions) {
+        //System.out.println("Calibration:" + calibration);
+        /*for (RobotAction action : actions) {
             System.out.println("In Simulator Robot: " + action);
-        }
+        }*/
 
         NotifyTask task = new NotifyTask(mapdirection, actions);
         taskqueue.offer(task);

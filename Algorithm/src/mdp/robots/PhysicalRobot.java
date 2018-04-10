@@ -178,6 +178,7 @@ public class PhysicalRobot extends RobotBase {
         sendArduinoMessage(new ArduinoStream(actions));
         Point rpoint = mstate.getRobotPoint();
         sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
+        System.out.println("After stream:"+rpoint);
     }
 
     public void stop() {

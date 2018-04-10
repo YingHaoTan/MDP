@@ -255,6 +255,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     }
     
     
+    
 
     /**
      * Returns true if specified robotPoint does not have any obstacles and have
@@ -513,7 +514,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                    return;
                }
                
-               System.out.println("indefLoopCounter:" + indefLoopCounter);
+               //System.out.println("indefLoopCounter:" + indefLoopCounter);
             }
 
             if (currentState == States.LOOPING) {
@@ -596,8 +597,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
 
             // Don't do round 2
-            System.out.println("Coverage");
-            System.out.println(getCurrentCoveragePercentage());
+            //System.out.println("Coverage : " + getCurrentCoveragePercentage());
             if(getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 60){
             //if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
                 currentState = States.COMPLETED;
@@ -608,7 +608,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
             if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
             //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
-                System.out.println(getCurrentCoveragePercentage());
+                //System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
                 //currentState = States.COMPLETED;
                 //complete();
@@ -629,30 +629,44 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         } else {
                             justTurned = false;
                         }
-                        // Stream actions?
-                        /*
+                        // Stream forwards
+                        
                         if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
                             int forwardNo = 1;
                             Point newLocation = nextLocation(getRobot().getCurrentOrientation());
-                            while(true){
+                            boolean stopFlag = false;
+                            while(!stopFlag){
                                 for(RobotAction lookAheadAction : actionPriority){
-                                    if(lookAheadAction == RobotAction.FORWARD && canMove(getRobot().getCurrentOrientation(), newLocation)){
-                                        forwardNo++;
-                                    }
-                                    else{
+                                    if(canMove(actionToMapDirection(lookAheadAction), newLocation)){
+                                        if(lookAheadAction != RobotAction.FORWARD){
+                                            stopFlag = true;
+                                            break;
+                                        }
+                                        newLocation = nextLocation(getRobot().getCurrentOrientation(), newLocation);
+                                        if(beenBefore(newLocation)){
+                                            forwardNo++;
+                                            break;
+                                        }
+                                        else{
+                                            stopFlag = true;
+                                            break;
+                                        }
+                                    } else if(lookAheadAction == RobotAction.FORWARD){
+                                        stopFlag = true;
                                         break;
                                     }
                                 }
-                                break;
+                                
                             }
-                            ArrayList<Direction> forwards = new ArrayList<Direction>();
-                            for(int forward = 0; forward < forwardNo; forward++){
-                                forwards.add(getRobot().getCurrentOrientation());
+                            if(forwardNo > 1){     
+                                ArrayList<Direction> forwards = new ArrayList<Direction>();
+                                for(int forward = 0; forward < forwardNo; forward++){
+                                    forwards.add(getRobot().getCurrentOrientation());
+                                }
+                                getRobot().moveStream(forwards, false);
+                                return;
                             }
-                            getRobot().moveStream(forwards, false);
-                            return;
-                            
-                        }*/
+                        }
                         /*
                         if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
                             boolean lookaheadFlag = true;
@@ -868,18 +882,18 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
             if(!spec.isInPosition(getRobot())) {
                 if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
-                    System.out.println("Last:" + RobotAction.ABOUT_TURN);
+                    //System.out.println("Last:" + RobotAction.ABOUT_TURN);
                     robot.move(RobotAction.ABOUT_TURN);
                 } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
-                    System.out.println("Last:" + RobotAction.TURN_LEFT);
+                    //System.out.println("Last:" + RobotAction.TURN_LEFT);
                     robot.move(RobotAction.TURN_LEFT);
                 } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
-                    System.out.println("Last:" + RobotAction.TURN_RIGHT);
+                    //System.out.println("Last:" + RobotAction.TURN_RIGHT);
                     robot.move(RobotAction.TURN_RIGHT);
                 }
             }
             robot.dispatchCalibration(spec.getCalibrationType());
-            System.out.println("Last:" + spec.getCalibrationType());
+            //System.out.println("Last:" + spec.getCalibrationType());
             getRobot().stop();
             super.complete();
             stopped = true;

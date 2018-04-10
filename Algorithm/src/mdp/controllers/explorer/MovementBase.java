@@ -70,6 +70,23 @@ public abstract class MovementBase {
     	this.scanlisteners.remove(listener);
     }
     
+    
+    protected boolean beenBefore(Point robotPoint){
+        
+        if(robotPoint.x >= 0 && robotPoint.x <= 12 && robotPoint.y >= 0 && robotPoint.y <= 17){
+            List<Point> points = getMapState().convertRobotPointToMapPoints(robotPoint);
+            boolean beenBefore = true;
+            for(Point point: points){
+                // upper limit
+                if(noObstaclesCounter[point.x][point.y] < 99){
+                    beenBefore = false;
+                }
+            }
+            return beenBefore;
+        }
+        return false;
+    }
+    
     /**
      * Scan area using sensors and updates cell states
      */

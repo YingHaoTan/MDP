@@ -313,7 +313,7 @@ public class XController {
 
     private void handleAndroidInstruction(AndroidInstruction instruction) {
         // Handle android instruction
-        System.out.println("Android instruction received: " + instruction.getMessage());
+        //System.out.println("Android instruction received: " + instruction.getMessage());
         //androidTranslator.sendArena(mstate.toString(MapDescriptorFormat.MDF1), mstate.toString(MapDescriptorFormat.MDF2));
 
         JSONObject jsonObj = new JSONObject(instruction.getMessage());
