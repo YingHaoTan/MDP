@@ -121,8 +121,12 @@ public class SimulatorRobot extends RobotBase {
 	}
 
     @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove) {
-        System.out.println("Starting fastest path");
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, RobotAction calibration, boolean discardLastMove) {
+        if(calibration != null){
+            System.out.println(calibration);
+        }
+        
+        System.out.println("Streaming");
         for (int i = 0; i < actions.size(); i++) {
             System.out.println(actions.get(i));
         }

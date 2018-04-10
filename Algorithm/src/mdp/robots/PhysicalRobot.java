@@ -140,9 +140,9 @@ public class PhysicalRobot extends RobotBase {
     }
 
     @Override
-    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, boolean discardLastMove) {
+    protected void moveRobotStream(List<RobotAction> actions, List<Direction> orientations, RobotAction calibration, boolean discardLastMove) {
 
-        System.out.println("Starting fastest path");
+        System.out.println("Streaming");
         for (int i = 0; i < actions.size(); i++) {
             System.out.println(actions.get(i));
         }
@@ -175,7 +175,7 @@ public class PhysicalRobot extends RobotBase {
         
         printStreamIntoTestString(actions);
 
-        sendArduinoMessage(new ArduinoStream(actions));
+        sendArduinoMessage(new ArduinoStream(actions, calibration));
         Point rpoint = mstate.getRobotPoint();
         sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
         System.out.println("After stream:"+rpoint);
