@@ -710,7 +710,6 @@ void commWithRPI() {
                     calibrateRIGHT();
                   }
                   calibrateFRONTV3();
-                  delay(RPIExpDelay);
                   calibrated = true;
                   mvmtCounter[0] = 0;
                   break;
@@ -872,13 +871,65 @@ void commWithRPI() {
           // may not matter
           RingBuffer_get(&usbBufferIn, &streamMsg.id, 2);
           RingBuffer_get(&usbBufferIn, &payloadSize, 3);
+          RingBuffer_get(&usbBufferIn, &streamMsg.calibrateFirst, 4);
 
           uint8_t tmpInBuffer;
-          if (4 + payloadSize <= usbBufferIn.count) {
-            if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 4 + payloadSize) == true && tmpInBuffer == '!') {
+          if (5 + payloadSize <= usbBufferIn.count) {
+            if (RingBuffer_get(&usbBufferIn, &tmpInBuffer, 5 + payloadSize) == true && tmpInBuffer == '!') {
+              bool calibrated = false;
+              switch (streamMsg.calibrateFirst) {
+                case CAL_CORNER:
+                  calibrateCORNER();
+                  calibrated = true;
+                  break;
+                case CAL_SIDE:
+                  if (calCounter >= CalPeriod) {
+                    if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+                      calibrateRIGHT();
+                      calibrated = true;
+                    }
+
+                    if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+                      delay(100);
+                      goRIGHT(angleToTicks(90));
+                      delay(100);
+                      calibrateFRONT();
+                      delay(100);
+                      goLEFT(angleToTicks(90));
+                      delay(100);
+                      calibrateRIGHT();
+                      calibrated = true;
+                    }
+                  }
+                  break;
+
+                case CAL_FORWARD:
+                  calibrateFRONTV3();
+                  calibrated = true;
+                  break;
+
+                case CAL_SIDE_FORWARD:
+                  if (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+                    calibrateRIGHT();
+                  }
+
+                  if ((irRightReadings[0] <= 90 && irRightReadings[1] <= 90) || (irRightReadings[0] >= 120 && irRightReadings[1] >= 120)) {
+                    delay(100);
+                    goRIGHT(angleToTicks(90));
+                    delay(100);
+                    calibrateFRONT();
+                    delay(100);
+                    goLEFT(angleToTicks(90));
+                    delay(100);
+                    calibrateRIGHT();
+                  }
+                  calibrateFRONTV3();
+                  break;
+              }
+
               uint8_t tmpPayload[payloadSize] = {0};
               for (int i = 0; i < payloadSize; i++) {
-                RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 4 + i);
+                RingBuffer_get(&usbBufferIn, &(tmpPayload[i]), 5 + i);
               }
               memcpy(streamMsg.streamActions, &tmpPayload, payloadSize);
 
@@ -898,9 +949,6 @@ void commWithRPI() {
                         break;
                       }
                     }
-                    //                    Serial.println("****fwdcount***");
-                    //                    Serial.println(forwardCount);
-                    //                    Serial.println("********");
                     goFORWARD(blockToTicks(forwardCount));
                     delay(RPIFPDelay);
                     break;
@@ -921,10 +969,10 @@ void commWithRPI() {
                     break;
                 }
               }
-              sendStatusUpdate(false);
+              sendStatusUpdate(calibrated);
               incrementID();
               alreadyReceived = false;
-              RingBuffer_erase(&usbBufferIn, payloadSize + 5);
+              RingBuffer_erase(&usbBufferIn, payloadSize + 6);
             }
           }
         }

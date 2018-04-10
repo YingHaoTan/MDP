@@ -123,7 +123,8 @@ public abstract class FastestPathBase implements RobotActionListener {
                     streamDirections.add(direction);
                 }
                 if(streamDirections.size() > 0)
-                    robot.moveStream(streamDirections, discardLastMove);
+                    // don't need to cal
+                    robot.moveStream(streamDirections, discardLastMove, false);
                 else
                     complete();
             } else {

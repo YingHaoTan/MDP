@@ -46,6 +46,7 @@ struct InstructionMessage
 struct StreamMessage
 {
   uint8_t id;
+  uint8_t calibrateFirst;
   uint8_t streamActions[PAYLOAD_SIZE]; //in case theres a lot of actions..
 };
 
