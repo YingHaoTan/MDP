@@ -31,9 +31,8 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-//    calibrationPhase1();
-//    calibrationPhase1();
-  // calibrateFRONTV3();
+    calibrationPhase1();
+    calibrationPhase1();
   goRIGHT(angleToTicks(90));
   delay(2000);
 }
