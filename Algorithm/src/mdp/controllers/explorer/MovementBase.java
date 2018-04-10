@@ -31,6 +31,9 @@ public abstract class MovementBase {
     // need to worry about reset too
     private double[][] obstaclesCounter;
     private double[][] noObstaclesCounter;
+    
+    // this is in robot points
+    private boolean[][] travelled; 
     private boolean obstacleChangedFlag = false;
     
     
@@ -71,18 +74,23 @@ public abstract class MovementBase {
     }
     
     
-    protected boolean beenBefore(Point robotPoint){
-        
-        if(robotPoint.x >= 0 && robotPoint.x <= 12 && robotPoint.y >= 0 && robotPoint.y <= 17){
+    protected boolean canStream(Point robotPoint){
+        if(robotPoint.x >= 0 && robotPoint.x <= mstate.getRobotSystemDimension().width && robotPoint.y >= 0 && robotPoint.y <= mstate.getRobotSystemDimension().height){
+            
             List<Point> points = getMapState().convertRobotPointToMapPoints(robotPoint);
-            boolean beenBefore = true;
+            boolean safe = true;
             for(Point point: points){
-                // upper limit
-                if(noObstaclesCounter[point.x][point.y] < 99){
-                    beenBefore = false;
+                // +2 cause front sensors range is two
+                if(noObstaclesCounter[point.x][point.y] <= obstaclesCounter[point.x][point.y] + 2){
+                    safe = false;
                 }
             }
-            return beenBefore;
+            /*System.out.println("========== Obstacles Counter =============");
+            printGrid(obstaclesCounter);
+            System.out.println("========== No Obstacles Counter =============");
+            printGrid(noObstaclesCounter);*/
+            return travelled[robotPoint.x][robotPoint.y] || safe;
+            //return canStream;
         }
         return false;
     }
@@ -255,8 +263,10 @@ public abstract class MovementBase {
         this.mstate = mstate;
         this.noObstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height];
         this.obstaclesCounter = new double[mstate.getMapSystemDimension().width][mstate.getMapSystemDimension().height]; 
+        this.travelled = new boolean[mstate.getRobotSystemDimension().width][mstate.getRobotSystemDimension().height];
         setNoObstacleUpperLimit(mstate.convertRobotPointToMapPoints(mstate.getStartPoint()));
         setNoObstacleUpperLimit(mstate.convertRobotPointToMapPoints(mstate.getEndPoint()));
+        travelled(mstate.getStartPoint());
     }
     
     /**
@@ -297,7 +307,6 @@ public abstract class MovementBase {
         }
     
     }
-
     
     // Checks obstaclesCounter and noObstaclesCounter, to determine it's an obstacle or not
     private boolean isThereAnObstacle(Point point) {
@@ -342,6 +351,12 @@ public abstract class MovementBase {
         }
         return false;
         
+    }
+    
+    
+    // set robot point as travelled
+    protected void travelled(Point robotPoint){
+        this.travelled[robotPoint.x][robotPoint.y] = true;
     }
     
     private void printGrid(double[][] grid){

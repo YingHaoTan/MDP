@@ -455,6 +455,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
         //System.out.println("Robot action completed: " + actions[0]);
         this.setNoObstacleUpperLimit(getMapState().convertRobotPointToMapPoints(getRobot().getMapState().getRobotPoint()));
+        this.travelled(getRobot().getMapState().getRobotPoint());
 
         // Update internal map state
         sensorsScan(getRobot());
@@ -650,7 +651,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                             break;
                                         }
                                         newLocation = nextLocation(getRobot().getCurrentOrientation(), newLocation);
-                                        if(beenBefore(newLocation)){
+                                        if(canStream(newLocation)){
                                             forwardNo++;
                                             break;
                                         }
