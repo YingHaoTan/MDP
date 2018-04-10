@@ -178,6 +178,21 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return true;
     }
+    
+    private boolean canMove(Direction direction, Point currentPoint) {
+        // Checks cell state;
+        CellState state = CellState.NORMAL;
+        List<Point> points = getMapState().convertRobotPointToMapPoints(nextLocation(direction, currentPoint));
+
+        for (Point p : points) {
+            CellState pstate = getCellState(p);
+
+            if (pstate == null || pstate == CellState.OBSTACLE) {// || pstate == CellState.UNEXPLORED){
+                return false;
+            }
+        }
+        return true;
+    }
 
     // Returns false if points has unexplored or obstacle
     private boolean canMoveStream(Point robotPoint) {
@@ -219,6 +234,27 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
         }
         return newPoint;
     }
+    
+    private Point nextLocation(Direction direction, Point currentPoint) {
+        Point newPoint = new Point(currentPoint.x, currentPoint.y);
+        switch (direction) {
+            case UP:
+                newPoint.y += 1;
+                break;
+            case DOWN:
+                newPoint.y -= 1;
+                break;
+            case LEFT:
+                newPoint.x -= 1;
+                break;
+            case RIGHT:
+                newPoint.x += 1;
+                break;
+        }
+        return newPoint;
+    }
+    
+    
 
     /**
      * Returns true if specified robotPoint does not have any obstacles and have
@@ -595,7 +631,30 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                         // Stream actions?
                         /*
-                        if(action == RobotAction.FORWARD){
+                        if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
+                            int forwardNo = 1;
+                            Point newLocation = nextLocation(getRobot().getCurrentOrientation());
+                            while(true){
+                                for(RobotAction lookAheadAction : actionPriority){
+                                    if(lookAheadAction == RobotAction.FORWARD && canMove(getRobot().getCurrentOrientation(), newLocation)){
+                                        forwardNo++;
+                                    }
+                                    else{
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            ArrayList<Direction> forwards = new ArrayList<Direction>();
+                            for(int forward = 0; forward < forwardNo; forward++){
+                                forwards.add(getRobot().getCurrentOrientation());
+                            }
+                            getRobot().moveStream(forwards, false);
+                            return;
+                            
+                        }*/
+                        /*
+                        if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
                             boolean lookaheadFlag = true;
                             int forwardNo = 1;
                             Point newLocation = nextLocation(getRobot().getCurrentOrientation());
