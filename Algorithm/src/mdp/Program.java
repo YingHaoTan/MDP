@@ -85,6 +85,92 @@ public class Program {
         		this.put(right2, 1);
         	}
         });
+        
+        CalibrationSpecification forward_side_spec_1 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front3, 1);
+        	}
+        });
+        
+        CalibrationSpecification forward_side_spec_2 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front2, 1);
+        	}
+        });
+        
+        CalibrationSpecification forward_side_spec_3 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front2, 1);
+                        this.put(front3, 1);
+        	}
+        });
+        CalibrationSpecification forward_side_spec_4 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front1, 1);
+        	}
+        });
+        CalibrationSpecification forward_side_spec_5 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front1, 1);
+                        this.put(front3, 1);
+        	}
+        });
+        CalibrationSpecification forward_side_spec_6 = new CalibrationSpecification(RobotAction.CAL_ANY, new HashMap<SensorConfiguration, Integer>() {
+        	{
+                        this.put(right1, 1);
+        		this.put(right2, 1);
+        		this.put(front1, 1);
+                        this.put(front2, 1);
+        	}
+        });
+        
+        CalibrationSpecification forward_spec_1 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front3, 1);
+        	}
+        });
+        
+        CalibrationSpecification forward_spec_2 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front2, 1);
+        	}
+        });
+        
+        CalibrationSpecification forward_spec_3 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front2, 1);
+                        this.put(front3, 1);
+        	}
+        });
+        CalibrationSpecification forward_spec_4 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front1, 1);
+        	}
+        });
+        CalibrationSpecification forward_spec_5 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front1, 1);
+                        this.put(front3, 1);
+        	}
+        });
+        CalibrationSpecification forward_spec_6 = new CalibrationSpecification(RobotAction.CAL_FORWARD, new HashMap<SensorConfiguration, Integer>() {
+        	{
+        		this.put(front1, 1);
+                        this.put(front2, 1);
+        	}
+        });
+                
+        
         /*CalibrationSpecification jieming_spec_1 = new CalibrationSpecification(RobotAction.CAL_JIEMING, new HashMap<SensorConfiguration, Integer>() {
         	{
         		this.put(right1, 2);
@@ -114,7 +200,19 @@ public class Program {
         srobot.install(left1);      
         
         srobot.addCalibrationSpecification(corner_spec);
+        srobot.addCalibrationSpecification(forward_side_spec_1);
+        srobot.addCalibrationSpecification(forward_side_spec_2);
+        srobot.addCalibrationSpecification(forward_side_spec_3);
+        srobot.addCalibrationSpecification(forward_side_spec_4);
+        srobot.addCalibrationSpecification(forward_side_spec_5);
+        srobot.addCalibrationSpecification(forward_side_spec_6);
         srobot.addCalibrationSpecification(side_spec);
+        srobot.addCalibrationSpecification(forward_spec_1);
+        srobot.addCalibrationSpecification(forward_spec_2);
+        srobot.addCalibrationSpecification(forward_spec_3);
+        srobot.addCalibrationSpecification(forward_spec_4);
+        srobot.addCalibrationSpecification(forward_spec_5);
+        srobot.addCalibrationSpecification(forward_spec_6);
         //srobot.addCalibrationSpecification(jieming_spec_1);
         //srobot.addCalibrationSpecification(jieming_spec_2);
         //srobot.addCalibrationSpecification(jieming_spec_3);
@@ -138,7 +236,19 @@ public class Program {
 	        probot.install(left1);    
 	        
 	        probot.addCalibrationSpecification(corner_spec);
+                probot.addCalibrationSpecification(forward_side_spec_1);
+                probot.addCalibrationSpecification(forward_side_spec_2);
+                probot.addCalibrationSpecification(forward_side_spec_3);
+                probot.addCalibrationSpecification(forward_side_spec_4);
+                probot.addCalibrationSpecification(forward_side_spec_5);
+                probot.addCalibrationSpecification(forward_side_spec_6);
 	        probot.addCalibrationSpecification(side_spec);
+                probot.addCalibrationSpecification(forward_spec_1);
+                probot.addCalibrationSpecification(forward_spec_2);
+                probot.addCalibrationSpecification(forward_spec_3);
+                probot.addCalibrationSpecification(forward_spec_4);
+                probot.addCalibrationSpecification(forward_spec_5);
+                probot.addCalibrationSpecification(forward_spec_6);
 	        //probot.addCalibrationSpecification(jieming_spec_1);
 	        //probot.addCalibrationSpecification(jieming_spec_2);
                 //probot.addCalibrationSpecification(jieming_spec_3);
