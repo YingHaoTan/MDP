@@ -48,10 +48,25 @@ public class BasicPathSpecification implements PathSpecification {
 
 	@Override
 	public double calculatePathCost(MapState mstate, State cstate, State nstate) {
+		double cost = 0;
+		
 		if(nstate.getOrientation() == cstate.getOrientation())
-			return 1.0;
+			cost = 1.0;
 		else
-			return 3.0;
+			cost = 3.0;
+		
+		Point coord = nstate.getLocation();
+		CellState[] nearbyStates = {
+				mstate.getMapCellState(new Point(coord.x, coord.y + 1)),
+				mstate.getMapCellState(new Point(coord.x, coord.y - 1)),
+				mstate.getMapCellState(new Point(coord.x + 1, coord.y)),
+				mstate.getMapCellState(new Point(coord.x - 1, coord.y))
+				};
+		for(CellState state: nearbyStates)
+			if(state == null || state == CellState.OBSTACLE)
+				cost = cost + 0.5;
+		
+		return cost;
 	}
 
 	@Override
