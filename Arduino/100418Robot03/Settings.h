@@ -83,7 +83,7 @@ int commands[] =
 //                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
-                //{1,1,1,1,1,1,1,1};                //Forward movement, block by block
+//                {1,1,1,1,1,1,1,1,7,8,8,5};                //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
@@ -92,7 +92,7 @@ int commands[] =
                 //----------Step 3: Check calibrations (10 mins)
 //                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
                 //{6,7,1,1,1};                  //Calibrate corner
-                //{9,1,1,1};                    //Calibrate with any blocks
+//                {1,9,1,1,9,1,1};                    //Calibrate with any blocks
                 
                 //----------Step X: Specific movement patterns
                 //{3,1,3,1,3,1,3,1,1,1,1};      //Loop movement (When algorithm gets stuck)
