@@ -46,6 +46,7 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
     int stairsPhase1Counter;
     int stairsPhase2Counter;
     int stairsToMove;
+    int streamCount = 0;
     //int justTurnedCounter;
     boolean justTurned;
     boolean stopped;
@@ -440,10 +441,16 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     @Override
     public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {       
-        if (actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE || actions[0] == RobotAction.CAL_JIEMING) {
+    	if(streamCount > 1) {
+    		streamCount--;
+    		return;
+    	}
+    	else if (actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE || actions[0] == RobotAction.CAL_JIEMING) {
             sensorsScan(prev);
             return;
         }
+    	
+    	streamCount = 0;
         prev = getRobot().clone();
 
         //System.out.println("Robot action completed: " + actions[0]);
@@ -658,7 +665,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                 }
                                 
                             }
-                            if(forwardNo > 1){     
+                            if(forwardNo > 1){
+                            	streamCount = forwardNo;
                                 ArrayList<Direction> forwards = new ArrayList<Direction>();
                                 for(int forward = 0; forward < forwardNo; forward++){
                                     forwards.add(getRobot().getCurrentOrientation());

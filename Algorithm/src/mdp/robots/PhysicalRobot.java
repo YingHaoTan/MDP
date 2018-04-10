@@ -205,6 +205,13 @@ public class PhysicalRobot extends RobotBase {
         int right2 = (int) (arduinoUpdate.getRight2());
         int left1 = (int) (arduinoUpdate.getLeft1());
         boolean calibrated = (arduinoUpdate.getCalibrated() == 0x00) ? false : true;
+        
+        System.out.println(front1);
+        System.out.println(front2);
+        System.out.println(front3);
+        System.out.println(right1);
+        System.out.println(right2);
+        System.out.println(left1);
 
         // Can this be optimized, or less hardcoded?
         List<SensorConfiguration> sensors = this.getSensors();
@@ -274,6 +281,10 @@ public class PhysicalRobot extends RobotBase {
             if (command != null) {
 
                 if (command.stream) {
+                	synchronized (commandqueue) {
+                        commandqueue.poll();
+                    }
+                	
                     int orientationIndex = 0;
 
                     for (int i = 0; i < command.actions.size(); i++) {

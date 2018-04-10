@@ -91,7 +91,6 @@ public abstract class MovementBase {
      * Scan area using sensors and updates cell states
      */
     protected void sensorsScan(RobotBase robot) {
-        
         Map<SensorConfiguration, Integer> readings = getRobot().getSensorReading();
         List<SensorConfiguration> sensors = robot.getSensors(); //getRobot().getSensors();
 
