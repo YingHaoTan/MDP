@@ -1,12 +1,12 @@
 MDP things to tune:
 1) Multiplier for fwdcorrection (check left and right fwdcorrection, and check mark's 10th move correction)
-2) RPICommDelay original(20)
+2) RPICommDelay original(20) D 
 3)
 
 
 
 MDP Things to add?:
 1) SAME PLACE 4 times and same direction, escape
-2) CAL_SIDE do internally?
-3) After CAL then do fast stream back
-4) Pack CAL into a ARDUINO_INSTRUCTION message
+2) CAL_SIDE do internally? D 
+3) After CAL then do fast stream back D 
+4) Pack CAL into a ARDUINO_INSTRUCTION message D
