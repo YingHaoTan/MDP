@@ -663,8 +663,12 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                 for (int forward = 0; forward < forwardNo; forward++) {
                                     forwards.add(getRobot().getCurrentOrientation());
                                 }
-                                getRobot().moveStream(forwards, false, true);
-                                return;
+                                
+                                if(getRobot().moveStream(forwards, false, true)){
+                                    return;
+                                }
+                                // if doesn't calibrate, just move forward one step
+                                streamCount = 0;
                             }
                         }
                         /*

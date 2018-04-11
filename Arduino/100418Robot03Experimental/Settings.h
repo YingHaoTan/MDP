@@ -17,7 +17,7 @@
 #define lfwdIrOS -40 //Left forward IR prev:-40
 #define rfwdIrOS -40 //Right forward IR prev:-40
 #define frgtIrOS -40 //Front right IR
-#define flftIrOS -5 //Front left IR.  The only long range IR.
+#define flftIrOS 0 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
 
 #define shrtmodel 1080
@@ -110,7 +110,7 @@ SharpIR rfwdIrVal(rfwdIrPin, shrtmodel, 0.0345, 0.090);
 //SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0366, 0.068);
 SharpIR frgtIrVal(frgtIrPin, shrtmodel, 0.0370, 0.068);
 SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.165);
-//SharpIR flftIrVal(flftIrPin, longmodel, 0.0150, 0.245);
+//SharpIR flftIrVal(flftIrPin, longmodel, 0.0145, 0.300);
 SharpIR brgtIrVal(brgtIrPin, shrtmodel, 0.0345, 0.081);
 
 //Battery 1 (Strong Battery, max charge)
