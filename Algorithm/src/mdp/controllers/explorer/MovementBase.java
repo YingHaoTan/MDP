@@ -84,7 +84,7 @@ public abstract class MovementBase {
             // are you really that confident that the area has no obstacles?
             for(Point point: points){
                 // +2 cause front sensors range is two
-                if(noObstaclesCounter[point.x][point.y] <= obstaclesCounter[point.x][point.y] + 2){
+                if(noObstaclesCounter[point.x][point.y] <= obstaclesCounter[point.x][point.y] + 1.5){
                     safe = false;
                 }
             }

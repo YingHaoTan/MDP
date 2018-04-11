@@ -6,6 +6,7 @@
 package mdp.tcp;
 
 import mdp.models.RobotAction;
+import mdp.tcp.ArduinoMessage;
 
 /**
  *

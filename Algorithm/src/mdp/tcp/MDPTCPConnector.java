@@ -150,8 +150,8 @@ public class MDPTCPConnector {
                                 break;
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
-                                System.out.println("Receiving: " + arduinoUpdate.getId());
-                                System.out.println("Expected ID: " + nextExpectedID);
+                                //System.out.println("Receiving: " + arduinoUpdate.getId());
+                                //System.out.println("Expected ID: " + nextExpectedID);
                                 if (arduinoUpdate.getId() == nextExpectedID && !getSentStop()) {
                                     yetToReceiveAck = false;
                                     
@@ -236,7 +236,7 @@ public class MDPTCPConnector {
                     	if((arduinoMessage = outgoingArduinoQueue.poll()) != null) {
 	                        // Raspberry Pi need to check byte [0], then sends byte [1] to [3] with ~ and ! to Arduino
                     		arduinoMessage.setID(currentID);
-	                        System.out.println("Sending: " + currentID + " " + arduinoMessage.getMessageAction());
+	                        //System.out.println("Sending: " + currentID + " " + arduinoMessage.getMessageAction());
 	                        
 	                        outToServer.writeBytes(new String(arduinoMessage.toBytes()) + "~");
 	                        yetToReceiveAck = true;
