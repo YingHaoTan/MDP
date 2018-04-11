@@ -17,7 +17,7 @@
 #define lfwdIrOS -40 //Left forward IR prev:-40
 #define rfwdIrOS -40 //Right forward IR prev:-40
 #define frgtIrOS -40 //Front right IR
-#define flftIrOS -5 //Front left IR.  The only long range IR.
+#define flftIrOS -3 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
 
 #define shrtmodel 1080
@@ -31,7 +31,7 @@
 //#define aboutTurnOffset 5
 //#define forwardOffsetTicks 120
 
-#define forwardOffsetTicks 130
+#define forwardOffsetTicks 120
 #define pullBackDelay 13
 
 int turnLeftTicks = 18;
@@ -77,10 +77,10 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
 int commands[] = 
-//                {0};                            //Set to commWithRPI mode
+                {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
-                {5};                          //IR Sensors, full scan
+                //{5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
 //                {1,1,1,1,1,1,1,1,7,8,8,5};                //Forward movement, block by block
@@ -93,7 +93,6 @@ int commands[] =
 //                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
                 //{6,7,1,1,1};                  //Calibrate corner
 //                {1,9,1,1,9,1,1};                    //Calibrate with any blocks
-                
                 //----------Step X: Specific movement patterns
                 //{3,1,3,1,3,1,3,1,1,1,1};      //Loop movement (When algorithm gets stuck)
                 //{1,1,1,1,1,1,3,1,3,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1}; //Snake movement
