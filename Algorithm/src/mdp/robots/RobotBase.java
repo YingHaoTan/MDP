@@ -282,7 +282,7 @@ public abstract class RobotBase {
         setCurrentOrientation(mapdirection);
     }
 
-    public void moveStream(ArrayList<Direction> streamDirections, boolean discardLastMove, boolean calibrateFirst) {
+    public boolean moveStream(ArrayList<Direction> streamDirections, boolean discardLastMove, boolean calibrateFirst) {
         RobotAction calibration = null;
         if(calibrateFirst){
             for (CalibrationSpecification spec : this.getCalibrationSpecifications()) {
@@ -290,7 +290,10 @@ public abstract class RobotBase {
                     calibration = spec.getCalibrationType();
                     break;
                 }
-
+            }
+            // if cannot calibrate, return false
+            if(calibration == null){
+                return false;
             }
         }
         List<RobotAction> actionsequence = new ArrayList<>();
@@ -335,6 +338,7 @@ public abstract class RobotBase {
             setCurrentOrientation(mapdirection);
         }
         moveRobotStream(actionsequence, orientations, calibration, discardLastMove);
+        return true;
     }
 
     public void move(RobotAction action) {

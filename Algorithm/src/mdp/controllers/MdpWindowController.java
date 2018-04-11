@@ -310,7 +310,7 @@ public class MdpWindowController implements CoordinateInputListener, MouseClickL
 		Point rlocation = mstate.getRobotPoint();
 
 		if(mapdirection != null){
-                        System.out.println("From WindowController: " + mapdirection);
+                        //System.out.println("From WindowController: " + mapdirection);
 			switch (mapdirection) {
 			case UP:
 				mstate.setRobotPoint(new Point(rlocation.x, rlocation.y + 1));

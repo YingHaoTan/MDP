@@ -6,6 +6,7 @@
 package mdp.tcp;
 
 import mdp.models.RobotAction;
+import mdp.tcp.ArduinoMessage;
 
 /**
  *
@@ -15,17 +16,17 @@ public class ArduinoInstruction extends ArduinoMessage{
     
     
     private RobotAction actionToTake;
-    private byte obstacleInFront;
+    private RobotAction calibration;
     
-    public ArduinoInstruction(int id, RobotAction actionToTake, boolean obstacleInFront){
+    public ArduinoInstruction(int id, RobotAction actionToTake, RobotAction calibration){
         super(id, StatusMessageType.ANDROID_INSTRUCTION);
-        this.obstacleInFront = (obstacleInFront) ? (byte)1 : (byte)0;
+        this.calibration = calibration;
         this.actionToTake = actionToTake;
     }
     
-    public ArduinoInstruction(RobotAction actionToTake, boolean obstacleInFront){
+    public ArduinoInstruction(RobotAction actionToTake, RobotAction calibration){
         super(StatusMessageType.ANDROID_INSTRUCTION);
-        this.obstacleInFront = (obstacleInFront) ? (byte)1 : (byte)0;
+        this.calibration = calibration;
         this.actionToTake = actionToTake;
     }
 
@@ -36,11 +37,14 @@ public class ArduinoInstruction extends ArduinoMessage{
         toSend[0] = StatusMessageType.ARDUINO_INSTRUCTION.getByte();
         toSend[1] = this.getID();
         toSend[2] = actionToTake.getByte();
-        toSend[3] = obstacleInFront;
+        if(calibration == null){
+            toSend[3] = 0x00;
+        }
+        else{
+            toSend[3] = calibration.getByte();
+        }
         return toSend;
     }
-    
-
     
     @Override
     public RobotAction getMessageAction(){

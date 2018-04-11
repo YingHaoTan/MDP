@@ -142,7 +142,8 @@ public class MDPTCPConnector {
                                 break;
                             case ARDUINO_UPDATE:
                                 ArduinoUpdate arduinoUpdate = new ArduinoUpdate(incoming);
-                                                        
+                                                   
+                                
                                 System.out.println("front1:" + (int) arduinoUpdate.getFront1());
                                 System.out.println("front2:" + (int) arduinoUpdate.getFront2());
                                 System.out.println("front3:" + (int) arduinoUpdate.getFront3());
@@ -235,25 +236,25 @@ public class MDPTCPConnector {
                     
                     switch(input){
                         case 1:
-                            ins = new ArduinoInstruction(RobotAction.FORWARD, true);
+                            ins = new ArduinoInstruction(RobotAction.FORWARD, null);
                             break;
                         case 2:
-                            ins = new ArduinoInstruction(RobotAction.TURN_LEFT, true);
+                            ins = new ArduinoInstruction(RobotAction.TURN_LEFT, null);
                             break;
                         case 3:
-                            ins = new ArduinoInstruction(RobotAction.TURN_RIGHT, true);
+                            ins = new ArduinoInstruction(RobotAction.TURN_RIGHT, null);
                             break;
                         case 4:
-                            ins = new ArduinoInstruction(RobotAction.ABOUT_TURN, true);
+                            ins = new ArduinoInstruction(RobotAction.ABOUT_TURN, null);
                             break;
                         case 5:
-                            ins = new ArduinoInstruction(RobotAction.CAL_SIDE, true);
+                            ins = new ArduinoInstruction(RobotAction.CAL_SIDE, null);
                             break;
                         case 6:
-                            ins = new ArduinoInstruction(RobotAction.CAL_CORNER, true);
+                            ins = new ArduinoInstruction(RobotAction.CAL_CORNER, null);
                             break;
                         case 7:
-                            ins = new ArduinoInstruction(RobotAction.CAL_JIEMING, true);
+                            ins = new ArduinoInstruction(RobotAction.CAL_JIEMING, null);
                             break;
                         case 8:
                             
@@ -295,10 +296,10 @@ public class MDPTCPConnector {
                             for(int i = 0; i< actions.size(); i++){
                                 System.out.println(actions.get(i));
                             }
-                            ins = new ArduinoStream(actions);
+                            ins = new ArduinoStream(actions, null);
                             break;
                         case 9:
-                            ins = new ArduinoInstruction(RobotAction.SCAN, true);
+                            ins = new ArduinoInstruction(RobotAction.SCAN, null);
                             break;
                             
                     }
