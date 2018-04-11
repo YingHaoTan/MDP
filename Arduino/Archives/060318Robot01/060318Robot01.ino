@@ -30,7 +30,7 @@ void setup() {
   delay(2000);
   //Serial.println("Initializations Done");
     //goFORWARD(12);
-  //goFORWARDObst(10,0);
+  goFORWARDObst(10,100);
 
   //goFORWARD(1);
 
@@ -320,21 +320,35 @@ void goFORWARDObst(int blocks, int diag) {
   for (int count = 0; count < blocks; count++) {
     scanFORWARD(&irFrontReadings[0]);
     
-    if (irFrontReadings[1] > (0 + diag) && irFrontReadings[1] <= (10 + diag)) {
+    if (irFrontReadings[1] > (0 + diag) && irFrontReadings[1] <= (100 + diag)) {
       if (diag) {
         //insert rotate 45 degree function below
         goLEFT(45);
 
         //insert move forward 
-        goFORWARDCM(irFrontReadings[0]);
-        goRIGHT(90);
+        delay(100);
+        goFORWARD(1);
+//        goFORWARDCM(irFrontReadings[0]/10);
+goFORWARD(1);
+goFORWARD(1);
+        delay(100);
+        goRIGHT(45);
+        delay(100);
+        goFORWARD(1);
+        goFORWARD(1);
+        delay(100);
+        goRIGHT(48);
+        delay(100);
+        goFORWARD(1);
+        goFORWARD(1);
+        goFORWARD(1);
+//        delay(100);
         //move forward by some cm
-        goFORWARDCM(irFrontReadings[0]);
-        
+//        goFORWARDCM(irFrontReadings[0]/10);
+        delay(100);
         //turn 45 back
         goLEFT(45);
-        
-        count += 5;
+        count += 6;
       } else {
         Serial.println("In else");
         goLEFT(90);
