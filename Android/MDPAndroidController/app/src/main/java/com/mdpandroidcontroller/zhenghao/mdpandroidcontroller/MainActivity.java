@@ -122,9 +122,9 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
 
     private ControllerTranslator translator = null;
 
-    // hacky variable to pass checklist
-    //boolean mapChecker = false;
-    //boolean robotChecker = false;
+    // hacky variables to solve double clicking issue
+    boolean hasExplored;
+    boolean hasFastestPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +174,10 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     }
 
     private void controllerInit(){
+        //temp solution
+        hasExplored = false;
+        hasFastestPath = false;
+
         explorationButton = (ToggleButton) findViewById(R.id.explorationButton);
         explorationButton.setOnClickListener(explorationButtonListener);
         fastestPathButton = (ToggleButton) findViewById(R.id.fastestPathButton);
@@ -717,18 +721,15 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
     Button.OnClickListener goButtonListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Send manual/auto info first
-//            if (updateModeSwitch.isChecked()) {
-//                mBluetoothService.write(translator.commandUpdateAuto().getBytes());
-//            }
-//            else {
-//                mBluetoothService.write(translator.commandUpdateManual().getBytes());
-//            }
 
             if(explorationButton.isChecked()){
                 //send message to robot via bluetooth
+                if(hasExplored) return;
+                hasExplored = true;
                 mBluetoothService.write(translator.commandExplore().getBytes());
             }else if(fastestPathButton.isChecked()){
+                if(hasFastestPath) return;
+                hasFastestPath = true;
                 mBluetoothService.write(translator.commandFastestPath().getBytes());
             }else{
                 //handle error here
@@ -793,6 +794,8 @@ public class MainActivity extends AppCompatActivity implements ControlMessageHan
             maze = new Maze();
             mazeGridAdapter.updateMaze(maze);
             mazeGridAdapter.notifyDataSetChanged();
+            hasFastestPath = false;
+            hasExplored = false;
         }
     };
 
