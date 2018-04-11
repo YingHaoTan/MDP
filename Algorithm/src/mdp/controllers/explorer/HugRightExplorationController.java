@@ -595,23 +595,31 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 }
             }
 
-            // Don't do round 2
             //System.out.println("Coverage : " + getCurrentCoveragePercentage());
+            
+            
+            /*
             if (getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 60) {
                 //if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
                 currentState = States.COMPLETED;
                 complete();
                 return;
-            }
+            }*/
 
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
-            if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
+            /*if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
                 //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
                 //System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
                 //currentState = States.COMPLETED;
                 //complete();
-            } else {
+            }*/ 
+            if(getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && reachedGoal){
+                currentState = States.COMPLETED;
+                complete();
+                return;
+            }
+            else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
                     //System.out.println("========================");
@@ -643,6 +651,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                             }
                                             newLocation = nextLocation(getRobot().getCurrentOrientation(), newLocation);
                                             if (canStream(newLocation, getRobot().getCurrentOrientation())) {
+                                                
+                                                
                                                 forwardNo++;
                                                 break;
                                             } else {
@@ -671,37 +681,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                 streamCount = 0;
                             }
                         }
-                        /*
-                        if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
-                            boolean lookaheadFlag = true;
-                            int forwardNo = 1;
-                            Point newLocation = nextLocation(getRobot().getCurrentOrientation());
-                            while(lookaheadFlag){
-                                for(RobotAction lookAheadAction : actionPriority){
-                                    if(canMoveStream(newLocation)){
-                                        if(lookAheadAction != RobotAction.FORWARD){
-                                            lookaheadFlag = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if(lookaheadFlag){
-                                    // Check if to be explored is already explored
-                                    //else
-                                    
-                                        lookaheadFlag = false;
-                                        break;
-                                }
-                            }
-                            if(lookaheadFlag == true && forwardNo > 1){
-                                //stream
-                                ArrayList<RobotAction> forwards = new ArrayList<RobotAction>();
-                                for(int forward = 0; forward < forwardNo; forward++){
-                                    forwards.add(RobotAction.FORWARD);
-                                }
-                                getRobot().moveStream(streamDirections);
-                            }
-                        }*/
 
                         // If Robot cannot FORWARD
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {
