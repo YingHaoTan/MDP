@@ -31,7 +31,7 @@
 //#define aboutTurnOffset 5
 //#define forwardOffsetTicks 120
 
-#define forwardOffsetTicks 120
+#define forwardOffsetTicks 130
 #define pullBackDelay 13
 
 int turnLeftTicks = 18;
@@ -42,7 +42,7 @@ int pullBackTicks = 0;
 //#define turnRightTicks 16
 //#define aboutTurnOffset 17
 
-#define breakDist 140
+#define breakDist 130
 
 
 //---------------------Global Variables---------------------//
@@ -77,10 +77,10 @@ int mvmtCounter[] = {0, 0, 0}; //[0]forward, [1]left, [2]right
 //---------------------Functional Check---------------------//
 int commandsDelay = 300;
 int commands[] = 
-                {0};                            //Set to commWithRPI mode
+//                {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
-//                {5};                          //IR Sensors, full scan
+                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
 //                {1,1,1,1,1,1,1,1,7,8,8,5};                //Forward movement, block by block
