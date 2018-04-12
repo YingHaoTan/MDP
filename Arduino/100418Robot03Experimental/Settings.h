@@ -17,11 +17,7 @@
 #define lfwdIrOS -40 //Left forward IR prev:-40
 #define rfwdIrOS -40 //Right forward IR prev:-40
 #define frgtIrOS -40 //Front right IR
-<<<<<<< HEAD
-#define flftIrOS -3 //Front left IR.  The only long range IR.
-=======
-#define flftIrOS 0 //Front left IR.  The only long range IR.
->>>>>>> d4afa0e620a08daee51dd5d3870ceda0e25307e7
+#define flftIrOS -5 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
 
 #define shrtmodel 1080
@@ -84,17 +80,17 @@ int commands[] =
                 {0};                            //Set to commWithRPI mode
 
                 //----------Step 1: Check sensors accuracy (5 mins)
-                //{5};                          //IR Sensors, full scan
+//                {5};                          //IR Sensors, full scan
 
                 //----------Step 2: Check basic movements (10 mins)
-//                {1,1,1,1,1,1,1,1,7,8,8,5};                //Forward movement, block by block
+//                {1,1,1,1,1,1,1};                //Forward movement, block by block
                 //{2,2,2,2,2,2,2,2,1,1,1};      //Left turns
                 //{3,3,3,3,3,3,3,3,1,1,1};      //Right turns
                 //{7,7,1,1,1};                  //Left turn 180
 //                {8,15,0};                        //Forward burst movement (After the command, 8, the next number is the number of blocks)
 
                 //----------Step 3: Check calibrations (10 mins)
-//                {4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1};                    //Calibrate side
+//                {4,1,1,1,1,1,1};                    //Calibrate side
                 //{6,7,1,1,1};                  //Calibrate corner
 //                {1,9,1,1,9,1,1};                    //Calibrate with any blocks
                 //----------Step X: Specific movement patterns
