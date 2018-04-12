@@ -113,6 +113,7 @@ public class PhysicalRobot extends RobotBase {
 
         for (RobotAction action : actions) {
             //System.out.println("In Physical Robot: " + action);
+        	
             sendArduinoMessage(new ArduinoInstruction(action, calibration));
         }
 
@@ -135,7 +136,7 @@ public class PhysicalRobot extends RobotBase {
         synchronized (commandqueue) {
             commandqueue.add(new Command(null, Arrays.asList(action), false));
         }
-        //System.out.println("Calibration Data: " + action);
+        System.out.println("Calibration Data: " + action);
         sendArduinoMessage(new ArduinoInstruction(action, null));
     }
 
@@ -178,7 +179,6 @@ public class PhysicalRobot extends RobotBase {
         sendArduinoMessage(new ArduinoStream(actions, calibration));
         Point rpoint = mstate.getRobotPoint();
         sendAndroidUpdate(new AndroidUpdate(androidTranslator.robotPosition(rpoint.x, rpoint.y, getCurrentOrientation())));
-        System.out.println("After stream:"+rpoint);
     }
 
     public void stop() {

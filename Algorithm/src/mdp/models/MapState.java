@@ -414,14 +414,6 @@ public class MapState {
         return obstaclesCount;  
     }
     
-    public void setUnexploredAsExplored(){
-        for(int x = 0; x < cellstates.length; x++){
-            for(int y = 0; y < cellstates.length; y++){
-                if(cellstates[x][y] == CellState.UNEXPLORED){
-                    cellstates[x][y] = CellState.NORMAL;
-                }
-            }
-        }
-    }
+    
 
 }

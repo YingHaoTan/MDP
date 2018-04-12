@@ -342,7 +342,7 @@ public abstract class RobotBase {
     }
 
     public void move(RobotAction action) {
-        System.out.println(action);
+        
         if (action == RobotAction.TURN_LEFT || action == RobotAction.TURN_RIGHT || action == RobotAction.SCAN || action == RobotAction.ABOUT_TURN) {
             Direction newDirection = getCurrentOrientation();
 
@@ -411,14 +411,14 @@ public abstract class RobotBase {
         for (CalibrationSpecification spec : this.getCalibrationSpecifications()) {
             //System.out.println("Checking if can send calibration data: " + spec.getCalibrationType());
             if (spec.isInPosition(this)) {
-                //System.out.println("Sending : " + spec.getCalibrationType());
+                System.out.println("Calibration first:" + spec.getCalibrationType() + " Action: " + actions[0]);
                 dispatchMovement(mapdirection, spec.getCalibrationType(), actions);
                 //dispatchCalibration(spec.getCalibrationType());
                 return;
             }
 
         }
-
+        System.out.println("Action: " + actions[0]);
         dispatchMovement(mapdirection, null, actions);
     }
 

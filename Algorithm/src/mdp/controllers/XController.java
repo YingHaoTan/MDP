@@ -289,15 +289,7 @@ public class XController {
             planner.orientate(mstate, robot, mstate.getEndPoint());
         }
         
-        int obstaclesDeficit = 30 - mstate.countObstacles();
-        int unexplored = mstate.countUnexplored();
         
-        if(obstaclesDeficit * 10 < unexplored * 2){
-            mstate.setUnexploredAsExplored();
-            // safe to put all as explored
-            
-        }
-        // if not, then leave it as it is
         
         
         

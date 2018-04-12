@@ -9,8 +9,12 @@ package mdp.controllers.explorer;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.stream.DoubleStream;
+
 import mdp.controllers.explorer.CellStateUpdateListener;
 import mdp.models.CellState;
 import mdp.models.Direction;
@@ -405,6 +409,39 @@ public abstract class MovementBase {
         }
         return false;
         
+    }
+    
+    protected void clearNLowestConfidentBlocks(int n){
+    	int width = mstate.getMapSystemDimension().width;
+    	Double[] differences = new Double[mstate.getMapSystemDimension().width * mstate.getMapSystemDimension().height];  
+    	
+    	for(int x = 0; x < mstate.getMapSystemDimension().width; x++) {
+    		for(int y = 0; y < mstate.getMapSystemDimension().height; y++) {
+    			differences[y *  mstate.getMapSystemDimension().width + x] = obstaclesCounter[x][y] - noObstaclesCounter[x][y];
+    			if(differences[y *  mstate.getMapSystemDimension().width + x]<0) {
+    				differences[y *  mstate.getMapSystemDimension().width + x] = Double.MAX_VALUE;
+    			}
+    		}
+    	}
+    	
+    	for(int i = 0; i < n; i++) {
+    		OptionalDouble minValue = Arrays.stream(differences).mapToDouble((val) -> (double) val).min();
+    		if(minValue.isPresent()) {
+    			int index = Arrays.asList(differences).indexOf(minValue.getAsDouble());
+    			differences[index] = Double.MAX_VALUE;
+    			setCellState(new Point(index % width, index / width), CellState.NORMAL, null);
+    		}
+    	}
+    }
+    
+    public void setUnexploredAsExplored(){
+        for(int x = 0; x < mstate.getMapSystemDimension().width; x++){
+            for(int y = 0; y < mstate.getMapSystemDimension().height; y++){
+                if(mstate.getMapCellState(new Point(x,y)) == CellState.UNEXPLORED){
+                	setCellState(new Point(x,y), CellState.NORMAL, null);
+                }
+            }
+        }
     }
     
     

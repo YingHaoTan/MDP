@@ -762,9 +762,9 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             }
         }
 
-        if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
+        /*if (currentState == States.COMPLETED && getMapState().getRobotPoint().equals(getMapState().getStartPoint())) {
             complete();
-        }
+        }*/
     }
 
     @Override
@@ -878,8 +878,25 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 }
             }
             robot.dispatchCalibration(spec.getCalibrationType());
-            //System.out.println("Last:" + spec.getCalibrationType());
             getRobot().stop();
+            
+            int givenObstacleCount = 30;
+            
+            int obstaclesDeficit = givenObstacleCount - getMapState().countObstacles();
+            int unexplored = getMapState().countUnexplored();
+            
+            if(obstaclesDeficit * 10 < unexplored * 2){
+            	setUnexploredAsExplored();
+                // safe to put all as explored
+                
+            }
+            // if not, then leave it as it is
+            
+            
+            if(getMapState().countObstacles() - givenObstacleCount > 0) {
+            	clearNLowestConfidentBlocks(getMapState().countObstacles() - givenObstacleCount);
+            }
+            
             super.complete();
             stopped = true;
         }
