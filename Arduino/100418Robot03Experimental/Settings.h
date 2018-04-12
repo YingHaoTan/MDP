@@ -17,11 +17,7 @@
 #define lfwdIrOS -40 //Left forward IR prev:-40
 #define rfwdIrOS -40 //Right forward IR prev:-40
 #define frgtIrOS -40 //Front right IR
-<<<<<<< HEAD
-#define flftIrOS -3 //Front left IR.  The only long range IR.
-=======
-#define flftIrOS 0 //Front left IR.  The only long range IR.
->>>>>>> d4afa0e620a08daee51dd5d3870ceda0e25307e7
+#define flftIrOS -5 //Front left IR.  The only long range IR.
 #define brgtIrOS -40 //Back right IR
 
 #define shrtmodel 1080

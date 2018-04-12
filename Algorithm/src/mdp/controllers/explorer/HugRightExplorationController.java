@@ -593,7 +593,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     justTurned = false;
-                    // after this TURN_LEFT, in the boundary state should be a TURN_LEFT too, so it'll make an ABOUT_TURN all together
                     getRobot().move(RobotAction.TURN_LEFT);
                     return;
                 }
@@ -622,9 +621,6 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
             } else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
-                    //System.out.println("========================");
-                    //System.out.println("Current Point: " + getMapState().getRobotPoint() + " Current orienttion: " + getRobot().getCurrentOrientation() + " Checking if I can move " + action);
-                    //System.out.println("========================");
                     if (canMove(actionToMapDirection(action))) {
                         // Do not turn twice in a row while exploring boundary
                         if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
