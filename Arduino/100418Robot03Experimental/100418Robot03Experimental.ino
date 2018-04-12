@@ -31,9 +31,12 @@ void setup() {
 
   delay(2000);
   D Serial.println("Initializations Done");
-  calibrationPhase1();
-  calibrationPhase1();
-  delay(2000);
+  
+  if(commands[0] == 0){
+    calibrationPhase1();
+    calibrationPhase1();
+    delay(2000);
+  }
 }
 
 
@@ -72,11 +75,11 @@ void goFORWARD(int distance) {
           if (checkFRONT()) {
             break;
           }
-          PIDControl(&setSpdR, &setSpdL, 30, 0, 40, 0); //By block 40, 0, 80, 0
+          PIDControl(&setSpdR, &setSpdL, 10, 0, 35, 0); //By block 40, 0, 80, 0
           lastTime = millis();
-//          setSpdR = setSpdR;
-//          setSpdL = setSpdL;
-          md.setSpeeds(setSpdR, setSpdL-1);
+          setSpdR = setSpdR - 1;
+          setSpdL = setSpdL+1;
+          md.setSpeeds(setSpdR, setSpdL);
 
         }
       }
@@ -90,12 +93,19 @@ void goFORWARD(int distance) {
         if (millis() - lastTime > 100) {
           PIDControl(&setSpdR, &setSpdL, 20, 0, 40, 0); //Current for 6.20-6.22 Long distance 30, 5, 60 prev
           lastTime = millis();
-          setSpdR = setSpdR;
-          setSpdL = setSpdL;
+          setSpdR = setSpdR -1;
+          setSpdL = setSpdL +1;
           md.setSpeeds(setSpdR, setSpdL);
         }
       }
     }
+
+    /*
+    md.setM1Speed(0);
+    delay(1);
+    md.setM2Speed(0);
+    delay(1);
+    */
     md.setBrakes(400, 400);
     resetMCounters();
   }
@@ -214,7 +224,7 @@ void calibrateRIGHT() {
   offsetOrientation = irRightReadings[0] - irRightReadings[1];
 
   int turnTicks = 0;
-  while (abs(irRightReadings[0] - irRightReadings[1]) > 4 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
+  while (abs(irRightReadings[0] - irRightReadings[1]) > 3 && (abs(irRightReadings[0] - irRightReadings[1]) <= 70)) {
     resetMCounters();
 
     turnTicks = (irRightReadings[0] - irRightReadings[1]) * 2;
@@ -529,14 +539,14 @@ void calibrateOffset(int cycle, int flag) {
 
   switch (flag) {
     case 0:
-      turnLeftTicks = turnLeftTicks + ((offset / cycle) / 2);
+      turnLeftTicks = turnLeftTicks + ((offset / cycle) / 3 * 2);
       break;
     case 1:
-      turnRightTicks = turnRightTicks - ((offset / cycle) / 2);
+      turnRightTicks = turnRightTicks - ((offset / cycle) / 3 * 2);
       break;
 
     case 2:
-      aboutTurnOffset = aboutTurnOffset + ((offset / cycle) / 2);
+      aboutTurnOffset = aboutTurnOffset + ((offset / cycle) / 3 * 2);
       break;
   }
 
@@ -598,12 +608,12 @@ bool calibrateFirst(uint8_t calibrateFirst) {
   return calibrated;
 
 }
-/*
-void calibrateLeftBurst(){
-  if((abs(irLeftReading - prevScan) > 10) && (abs(irLeftReading - prevScan) < 20)){
-    calibrateFRONT();
-  }
-}*/
+
+//void calibrateLeftBurst(){
+//  if((abs(irLeftReading - prevScan) > 10) && (abs(irLeftReading - prevScan) < 20)){
+//    calibrateFRONT();
+//  }
+//}
 
 
 //------------Functions for IR Sensors------------//
@@ -907,7 +917,7 @@ void stringCommands() {
       Serial.println("Moving forward");
       goFORWARD(blockToTicks(1));
       mvmtCounter[0]++;
-      fwdCorrection();
+//      fwdCorrection();
       calCounter++;
       break;
 
@@ -985,7 +995,7 @@ void stringCommands() {
       }
       break;
   }
-  delay(commandsDelay);
+  delay(255);
 
   if (x <= sizeof(commands) / sizeof(int)) {
     x++;
