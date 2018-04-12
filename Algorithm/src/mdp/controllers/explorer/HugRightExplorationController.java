@@ -389,8 +389,26 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
     }
 
+    private int checkStairs(Point robotPoint, Direction orientation) {
+        if (orientation == Direction.DOWN) {
+            Point lowerRight = new Point(robotPoint.x - 1, robotPoint.y + 2);
+            return checkStairsNum(0, lowerRight, Direction.DOWN);
+        } else if (orientation == Direction.UP) {
+            Point lowerRight = new Point(robotPoint.x + 3, robotPoint.y);
+            return checkStairsNum(0, lowerRight, Direction.UP);
+        }
+        if (orientation == Direction.LEFT) {
+            Point lowerRight = new Point(robotPoint.x + 2, robotPoint.y + 3);
+            return checkStairsNum(0, lowerRight, Direction.LEFT);
+        } else if (orientation == Direction.RIGHT) {
+            Point lowerRight = new Point(robotPoint.x, robotPoint.y - 1);
+            return checkStairsNum(0, lowerRight, Direction.RIGHT);
+        }
+        return 0;
+    }
+
     // return size of stairs
-    private int checkStairs(int space, Point stairPoint, Direction orientation) {
+    private int checkStairsNum(int space, Point stairPoint, Direction orientation) {
         if (getMapState().getMapCellState(stairPoint) == CellState.OBSTACLE) {
             int temp = space;
             boolean flag = true;
@@ -419,13 +437,13 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                 // can stick to BOUNDARY
                 return 0;
             } else if (orientation == Direction.UP) {
-                return 1 + checkStairs(space + 1, new Point(stairPoint.x + 1, stairPoint.y + 1), orientation);
+                return 1 + checkStairsNum(space + 1, new Point(stairPoint.x + 1, stairPoint.y + 1), orientation);
             } else if (orientation == Direction.DOWN) {
-                return 1 + checkStairs(space + 1, new Point(stairPoint.x - 1, stairPoint.y - 1), orientation);
+                return 1 + checkStairsNum(space + 1, new Point(stairPoint.x - 1, stairPoint.y - 1), orientation);
             } else if (orientation == Direction.LEFT) {
-                return 1 + checkStairs(space + 1, new Point(stairPoint.x - 1, stairPoint.y + 1), orientation);
+                return 1 + checkStairsNum(space + 1, new Point(stairPoint.x - 1, stairPoint.y + 1), orientation);
             } else if (orientation == Direction.RIGHT) {
-                return 1 + checkStairs(space + 1, new Point(stairPoint.x + 1, stairPoint.y - 1), orientation);
+                return 1 + checkStairsNum(space + 1, new Point(stairPoint.x + 1, stairPoint.y - 1), orientation);
             }
         } else {
             return 0;
@@ -526,22 +544,8 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
 
             // Checks if you should skip stairs;
             if (currentState == States.BOUNDARY) {
-                int stairs = 0;
-                Point robotPoint = getMapState().getRobotPoint();
-                if (getRobot().getCurrentOrientation() == Direction.DOWN) {
-                    Point lowerRight = new Point(robotPoint.x - 1, robotPoint.y + 2);
-                    stairs = checkStairs(0, lowerRight, Direction.DOWN);
-                } else if (getRobot().getCurrentOrientation() == Direction.UP) {
-                    Point lowerRight = new Point(robotPoint.x + 3, robotPoint.y);
-                    stairs = checkStairs(0, lowerRight, Direction.UP);
-                }
-                if (getRobot().getCurrentOrientation() == Direction.LEFT) {
-                    Point lowerRight = new Point(robotPoint.x + 2, robotPoint.y + 3);
-                    stairs = checkStairs(0, lowerRight, Direction.LEFT);
-                } else if (getRobot().getCurrentOrientation() == Direction.RIGHT) {
-                    Point lowerRight = new Point(robotPoint.x, robotPoint.y - 1);
-                    stairs = checkStairs(0, lowerRight, Direction.RIGHT);
-                }
+                int stairs = checkStairs(getMapState().getRobotPoint(), getRobot().getCurrentOrientation());
+
                 if (stairs > 1 && canMove(actionToMapDirection(RobotAction.FORWARD))) {
                     currentState = States.STAIRS_PHASE_ONE;
                     stairsToMove = stairs;
@@ -589,34 +593,34 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                         }
                     }
                     justTurned = false;
-                    // after this TURN_LEFT, in the boundary state should be a TURN_LEFT too, so it'll make an ABOUT_TURN all together
                     getRobot().move(RobotAction.TURN_LEFT);
                     return;
                 }
             }
 
-            // Don't do round 2
             //System.out.println("Coverage : " + getCurrentCoveragePercentage());
+            /*
             if (getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 60) {
                 //if(mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() >= 95){
                 currentState = States.COMPLETED;
                 complete();
                 return;
-            }
-
+            }*/
             // To solve Zhi Jie's map where robot will go back to the Start while hugging right in a few moves, that's why this condition: "getCurrentCoveragePercentage() > 20" is added
-            if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
+            /*if ((getMapState().getRobotPoint().equals(getMapState().getStartPoint())) && ((getCurrentCoveragePercentage() < 60 && getCurrentCoveragePercentage() > 50))) {
                 //if (mapdirection != null && getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && getCurrentCoveragePercentage() < 95 && getCurrentCoveragePercentage() > 20) {
                 //System.out.println(getCurrentCoveragePercentage());
                 currentState = States.EXPLORATION;
                 //currentState = States.COMPLETED;
                 //complete();
+            }*/
+            if (getMapState().getRobotPoint().equals(getMapState().getStartPoint()) && reachedGoal) {
+                currentState = States.COMPLETED;
+                complete();
+                return;
             } else {
                 for (int i = 0; i < actionPriority.length; i++) {
                     RobotAction action = actionPriority[i];
-                    //System.out.println("========================");
-                    //System.out.println("Current Point: " + getMapState().getRobotPoint() + " Current orienttion: " + getRobot().getCurrentOrientation() + " Checking if I can move " + action);
-                    //System.out.println("========================");
                     if (canMove(actionToMapDirection(action))) {
                         // Do not turn twice in a row while exploring boundary
                         if (action == RobotAction.TURN_RIGHT || action == RobotAction.TURN_LEFT) {
@@ -643,6 +647,11 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                             }
                                             newLocation = nextLocation(getRobot().getCurrentOrientation(), newLocation);
                                             if (canStream(newLocation, getRobot().getCurrentOrientation())) {
+                                                int lookAheadStairs = checkStairs(newLocation, getRobot().getCurrentOrientation());
+                                                if(lookAheadStairs > 1){
+                                                    stopFlag = true;
+                                                    break;
+                                                }
                                                 forwardNo++;
                                                 break;
                                             } else {
@@ -663,45 +672,14 @@ public class HugRightExplorationController extends ExplorationBase implements Ro
                                 for (int forward = 0; forward < forwardNo; forward++) {
                                     forwards.add(getRobot().getCurrentOrientation());
                                 }
-                                
-                                if(getRobot().moveStream(forwards, false, true)){
+
+                                if (getRobot().moveStream(forwards, false, true)) {
                                     return;
                                 }
                                 // if doesn't calibrate, just move forward one step
                                 streamCount = 0;
                             }
                         }
-                        /*
-                        if(action == RobotAction.FORWARD && currentState == States.BOUNDARY){
-                            boolean lookaheadFlag = true;
-                            int forwardNo = 1;
-                            Point newLocation = nextLocation(getRobot().getCurrentOrientation());
-                            while(lookaheadFlag){
-                                for(RobotAction lookAheadAction : actionPriority){
-                                    if(canMoveStream(newLocation)){
-                                        if(lookAheadAction != RobotAction.FORWARD){
-                                            lookaheadFlag = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if(lookaheadFlag){
-                                    // Check if to be explored is already explored
-                                    //else
-                                    
-                                        lookaheadFlag = false;
-                                        break;
-                                }
-                            }
-                            if(lookaheadFlag == true && forwardNo > 1){
-                                //stream
-                                ArrayList<RobotAction> forwards = new ArrayList<RobotAction>();
-                                for(int forward = 0; forward < forwardNo; forward++){
-                                    forwards.add(RobotAction.FORWARD);
-                                }
-                                getRobot().moveStream(streamDirections);
-                            }
-                        }*/
 
                         // If Robot cannot FORWARD
                         if (currentState == States.EXITING_LOOP && action == RobotAction.TURN_LEFT) {

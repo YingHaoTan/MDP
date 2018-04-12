@@ -598,12 +598,12 @@ bool calibrateFirst(uint8_t calibrateFirst) {
   return calibrated;
 
 }
-
+/*
 void calibrateLeftBurst(){
   if((abs(irLeftReading - prevScan) > 10) && (abs(irLeftReading - prevScan) < 20)){
     calibrateFRONT();
   }
-}
+}*/
 
 
 //------------Functions for IR Sensors------------//
