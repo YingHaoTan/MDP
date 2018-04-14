@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="500dp"
+    android:layout_height="630dp"
+    android:layout_gravity="center"
+    android:background="@drawable/layout_border">
+
+    <TextView
+        android:id="@+id/settingsClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:text="X"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:layout_gravity="right"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/robotStartTextView"
+            android:layout_width="300dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            android:text="@string/robotStartText" />
+
+        <TextView
+            android:id="@+id/robotColTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/robotColText"
+            android:layout_below="@+id/robotStartTextView" />
+
+        <EditText
+            android:id="@+id/robotColSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/robotStartTextView"
+            android:layout_toRightOf="@+id/robotColTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/robotRowTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/robotRowText"
+            android:layout_below="@+id/robotColTextView" />
+
+        <EditText
+            android:id="@+id/robotRowSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/robotColTextView"
+            android:layout_toRightOf="@+id/robotRowTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/robotDirTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/robotDirText"
+            android:layout_below="@+id/robotRowTextView"/>
+
+        <Spinner
+            android:id="@+id/robotDirSpinner"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/robotRowTextView"
+            android:layout_toRightOf="@+id/robotDirTextView"/>
+
+        <Button
+            android:id="@+id/robotButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/robotRowTextView"
+            android:layout_alignParentEnd="true"
+            android:text="@string/send" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/waypointTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:text="@string/waypointText" />
+
+        <TextView
+            android:id="@+id/waypointColTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/waypointColText"
+            android:layout_below="@+id/waypointTextView" />
+
+        <EditText
+            android:id="@+id/waypointColSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/waypointTextView"
+            android:layout_toRightOf="@+id/waypointColTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <TextView
+            android:id="@+id/waypointRowTextView"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:text="@string/waypointRowText"
+            android:layout_below="@+id/waypointColTextView" />
+
+        <EditText
+            android:id="@+id/waypointRowSelection"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/waypointColTextView"
+            android:layout_toRightOf="@+id/waypointRowTextView"
+            android:inputType="number"
+            android:text="0"/>
+
+        <Button
+            android:id="@+id/waypointButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@+id/waypointColTextView"
+            android:layout_alignParentEnd="true"
+            android:text="@string/send" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/persistentTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:text="@string/configStringText"/>
+
+        <ToggleButton
+            android:id="@+id/persist1"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@+id/persistentTextView"
+            android:checked="true"
+            android:textOn="1"
+            android:textOff="1"/>
+
+        <ToggleButton
+            android:id="@+id/persist2"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@+id/persistentTextView"
+            android:layout_toRightOf="@+id/persist1"
+            android:textOn="2"
+            android:textOff="2"/>
+
+        <EditText
+            android:id="@+id/persistText"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@id/persistentTextView"
+            android:layout_toRightOf="@+id/persist2"/>
+
+        <Button
+            android:id="@+id/persistSaveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/persist1"
+            android:layout_toLeftOf="@id/persistSendButton"
+            android:text="save"/>
+
+        <Button
+            android:id="@+id/persistSendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/persist1"
+            android:layout_alignParentEnd="true"
+            android:text="send"/>
+
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/deleteTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:text="@string/resetStringText"/>
+
+        <TextView
+            android:id="@+id/deleteDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:layout_below="@id/deleteTextView"
+            android:text="@string/resetDescriptionText"/>
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_below="@id/deleteTextView"
+            android:layout_alignParentEnd="true"
+            android:text="reset"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

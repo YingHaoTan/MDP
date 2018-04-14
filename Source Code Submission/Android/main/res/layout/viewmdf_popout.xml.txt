@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/layout_border">
+
+    <TextView
+        android:id="@+id/mdfClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:text="X"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:layout_gravity="right"
+        android:gravity="center"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@drawable/layout_border">
+
+        <TextView
+            android:id="@+id/mdf1headerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@string/mdf1TextViewText"/>
+
+        <TextView
+            android:id="@+id/mdf1contentText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_below="@+id/mdf1headerText"/>
+
+        <TextView
+            android:id="@+id/mdf2headerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_below="@+id/mdf1contentText"
+            android:text="@string/mdf2TextViewText" />
+
+        <TextView
+            android:id="@+id/mdf2contentText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_below="@+id/mdf2headerText" />
+
+    </RelativeLayout>
+
+</LinearLayout>

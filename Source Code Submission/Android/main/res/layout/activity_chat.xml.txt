@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.mdpandroidcontroller.zhenghao.mdpandroidcontroller.ChatActivity">
+
+    <LinearLayout
+        android:id="@+id/chatReceiveField"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/chatReceivedMsg"
+            android:textSize="36sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/receivedTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/chatReceivedMsgDefaultText"
+            android:background="@drawable/text_view_border"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatSendField"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/chatSendMsg"
+            android:textSize="36sp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/sendTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            android:hint="@string/chatSendMsgDefaultText"/>
+
+        <Button
+            android:id="@+id/chatSendBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/chatSendBtn"
+            android:layout_marginLeft="48dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
