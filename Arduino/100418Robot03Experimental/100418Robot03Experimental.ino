@@ -77,7 +77,7 @@ void goFORWARD(int distance) {
           }
           PIDControl(&setSpdR, &setSpdL, 10, 0, 35, 0); //By block 40, 0, 80, 0
           lastTime = millis();
-          setSpdR = setSpdR - 1;
+          setSpdR = setSpdR - 2;
           setSpdL = setSpdL+1;
           md.setSpeeds(setSpdR, setSpdL);
 
@@ -93,7 +93,7 @@ void goFORWARD(int distance) {
         if (millis() - lastTime > 100) {
           PIDControl(&setSpdR, &setSpdL, 20, 0, 40, 0); //Current for 6.20-6.22 Long distance 30, 5, 60 prev
           lastTime = millis();
-          setSpdR = setSpdR -1;
+          setSpdR = setSpdR ;
           setSpdL = setSpdL +1;
           md.setSpeeds(setSpdR, setSpdL);
         }
