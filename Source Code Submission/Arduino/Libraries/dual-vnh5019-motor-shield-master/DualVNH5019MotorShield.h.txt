@@ -1,14 +1,14 @@
-#ifndef CustomMotorLib_h
-#define CustomMotorLib_h
+#ifndef DualVNH5019MotorShield_h
+#define DualVNH5019MotorShield_h
 
 #include <Arduino.h>
 
-class CustomMotorLib
+class DualVNH5019MotorShield
 {
   public:  
     // CONSTRUCTORS
-    CustomMotorLib(); // Default pin selection.
-    CustomMotorLib(unsigned char INA1, unsigned char INB1, unsigned char EN1DIAG1, unsigned char CS1, 
+    DualVNH5019MotorShield(); // Default pin selection.
+    DualVNH5019MotorShield(unsigned char INA1, unsigned char INB1, unsigned char EN1DIAG1, unsigned char CS1, 
                            unsigned char INA2, unsigned char INB2, unsigned char EN2DIAG2, unsigned char CS2); // User-defined pin selection. 
     
     // PUBLIC METHODS
@@ -19,6 +19,10 @@ class CustomMotorLib
     void setM1Brake(int brake); // Brake M1. 
     void setM2Brake(int brake); // Brake M2.
     void setBrakes(int m1Brake, int m2Brake); // Brake both M1 and M2.
+    unsigned int getM1CurrentMilliamps(); // Get current reading for M1. 
+    unsigned int getM2CurrentMilliamps(); // Get current reading for M2.
+    unsigned char getM1Fault(); // Get fault reading from M1.
+    unsigned char getM2Fault(); // Get fault reading from M2.
     
   private:
     unsigned char _INA1;
