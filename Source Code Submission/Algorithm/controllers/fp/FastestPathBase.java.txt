@@ -1,0 +1,262 @@
+package mdp.controllers.fp;
+
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
+import mdp.models.Direction;
+import mdp.models.MapState;
+import mdp.models.RobotAction;
+import mdp.robots.CalibrationSpecification;
+import mdp.robots.RobotActionListener;
+import mdp.robots.RobotBase;
+
+/**
+ * FastestPathBase is an abstract base class for all fastest path classes
+ *
+ * @author Ying Hao
+ */
+public abstract class FastestPathBase implements RobotActionListener {
+
+    private boolean completed;
+    private boolean faststream;
+    private boolean discardLastMove;
+    private MapState mstate;
+    private List<FastestPathCompletedListener> listeners;
+    private RobotBase robot;
+    private Point destination;
+
+    public FastestPathBase(boolean discardLastMove) {
+        this.listeners = new ArrayList<>();
+        this.discardLastMove = discardLastMove;
+    }
+
+    /**
+     * Add FastestPathCompletedListener
+     *
+     * @param listener
+     */
+    public void addFastestPathCompletedListener(FastestPathCompletedListener listener) {
+        this.listeners.add(listener);
+    }
+
+    /**
+     * Remove FastestPathCompletedListener
+     *
+     * @param listener
+     */
+    public void removeFastestPathCompletedListener(FastestPathCompletedListener listener) {
+        this.listeners.remove(listener);
+    }
+    
+    /**
+     * Orientates robot to the fastest path initial direction
+     * @return 
+     */
+    public void orientate(MapState mstate, RobotBase robot, Point destination) {
+        this.mstate = mstate.clone();
+        this.robot = robot;
+        this.destination = destination;
+
+        boolean success = preprocess();
+
+        Direction mapdirection = next();
+        Direction orientation = robot.getCurrentOrientation();
+        System.out.println("Re-orientate");
+        if (orientation == Direction.UP) {
+            if (mapdirection == Direction.LEFT) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.DOWN) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (orientation == Direction.DOWN) {
+            if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.LEFT) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.UP) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (orientation == Direction.LEFT) {
+            if (mapdirection == Direction.DOWN) {
+                robot.move(RobotAction.TURN_LEFT);
+            } else if (mapdirection == Direction.UP) {
+                robot.move(RobotAction.TURN_RIGHT);
+            } else if (mapdirection == Direction.RIGHT) {
+                robot.move(RobotAction.ABOUT_TURN);
+            }
+        } else if (mapdirection == Direction.UP) {
+            robot.move(RobotAction.TURN_LEFT);
+        } else if (mapdirection == Direction.DOWN) {
+            robot.move(RobotAction.TURN_RIGHT);
+        } else if (mapdirection == Direction.LEFT) {
+            robot.move(RobotAction.ABOUT_TURN);
+        }
+    }
+
+    /**
+     * Moves to the specified destination in robot coordinate using fastest path
+     *
+     * @param mstate
+     * @param robot
+     * @param destination
+     * @param faststream - False indicates that the FastestPathBase should wait
+     * for robot acknowledgement before issuing another command
+     */
+    public boolean move(MapState mstate, RobotBase robot, Point destination, boolean faststream) {
+        this.mstate = mstate.clone();
+        this.robot = robot;
+        this.destination = destination;
+        this.faststream = faststream;
+        this.completed = false;
+
+        boolean success = preprocess();
+
+        if (success) {
+            robot.addRobotActionListener(this);
+            if (faststream) {
+                Direction direction;
+                ArrayList<Direction> streamDirections = new ArrayList<>();
+                while ((direction = next()) != null) {
+                    streamDirections.add(direction);
+                }
+                if(streamDirections.size() > 0)
+                    // don't need to cal
+                    robot.moveStream(streamDirections, discardLastMove, false);
+                else
+                    complete();
+            } else {
+                Direction direction = next();
+                if (direction != null) {
+                    robot.move(direction);
+                } else {
+                    complete();
+                }
+            }
+        }
+
+        return success;
+    }
+
+    @Override
+    public void onRobotActionCompleted(Direction mapdirection, RobotAction[] actions) {
+        
+        if(actions[0] == RobotAction.CAL_CORNER || actions[0] == RobotAction.CAL_SIDE){
+            return;
+        }
+        
+        Direction mdirection = next();
+
+        if (mdirection != null) {
+            robot.move(mdirection);
+        } else {
+            complete();
+        }
+    }
+
+    /**
+     * Completes the fastest path by notifying listeners and removing robot
+     * action listener
+     */
+    private void complete() {
+    	if(!completed) {
+	        robot.removeRobotActionListener(this);
+	        if (faststream) {
+	            System.out.println("Fastest path stream completed. Will calibrate now..");
+	            RobotBase robot = getRobot();
+	            CalibrationSpecification spec = robot.getCalibrationSpecifications().get(0);
+	            if (spec.isInPosition(getRobot(), RobotAction.ABOUT_TURN)) {
+	                robot.move(RobotAction.ABOUT_TURN);
+	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_LEFT)) {
+	                robot.move(RobotAction.TURN_LEFT);
+	            } else if (spec.isInPosition(getRobot(), RobotAction.TURN_RIGHT)) {
+	                robot.move(RobotAction.TURN_RIGHT);
+	            }
+	            robot.dispatchCalibration(RobotAction.CAL_CORNER);//spec.getCalibrationType());
+                    
+                    
+                    //robot.move(RobotAction.CAL_FORWARD);
+                    completed = true;
+	        }
+	
+	        for (FastestPathCompletedListener listener : listeners) {
+	            listener.onFastestPathCompleted();
+	        }
+    	}
+    }
+    
+    /**
+     * Number of RobotAction needed to get this robot from its current location to destination
+     * @param mstate
+     * @param robot
+     * @param destination
+     * @return -1 if unable to go to destination, else, return the number of RobotAction needed.
+     */
+    public int numberOfMoves(MapState mstate, RobotBase robot, Point destination){
+        int moves = -1;
+        this.mstate = mstate.clone();
+        this.robot = robot;
+        this.destination = destination;
+        
+        boolean success = preprocess();
+        
+        if(success){
+            moves = 0;
+            Direction direction;
+            while ((direction = next()) != null) {
+                moves++;
+            }
+            return moves;
+        }
+        
+        return moves;
+    
+    }
+
+    /**
+     * Gets the next map direction to move into
+     *
+     * @return
+     */
+    protected abstract Direction next();
+    
+    /**
+     * Resets the policy current state
+     */
+    protected abstract void reset();
+
+    /**
+     * Performs preprocessing before starting to stream actions for robot
+     */
+    protected abstract boolean preprocess();
+
+    /**
+     * Gets the map state
+     *
+     * @return
+     */
+    protected MapState getMapState() {
+        return mstate;
+    }
+
+    /**
+     * Gets the robot
+     *
+     * @return
+     */
+    protected RobotBase getRobot() {
+        return robot;
+    }
+
+    /**
+     * Gets the destination
+     *
+     * @return
+     */
+    protected Point getDestination() {
+        return destination;
+    }
+
+}
