@@ -117,7 +117,7 @@ public class SimulatorRobot extends RobotBase {
     
     @Override
 	public void dispatchCalibration(RobotAction action) {
-            //System.out.println("Calibration Data: " + action);
+            System.out.println("Calibration Data: " + action);
 	}
 
     @Override
